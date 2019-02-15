@@ -1,0 +1,15 @@
+{
+    "name": "Photo Sphere Viewer",
+    "description": "Enables viewing of google photosphere images",
+    "type": "project",
+    "license": "AGPL",
+    "authors": [
+        {
+            "name": "Robin Windey"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^5.4"
+    }
+}

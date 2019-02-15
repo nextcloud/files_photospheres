@@ -1,0 +1,10 @@
+  #viewer {
+    width: 100vw;
+    height: calc(100vh - 50px);
+  }
+  
+  /* Fix Nexcloud-Layout, affecting the photosphere-viewer js*/
+  #viewer .psv-navbar, #viewer .psv-navbar * {
+    -webkit-box-sizing: content-box;
+    box-sizing: content-box;
+}
