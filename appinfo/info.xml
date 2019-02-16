@@ -14,7 +14,9 @@
     <author mail="ro.windey@gmail.com" >Robin Windey</author>
     <namespace>PhotoSphereViewer</namespace>
     <category>multimedia</category>
-    <bugs>http://to-be-filled.com</bugs>
+    <bugs>https://github.com/R0Wi/Nextcloud-PhotoSphereViewer/issues</bugs>
+    <website>https://github.com/R0Wi/Nextcloud-PhotoSphereViewer</website>
+    <repository>https://github.com/R0Wi/Nextcloud-PhotoSphereViewer.git</repository>
     <dependencies>
         <nextcloud min-version="14" max-version="14"/>
     </dependencies>
