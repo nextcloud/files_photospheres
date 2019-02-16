@@ -1,3 +1,16 @@
+/**
+ * Nextcloud - PhotoSphereViewer
+ *
+ *
+ * This file is licensed under the Affero General Public License version 3 or
+ * later. See the COPYING file.
+ *
+ * @author Robin Windey <ro.windey@gmail.com>
+ *
+ * @copyright Robin Windey 2019
+ * 
+ * Initializes the viewer-component with a given photospere-image
+ */
 $(document).ready(function(){
     
     if (typeof(URLSearchParams) !== 'function'){

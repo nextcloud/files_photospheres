@@ -1,8 +1,17 @@
-/*
- * This scripts is included globally
- * for all requests to the Nextcloud-instance
+/**
+ * Nextcloud - PhotoSphereViewer
+ *
+ *
+ * This file is licensed under the Affero General Public License version 3 or
+ * later. See the COPYING file.
+ *
+ * @author Robin Windey <ro.windey@gmail.com>
+ *
+ * @copyright Robin Windey 2019
+ * 
+ * Injected via the OCA\Files::loadAdditionalScripts-callback.
+ * Used to hook into the actionhandler for images.
  */
-
 (function ($, OC, OCA, oc_requesttoken) {
 	"use strict";
 	var photoSphereViewerFileAction = {

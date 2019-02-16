@@ -4,13 +4,17 @@
     <id>photosphereviewer</id>
     <name>Photo Sphere Viewer</name>
     <summary>Enables viewing of google photosphere images</summary>
-    <description><![CDATA[Enables viewing of google photosphere images]]></description>
+    <description><![CDATA[
+        Enables viewing of google photosphere images by 
+        integrating the photo-sphere-viewer.js component
+        into your nextcloud instance.
+    ]]></description>
     <version>0.0.1</version>
     <licence>agpl</licence>
     <author mail="ro.windey@gmail.com" >Robin Windey</author>
     <namespace>PhotoSphereViewer</namespace>
     <category>multimedia</category>
-    <bugs>http://labella-band.de</bugs>
+    <bugs>http://to-be-filled.com</bugs>
     <dependencies>
         <nextcloud min-version="14" max-version="14"/>
     </dependencies>

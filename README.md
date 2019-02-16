@@ -1,52 +1,23 @@
 # Photo Sphere Viewer
-Place this app in **nextcloud/apps/**
 
-## Building the app
+Nextcloud app for viewing Google PhotoSphere 360° images. This app is based on 
+the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library.
 
-The app can be built by using the provided Makefile by running:
+**This version is for Nextcloud 14.**
 
-    make
+## Features
+* Interactive view of PhotoSphere images
+* Fully compatiple with other existing image-viewer apps (e.g. gallery-app)
 
-This requires the following things to be present:
-* make
-* which
-* tar: for building the archive
-* curl: used if phpunit and composer are not installed to fetch them from the web
-* npm: for building and testing everything JS, only required if a package.json is placed inside the **js/** folder
+## How to use
+### Install
+Install the app by simply downloading it from the store. You can also install it by cloning this repository into your nextcloud installation to a directory called *photosphereviewer*, e.g.
 
-The make command will install or update Composer dependencies if a composer.json is present and also **npm run build** if a package.json is present in the **js/** folder. The npm **build** script should use local paths for build systems and package managers, so people that simply want to build the app won't need to install npm libraries globally, e.g.:
+    /var/www/html/nextcloud/apps/photosphereviewer 
 
-**package.json**:
-```json
-"scripts": {
-    "test": "node node_modules/gulp-cli/bin/gulp.js karma",
-    "prebuild": "npm install && node_modules/bower/bin/bower install && node_modules/bower/bin/bower update",
-    "build": "node node_modules/gulp-cli/bin/gulp.js"
-}
-```
+### Usage
+After installing the app you can view your Google PhotoSphere 360° images just by clicking on the file.
 
+## Caveats
+* Currently it's only possible to identify photosphere-images by the file prefix. So if you want the image to be opened in the photosphere-viewer, you will have to give the prefix "PANO" to the filename (e.g. PANO_myImage.jpg).
 
-## Publish to App Store
-
-First get an account for the [App Store](http://apps.nextcloud.com/) then run:
-
-    make && make appstore
-
-The archive is located in build/artifacts/appstore and can then be uploaded to the App Store.
-
-## Running tests
-You can use the provided Makefile to run all tests by using:
-
-    make test
-
-This will run the PHP unit and integration tests and if a package.json is present in the **js/** folder will execute **npm run test**
-
-Of course you can also install [PHPUnit](http://phpunit.de/getting-started.html) and use the configurations directly:
-
-    phpunit -c phpunit.xml
-
-or:
-
-    phpunit -c phpunit.integration.xml
-
-for integration tests
