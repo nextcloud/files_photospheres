@@ -12,10 +12,18 @@ $(document).ready(function(){
         return;
     }
     
-    var viewer = new PhotoSphereViewer({
+    var configObject = {
         container: 'viewer',
         time_anim: false,
         panorama: urlParam
-    });
+    };
     
+    var captionParam = searchParams.get('filename');
+    if (captionParam){
+        configObject.caption = captionParam;
+    }
+    
+    var viewer = new PhotoSphereViewer(configObject);
+    
+    window.photoSphereViewer = viewer;
 });

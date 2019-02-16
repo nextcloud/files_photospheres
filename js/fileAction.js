@@ -46,7 +46,7 @@
             _showImage: function(fileObject){
                 var imageUrl = OC.getRootPath() + '/remote.php/webdav/' + fileObject.name;
                 var appUrl = OC.generateUrl('apps/photosphereviewer');
-                location.href = appUrl + "?url=" + imageUrl;
+                location.href = appUrl + "?url=" + imageUrl + "&filename=" + fileObject.name;
             },
             
             /*
