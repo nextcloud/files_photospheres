@@ -1,4 +1,4 @@
-# Photo Sphere Viewer
+# Nextcloud - Photo Sphere Viewer
 
 Nextcloud app for viewing Google PhotoSphere 360° images. This app is based on 
 the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library.
