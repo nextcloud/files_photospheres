@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>photosphereviewer</id>
+    <name>Photo Sphere Viewer</name>
+    <summary>Enables viewing of google photosphere images</summary>
+    <description><![CDATA[Enables viewing of google photosphere images]]></description>
+    <version>0.0.1</version>
+    <licence>agpl</licence>
+    <author mail="ro.windey@gmail.com" >Robin Windey</author>
+    <namespace>PhotoSphereViewer</namespace>
+    <category>multimedia</category>
+    <bugs>http://labella-band.de</bugs>
+    <dependencies>
+        <nextcloud min-version="14" max-version="14"/>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <name>Photo Sphere Viewer</name>
+            <route>photosphereviewer.page.index</route>
+        </navigation>
+    </navigations>
+</info>
