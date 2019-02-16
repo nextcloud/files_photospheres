@@ -88,6 +88,8 @@
                }
             }            
         };
+        
+        window.photoSphereViewerFileAction = photoSphereViewerFileAction;
          
     })(jQuery, OC, OCA, oc_requesttoken);
 
