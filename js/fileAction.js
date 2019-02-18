@@ -52,10 +52,14 @@
              * Generates the url and jumps
              * to the photosphere app
              */
-            _showImage: function(fileObject){
-                var imageUrl = OC.getRootPath() + '/remote.php/webdav/' + fileObject.name;
+             _showImage: function(fileObject){
+                var imageUrl = OC.getRootPath() + '/remote.php/webdav' + fileObject.path + '/' + fileObject.name;
                 var appUrl = OC.generateUrl('apps/photosphereviewer');
-                location.href = appUrl + "?url=" + imageUrl + "&filename=" + fileObject.name;
+                var urlParams = {
+                    url: imageUrl,
+                    filename: fileObject.name
+                };
+                location.href = appUrl + '?' + $.param(urlParams);
             },
             
             /*
