@@ -17,6 +17,7 @@
     <bugs>https://github.com/R0Wi/Nextcloud-PhotoSphereViewer/issues</bugs>
     <website>https://github.com/R0Wi/Nextcloud-PhotoSphereViewer</website>
     <repository>https://github.com/R0Wi/Nextcloud-PhotoSphereViewer.git</repository>
+    <screenshot>https://user-images.githubusercontent.com/19730957/53694835-62a68a80-3db4-11e9-8c60-4ebdc02566d6.jpg</screenshot>
     <dependencies>
         <nextcloud min-version="14" max-version="15"/>
     </dependencies>
