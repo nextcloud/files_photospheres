@@ -23,8 +23,10 @@ use OCP\Util;
  */
 class Application extends App {
     
+        const APP_NAME = 'photosphereviewer';
+    
 	public function __construct(array $urlParams = []) {
-		parent::__construct('photosphereviewer', $urlParams);
+		parent::__construct(self::APP_NAME, $urlParams);
         }
         
         public function init(){
@@ -32,14 +34,12 @@ class Application extends App {
         }
 
         private function registerHooks(){
-            \OC::$server->getEventDispatcher()->addListener('OCA\Files::loadAdditionalScripts', $this->loadGlobalScripts());
-        }
-        
-        private function loadGlobalScripts(){
-            $appName = $this->getContainer()->query('AppName');
-            Util::addScript($appName, 'fileAction');
-        }
-        
+            $eventDispatcher = \OC::$server->getEventDispatcher();
+            
+            $eventDispatcher->addListener('OCA\Files::loadAdditionalScripts', function() {
+              script(self::APP_NAME, 'fileAction');  
+            });
+        }       
 }
 
 
