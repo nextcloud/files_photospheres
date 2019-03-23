@@ -1,4 +1,6 @@
 <?php
+    use OCA\Files_PhotoSpheres\AppInfo;
+    
     /*
      * Javascript
      */
@@ -10,7 +12,7 @@
         'photo-sphere-viewer.min',
         'init'
     );
-    script('photosphereviewer', $scripts);
+    script(AppInfo\Application::APP_NAME, $scripts);
     
     /*
      * CSS
@@ -19,7 +21,7 @@
         'photo-sphere-viewer.min',
         'style'
     );
-    style('photosphereviewer', $styles);
+    style(AppInfo\Application::APP_NAME, $styles);
 ?>
 
 <div id="app">

@@ -1,6 +1,6 @@
 <?php
 /**
- * Nextcloud - PhotoSphereViewer
+ * Nextcloud - Files_PhotoSpheres
  *
  *
  * This file is licensed under the Affero General Public License version 3 or
@@ -11,7 +11,7 @@
  * @copyright Robin Windey 2019
  */
 
-namespace OCA\PhotoSphereViewer\AppInfo;
+namespace OCA\Files_PhotoSpheres\AppInfo;
 
 use OCP\AppFramework\App;
 use OCP\Util;
@@ -19,11 +19,11 @@ use OCP\Util;
 /**
  * class Application
  *
- * @package OCA\PhotoSphereViewer\AppInfo
+ * @package OCA\Files_PhotoSpheres\AppInfo
  */
 class Application extends App {
     
-        const APP_NAME = 'photosphereviewer';
+        const APP_NAME = 'files_photospheres';
     
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_NAME, $urlParams);

@@ -1,12 +1,11 @@
 <?php
 
-namespace OCA\PhotoSphereViewer\Tests\Unit\Controller;
+namespace OCA\Files_PhotoSpheres\Tests\Unit\Controller;
 
+use OCA\Files_PhotoSpheres\AppInfo;
 use PHPUnit_Framework_TestCase;
-
 use OCP\AppFramework\Http\TemplateResponse;
-
-use OCA\PhotoSphereViewer\Controller\PageController;
+use OCA\Files_PhotoSpheres\Controller\PageController;
 
 
 class PageControllerTest extends PHPUnit_Framework_TestCase {
@@ -17,7 +16,7 @@ class PageControllerTest extends PHPUnit_Framework_TestCase {
 		$request = $this->getMockBuilder('OCP\IRequest')->getMock();
 
 		$this->controller = new PageController(
-			'photosphereviewer', $request, $this->userId
+                    AppInfo\Application::APP_NAME, $request, $this->userId
 		);
 	}
 

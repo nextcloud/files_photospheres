@@ -1,5 +1,5 @@
 /**
- * Nextcloud - PhotoSphereViewer
+ * Nextcloud - Files_PhotoSpheres
  *
  *
  * This file is licensed under the Affero General Public License version 3 or
@@ -14,14 +14,14 @@
 $(document).ready(function(){
     
     if (typeof(URLSearchParams) !== 'function'){
-        console.error('URLSearchParams is not available (PhotosphereViewer)');
+        console.error('URLSearchParams is not available (Files_PhotoSpheres)');
         return;
     }
     
     var searchParams = new URLSearchParams(location.search);
     var urlParam = searchParams.get('url');
     if (!urlParam){
-        console.error('No URL for PhotosphereViewer provided');
+        console.error('No URL for Files_PhotoSpheres provided');
         return;
     }
     

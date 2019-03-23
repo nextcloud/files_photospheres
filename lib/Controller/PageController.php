@@ -1,6 +1,6 @@
 <?php
 /**
- * Nextcloud - PhotoSphereViewer
+ * Nextcloud - Files_PhotoSpheres
  *
  *
  * This file is licensed under the Affero General Public License version 3 or
@@ -11,8 +11,9 @@
  * @copyright Robin Windey 2019
  */
 
-namespace OCA\PhotoSphereViewer\Controller;
+namespace OCA\Files_PhotoSpheres\Controller;
 
+use OCA\Files_PhotoSpheres\AppInfo;
 use OCP\IRequest;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Controller;
@@ -21,7 +22,7 @@ use OCP\AppFramework\Http\ContentSecurityPolicy;
 /**
  * class PageController
  *
- * @package OCA\PhotoSphereViewer\Controller
+ * @package OCA\Files_PhotoSpheres\Controller
  */
 class PageController extends Controller {
 	private $userId;
@@ -36,7 +37,7 @@ class PageController extends Controller {
 	 * @NoCSRFRequired
 	 */
 	public function index() {
-		$response = new TemplateResponse('photosphereviewer', 'index');  // templates/index.php
+		$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'index');  // templates/index.php
                 $this->setContentSecurityPolicy($response);  
                 return $response;
         }

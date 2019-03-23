@@ -1,4 +1,4 @@
-# Nextcloud - Photo Sphere Viewer
+# Nextcloud - Files_PhotoSpheres
 
 Nextcloud app for viewing Google PhotoSphere 360° images (panorama-images). This app is based on 
 the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library.
@@ -11,9 +11,9 @@ the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library.
 
 ## How to use
 ### Install
-Install the app by simply downloading it from the store. You can also install it by cloning this repository into your nextcloud installation to a directory called *photosphereviewer*, e.g.
+Install the app by simply downloading it from the store. You can also install it by cloning this repository into your nextcloud installation to a directory called *files_photospheres*, e.g.
 
-    /var/www/html/nextcloud/apps/photosphereviewer 
+    /var/www/html/nextcloud/apps/files_photoSpheres 
 
 ### Usage
 After installing the app you can view your Google PhotoSphere 360° images just by clicking on the file.

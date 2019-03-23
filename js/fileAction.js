@@ -1,5 +1,5 @@
 /**
- * Nextcloud - PhotoSphereViewer
+ * Nextcloud - Files_PhotoSpheres
  *
  *
  * This file is licensed under the Affero General Public License version 3 or
@@ -54,7 +54,7 @@
              */
              _showImage: function(fileObject){
                 var imageUrl = OC.getRootPath() + '/remote.php/webdav' + fileObject.path + '/' + fileObject.name;
-                var appUrl = OC.generateUrl('apps/photosphereviewer');
+                var appUrl = OC.generateUrl('apps/files_photospheres');
                 var urlParams = {
                     url: imageUrl,
                     filename: fileObject.name
