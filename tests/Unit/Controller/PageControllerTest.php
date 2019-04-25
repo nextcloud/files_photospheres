@@ -1,29 +1,42 @@
 <?php
+/**
+ * Nextcloud - Files_PhotoSpheres
+ *
+ *
+ * This file is licensed under the Affero General Public License version 3 or
+ * later. See the COPYING file.
+ *
+ * @author Robin Windey <ro.windey@gmail.com>
+ *
+ * @copyright Robin Windey 2019
+ */
 
 namespace OCA\Files_PhotoSpheres\Tests\Unit\Controller;
 
 use OCA\Files_PhotoSpheres\AppInfo;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCA\Files_PhotoSpheres\Controller\PageController;
 
 
-class PageControllerTest extends PHPUnit_Framework_TestCase {
+class PageControllerTest extends TestCase {
+
+	/** @var PageController */
 	private $controller;
-	private $userId = 'john';
 
 	public function setUp() {
 		$request = $this->getMockBuilder('OCP\IRequest')->getMock();
+		$urlGenerator = $this->getMockBuilder('OCP\IURLGenerator')->getMock();
 
 		$this->controller = new PageController(
-                    AppInfo\Application::APP_NAME, $request, $this->userId
+                    AppInfo\Application::APP_NAME, $request, $urlGenerator
 		);
 	}
 
 	public function testIndex() {
 		$result = $this->controller->index();
 
-		$this->assertEquals('index', $result->getTemplateName());
+		$this->assertEquals('viewer', $result->getTemplateName());
 		$this->assertTrue($result instanceof TemplateResponse);
 	}
 
