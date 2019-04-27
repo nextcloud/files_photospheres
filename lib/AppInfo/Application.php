@@ -38,6 +38,12 @@ class Application extends App {
             
             $eventDispatcher->addListener('OCA\Files::loadAdditionalScripts', function() {
               script(self::APP_NAME, 'fileAction');  
+              style(self::APP_NAME, 'style');
+            });
+
+            $eventDispatcher->addListener('OCA\Files_Sharing::loadAdditionalScripts', function() {
+              Util::addScript(self::APP_NAME, 'fileAction');  
+              Util::addStyle(self::APP_NAME, 'style');
             });
         }       
 }

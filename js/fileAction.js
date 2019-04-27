@@ -20,6 +20,13 @@
              * image-click (e.g. gallery)
              */
             _oldActionHandler: null,
+
+            /*
+             *  The iframe dom element that holds the viewer.
+             */
+            _frameVisible: false,
+            _frameId: 'photo-sphere-viewer-frame',
+            _frameContainer: null,
        
             /*
              * Actionhandler for image-click
@@ -54,12 +61,68 @@
              */
              _showImage: function(fileObject){
                 var imageUrl = OC.getRootPath() + '/remote.php/webdav' + fileObject.path + '/' + fileObject.name;
-                var appUrl = OC.generateUrl('apps/files_photospheres');
+                
                 var urlParams = {
                     url: imageUrl,
                     filename: fileObject.name
                 };
-                location.href = appUrl + '?' + $.param(urlParams);
+
+                this.showFrame(urlParams, false);
+            },
+
+            /*
+             * Injects the iframe with the viewer into the current page. 
+             * Suiteable for both the sharing option (based on a token) and the authenticated explorer view (filename).
+             */
+            showFrame: function(urlParams, isSharedViewer) {
+
+                var appUrl = OC.generateUrl('apps/files_photospheres');
+
+                this._frameContainer = $('<iframe id="'+ this._frameId +'" src="'+ appUrl + '?' + $.param(urlParams) +'" allowfullscreen="true"/>');
+                $('#app-content').after(this._frameContainer);
+
+                if(isSharedViewer) {
+                    $('footer').addClass('hidden');
+
+                } else {
+                    // Provide controls to exit the viewer
+                    FileList.setViewerMode(true);
+
+                    var self = this;
+                    var onKeyUp = function(e) {
+                        if (e.keyCode == 27) {
+                            self.hideFrame();
+                        }
+                    }
+
+                    // Register on original document
+                    $(window).keyup(onKeyUp);
+
+                    if(!$('html').hasClass('ie8')) {
+                        history.pushState({}, '', '#' + self._frameId);
+
+                        $(window).one('popstate', function (e) {
+                            self.hideFrame();
+                        });
+                    }
+
+                    this._frameContainer.load('ready', function() {
+                        // Register on iframe document
+                        var frameBody = this.contentWindow.document;
+                        $(frameBody).keyup(onKeyUp);
+                    });
+                }
+            },
+
+            /*
+             *  Removes the injected iframe that contains the viewer.
+             */
+            hideFrame: function() {
+                if(this._frameContainer != null && document.contains(this._frameContainer[0])) {
+                    this._frameContainer.detach();
+                    this._frameContainer = null;
+                    FileList.setViewerMode(false);
+                }
             },
             
             /*
@@ -108,6 +171,25 @@
 
 $(document).ready(function(){
     "use strict";
-    
-    window.photoSphereViewerFileAction.init();
+
+    // is the page visit from a shared file, or is this via the file explorer?
+    var isSharedViewer = $('#isPublic').val();
+
+    if(!isSharedViewer) { 
+        window.photoSphereViewerFileAction.init();
+    } else {
+        var mimeType = $('#mimetype').val();
+        var fileName = $('#filename').val();
+        if(mimeType == 'image/jpeg' && window.photoSphereViewerFileAction.canShow(fileName)) {
+            var sharingToken = $('#sharingToken').val();
+            var imageUrl = OC.generateUrl('/s/{token}/download', {token: sharingToken});
+
+            var urlParams = {
+                url: imageUrl,
+                filename: fileName
+            };
+
+            window.photoSphereViewerFileAction.showFrame(urlParams, true);
+        }
+    }
 });

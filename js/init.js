@@ -11,7 +11,7 @@
  * 
  * Initializes the viewer-component with a given photospere-image
  */
-$(document).ready(function(){
+document.addEventListener("DOMContentLoaded", function(event) { 
     
     if (typeof(URLSearchParams) !== 'function'){
         console.error('URLSearchParams is not available (Files_PhotoSpheres)');
