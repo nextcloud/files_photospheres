@@ -24,7 +24,6 @@
             /*
              *  The iframe dom element that holds the viewer.
              */
-            _frameVisible: false,
             _frameId: 'photo-sphere-viewer-frame',
             _frameContainer: null,
        
