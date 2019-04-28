@@ -39,7 +39,9 @@ class PageController extends Controller {
 	 */
 	public function index() {
                 $params = [
-                        'urlGenerator' => $this->urlGenerator
+                        'urlGenerator' => $this->urlGenerator,
+                        'appVersion' => \OC::$server->getAppManager()->getAppVersion(AppInfo\Application::APP_NAME),
+                        'nounceManager' => \OC::$server->getContentSecurityPolicyNonceManager()
                 ];
 		$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer', $params, 'blank');  // templates/viewer.php
                 $this->setContentSecurityPolicy($response);  

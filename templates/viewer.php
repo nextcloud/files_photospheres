@@ -2,8 +2,8 @@
     use OCA\Files_PhotoSpheres\AppInfo;
 
     $urlGenerator = $_['urlGenerator'];
-    $version = \OCP\App::getAppVersion(AppInfo\Application::APP_NAME);
-    $nounceManager = \OC::$server->getContentSecurityPolicyNonceManager();
+    $version = $_['appVersion'];
+    $nounceManager = $_['nounceManager'];
 ?>
 <!DOCTYPE html>
 <html>
