@@ -3,11 +3,12 @@
 Nextcloud app for viewing Google PhotoSphere 360° images (panorama-images). This app is based on 
 the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library.
 
-**This version is for Nextcloud 14/15.**
+**This version is for Nextcloud 14/15/16.**
 
 ## Features
 * Interactive view of PhotoSphere images
 * Fully compatible with other existing image-viewer apps (e.g. gallery-app)
+* Share your PhotoSpheres via the usual file sharing option in Nextcloud
 
 ## How to use
 ### Install
