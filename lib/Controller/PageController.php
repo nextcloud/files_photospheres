@@ -14,6 +14,7 @@
 namespace OCA\Files_PhotoSpheres\Controller;
 
 use OCA\Files_PhotoSpheres\AppInfo;
+use OCP\IURLGenerator;
 use OCP\IRequest;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Controller;
@@ -27,17 +28,22 @@ use OCP\AppFramework\Http\ContentSecurityPolicy;
 class PageController extends Controller {
 	private $userId;
 
-	public function __construct($AppName, IRequest $request, $UserId){
+	public function __construct($AppName, IRequest $request, IURLGenerator $urlGenerator){
 		parent::__construct($AppName, $request);
-		$this->userId = $UserId;
+                $this->urlGenerator = $urlGenerator;
 	}
 
 	/**
-	 * @NoAdminRequired
 	 * @NoCSRFRequired
+         * @PublicPage
 	 */
 	public function index() {
-		$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'index');  // templates/index.php
+                $params = [
+                        'urlGenerator' => $this->urlGenerator,
+                        'appVersion' => \OC::$server->getAppManager()->getAppVersion(AppInfo\Application::APP_NAME),
+                        'nounceManager' => \OC::$server->getContentSecurityPolicyNonceManager()
+                ];
+		$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer', $params, 'blank');  // templates/viewer.php
                 $this->setContentSecurityPolicy($response);  
                 return $response;
         }

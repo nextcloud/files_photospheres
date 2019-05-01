@@ -15,16 +15,9 @@
     <namespace>Files_PhotoSpheres</namespace>
     <category>multimedia</category>
     <bugs>https://github.com/nextcloud/files_photospheres/issues</bugs>
-    <website>https://github.com/nextcloud/files_photospheres</website>
     <repository>https://github.com/nextcloud/files_photospheres.git</repository>
     <screenshot>https://user-images.githubusercontent.com/19730957/53694835-62a68a80-3db4-11e9-8c60-4ebdc02566d6.jpg</screenshot>
     <dependencies>
-        <nextcloud min-version="14" max-version="15"/>
+        <nextcloud min-version="14" max-version="16"/>
     </dependencies>
-    <navigations>
-        <navigation>
-            <name>Photo Sphere Viewer</name>
-            <route>files_photospheres.page.index</route>
-        </navigation>
-    </navigations>
 </info>
