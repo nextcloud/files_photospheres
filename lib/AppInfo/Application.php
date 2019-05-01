@@ -14,7 +14,7 @@
 namespace OCA\Files_PhotoSpheres\AppInfo;
 
 use OCP\AppFramework\App;
-use OCP\Util;
+use OCA\Files_PhotoSpheres\Service\StorageService;
 
 /**
  * class Application
@@ -24,13 +24,15 @@ use OCP\Util;
 class Application extends App {
     
         const APP_NAME = 'files_photospheres';
-    
+        
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_NAME, $urlParams);
+                $this->init();
         }
         
-        public function init(){
+        private function init(){
             $this->registerHooks();
+            $this->registerServices();
         }
 
         private function registerHooks(){
@@ -39,7 +41,16 @@ class Application extends App {
             $eventDispatcher->addListener('OCA\Files::loadAdditionalScripts', function() {
               script(self::APP_NAME, 'fileAction');  
             });
-        }       
+        }  
+        
+        private function registerServices(){
+            $container = $this->getContainer();
+
+            $container->registerService(StorageService::class, function($c) {
+                return new StorageService($c->query('ServerContainer')->getUserFolder());
+            });
+
+        }
 }
 
 
