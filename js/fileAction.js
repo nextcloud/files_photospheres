@@ -174,7 +174,7 @@
                 $.get(xmpBackendUrl, function(serverResponse){
                     if (!serverResponse.success){
                         if (serverResponse.message){
-                            OC.Notification.show(t('files_photospheres', 'An error occured while trying to read xmp-data: ' + serverResponse.message));
+                            PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', serverResponse.message]);
                         }
                         callback(false, null);
                         return;
@@ -186,14 +186,14 @@
                     callback(false, null);
                 })
                 .fail(function( jqXHR, textStatus, errorThrown ) {
-                      OC.Notification.show(t('files_photospheres', 'An error occured while trying to read xmp-data: ' + textStatus));      
+                      PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', errorThrown]);      
                 });
             },
             
             showImage: function (filename, context){
                 var file = this._getImageFileObject(filename, context);
                 if (!file){
-                    OC.Notification.show(t('files_photospheres', 'Could not locate file'));
+                    PhotosphereViewerFunctions.notify(['Could not locate file']);
                     return;
                 }
                 this._showImage(file);

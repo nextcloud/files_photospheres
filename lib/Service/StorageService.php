@@ -20,7 +20,7 @@ use \OCP\Files\Folder;
  *
  * @package OCA\Files_PhotoSpheres\Service;
  */
-class StorageService {
+class StorageService implements IStorageService {
     
     /**
      * Read files in 100kb blocks
@@ -91,17 +91,16 @@ class StorageService {
     }
     
     private function readXmpDataFromFileSting($fileString){
-        $buffer = NULL;
+        $posStart = strpos($fileString, self::$XMP_START_TAG);
+        $posEnd = strpos($fileString, self::$XMP_END_TAG);
         
-        if (($posStart = strpos($fileString, self::$XMP_START_TAG)) !== FALSE) {
-            $buffer = substr($fileString, $posStart);
-            $posEnd = strpos($buffer, self::$XMP_END_TAG);
-            $buffer = substr($buffer, 0, $posEnd + 12);
-        }
+        // We need both the start and end tag
+        if ($posStart === FALSE || $posEnd === FALSE)
+            return NULL;
         
-        if ($buffer == NULL)
-            return $buffer;
-        
+        $bufferCutStart = substr($fileString, $posStart);
+        $buffer = substr($bufferCutStart, 0, $posEnd + 12);
+
         return $this->getXmpArrayFromXml($buffer);
     }
     
