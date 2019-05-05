@@ -33,7 +33,7 @@
             _actionHandler: function (filename, context){
                 this.canShow(filename, context, function(canShowImage, xmpDataObject){
                    if (canShowImage){
-                        this.showImage(filename, context);
+                        this.showImage(filename, context, xmpDataObject);
                     }
                     else if (typeof(this._oldActionHandler) === 'function'){
                         this._oldActionHandler(filename, context);
@@ -61,13 +61,18 @@
              * Generates the url and jumps
              * to the photosphere app
              */
-             _showImage: function(fileObject){
+             _showImage: function(fileObject, xmpDataObject){
                 var imageUrl = OC.getRootPath() + '/remote.php/webdav' + fileObject.path + '/' + fileObject.name;
                 
                 var urlParams = {
                     url: imageUrl,
                     filename: fileObject.name
                 };
+                
+                // Add xmpData to url-params, if we have some
+                if (xmpDataObject){
+                    urlParams = $.extend(urlParams, xmpDataObject);
+                }
 
                 this.showFrame(urlParams, false);
             },
@@ -77,7 +82,7 @@
              * Suiteable for both the sharing option (based on a token) and the authenticated explorer view (filename).
              */
             showFrame: function(urlParams, isSharedViewer) {
-
+                
                 var appUrl = OC.generateUrl('apps/files_photospheres');
 
                 this._frameContainer = $('<iframe id="'+ this._frameId +'" src="'+ appUrl + '?' + $.param(urlParams) +'" allowfullscreen="true"/>');
@@ -190,13 +195,13 @@
                 });
             },
             
-            showImage: function (filename, context){
+            showImage: function (filename, context, xmpDataObject){
                 var file = this._getImageFileObject(filename, context);
                 if (!file){
                     PhotosphereViewerFunctions.notify(['Could not locate file']);
                     return;
                 }
-                this._showImage(file);
+                this._showImage(file, xmpDataObject);
             }            
         };
         
@@ -224,7 +229,7 @@ $(document).ready(function(){
                 filename: fileName
             };
 
-            window.photoSphereViewerFileAction.showFrame(urlParams, true);
+            window.photoSphereViewerFileAction.showFrame(urlParams, true); 
         }
     }
 });

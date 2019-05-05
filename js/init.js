@@ -31,6 +31,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
         panorama: urlParam
     };
     
+    var xmpData = PhotosphereViewerFunctions.getXmpDataFromUrlParams(searchParams);
+    if (xmpData){
+        configObject.usexmpdata = false;
+        configObject.pano_data = xmpData;
+    }
+    
     var captionParam = searchParams.get('filename');
     if (captionParam){
         configObject.caption = captionParam;

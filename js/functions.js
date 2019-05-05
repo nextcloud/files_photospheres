@@ -37,6 +37,52 @@ var PhotosphereViewerFunctions = {
         setTimeout(function(){
             OC.Notification.hide(notifyRow);
         }, 5000);
+    },
+    
+    /*
+     * Parses the xmp-data from the url-string-object
+     * into an valid JSON-object
+     * @param {URLSearchParams} urlSearchParams
+     * @returns {object} JSON object
+     */
+    getXmpDataFromUrlParams: function(urlSearchParams){
+        var xmpData = {};
+        
+        var fullWidth = urlSearchParams.get('full_width');
+        if (fullWidth){
+            xmpData.full_width = fullWidth;
+        }
+        
+        var fullHeight = urlSearchParams.get('full_height');
+        if (fullHeight){
+            xmpData.full_height = fullHeight;
+        }
+        
+        var croppedWidth = urlSearchParams.get('cropped_width');
+        if (croppedWidth){
+            xmpData.cropped_width = croppedWidth;
+        }
+        
+        var croppedHeight = urlSearchParams.get('cropped_height');
+        if (croppedHeight){
+            xmpData.cropped_height = croppedHeight;
+        }
+        
+        var croppedX = urlSearchParams.get('cropped_x');
+        if (croppedX){
+            xmpData.cropped_x = croppedX;
+        }
+        
+        var croppedY = urlSearchParams.get('cropped_y');
+        if (croppedY){
+            xmpData.cropped_y = croppedY;
+        }
+        
+        if (Object.keys(xmpData).length === 0){
+            return null;
+        }
+        
+        return xmpData;
     }
 }
 
