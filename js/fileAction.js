@@ -31,12 +31,15 @@
              * Actionhandler for image-click
              */
             _actionHandler: function (filename, context){
-                 if (this.canShow(filename)){
-                    this.showImage(filename, context);
-                }
-                else if (typeof(this._oldActionHandler) === 'function'){
-                    this._oldActionHandler(filename, context);
-                } 
+                this.canShow(filename, context, function(canShowImage, xmpDataObject){
+                   if (canShowImage){
+                        this.showImage(filename, context, xmpDataObject);
+                    }
+                    else if (typeof(this._oldActionHandler) === 'function'){
+                        this._oldActionHandler(filename, context);
+                    }  
+                }.bind(this));
+                 
             },
             
             /*
@@ -58,13 +61,18 @@
              * Generates the url and jumps
              * to the photosphere app
              */
-             _showImage: function(fileObject){
+             _showImage: function(fileObject, xmpDataObject){
                 var imageUrl = OC.getRootPath() + '/remote.php/webdav' + fileObject.path + '/' + fileObject.name;
                 
                 var urlParams = {
                     url: imageUrl,
                     filename: fileObject.name
                 };
+                
+                // Add xmpData to url-params, if we have some
+                if (xmpDataObject){
+                    urlParams = $.extend(urlParams, xmpDataObject);
+                }
 
                 this.showFrame(urlParams, false);
             },
@@ -74,7 +82,7 @@
              * Suiteable for both the sharing option (based on a token) and the authenticated explorer view (filename).
              */
             showFrame: function(urlParams, isSharedViewer) {
-
+                
                 var appUrl = OC.generateUrl('apps/files_photospheres');
 
                 this._frameContainer = $('<iframe id="'+ this._frameId +'" src="'+ appUrl + '?' + $.param(urlParams) +'" allowfullscreen="true"/>');
@@ -124,6 +132,18 @@
                 }
             },
             
+            _getImageFileObject: function(filename, context){
+               var fileList = context.fileList;
+               var files = fileList.files;
+               for(var i = 0; i < files.length; i++){
+                   var file = files[i];
+                   if (file.name === filename){
+                       return file;
+                   }
+               } 
+               return null;
+            },
+            
             /*
              * Initialize action callbacks. "Override" 
              * the action for image/jpeg
@@ -146,21 +166,42 @@
                 }.bind(this));
             },
             
-            canShow: function(filename){
-                // Currently we identify a photosphere-image
-                // by the 'PANO'-filename-prefix
-                return filename.indexOf('PANO') === 0;
+            canShow: function(filename, context, callback){
+                // Trigger serverside function to
+                // try to read xmp-data of the file
+                var file = this._getImageFileObject(filename, context);
+                if (!file){
+                    callback(false, null);
+                    return;
+                }
+                
+                var xmpBackendUrl = OC.generateUrl('apps/files_photospheres') + "/files/xmpdata/" + file.id;
+                $.get(xmpBackendUrl, function(serverResponse){
+                    if (!serverResponse.success){
+                        if (serverResponse.message){
+                            PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', serverResponse.message]);
+                        }
+                        callback(false, null);
+                        return;
+                    }
+                    if (serverResponse.data && typeof(serverResponse.data) === 'object'){
+                        callback(true, serverResponse.data);
+                        return;
+                    }
+                    callback(false, null);
+                })
+                .fail(function( jqXHR, textStatus, errorThrown ) {
+                      PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', errorThrown]);      
+                });
             },
             
-            showImage: function (filename, context){
-               var fileList = context.fileList;
-               var files = fileList.files;
-               for(var i = 0; i < files.length; i++){
-                   var file = files[i];
-                   if (file.name === filename){
-                       this._showImage(file);
-                   }
-               }
+            showImage: function (filename, context, xmpDataObject){
+                var file = this._getImageFileObject(filename, context);
+                if (!file){
+                    PhotosphereViewerFunctions.notify(['Could not locate file']);
+                    return;
+                }
+                this._showImage(file, xmpDataObject);
             }            
         };
         
@@ -188,7 +229,7 @@ $(document).ready(function(){
                 filename: fileName
             };
 
-            window.photoSphereViewerFileAction.showFrame(urlParams, true);
+            window.photoSphereViewerFileAction.showFrame(urlParams, true); 
         }
     }
 });

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Create your routes in here. The name is the lowercase name of the controller
  * without the controller part, the stuff after the hash is the method.
@@ -9,6 +10,8 @@
  */
 return [
     'routes' => [
-	   ['name' => 'page#index', 'url' => '/', 'verb' => 'GET']
+        // Controllers
+        ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
+        ['name' => 'files#get_xmp_data', 'url' => '/files/xmpdata/{fileId}', 'verb' => 'GET'],
     ]
 ];
