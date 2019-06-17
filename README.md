@@ -20,5 +20,4 @@ Install the app by simply downloading it from the store. You can also install it
 After installing the app you can view your Google PhotoSphere 360° images just by clicking on the file.
 
 ## Caveats
-* Currently it's only possible to identify photosphere-images by the file prefix. So if you want the image to be opened in the photosphere-viewer, you will have to give the prefix "PANO" to the filename (e.g. PANO_myImage.jpg).
-
+* Currently the app is not compatible with the "Viewer"-app. As a temporary workaround please deactivate this app in your NC settings. This especially refers to NC16 or higher, where the "Viewer"-app is enabled by default.
