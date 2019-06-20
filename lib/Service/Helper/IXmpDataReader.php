@@ -12,14 +12,9 @@
  * @copyright Robin Windey 2019
  */
 
-namespace OCA\Files_PhotoSpheres\Service;
+namespace OCA\Files_PhotoSpheres\Service\Helper;
 
-interface IStorageService {
-
-    /**
-     * 
-     * @param int $fileId
-     * @return array
-     */
-    function getXmpData($fileId);
+interface IXmpDataReader {
+    
+    function readXmpDataFromFileObject(\OCP\Files\File $file) : array;
 }
