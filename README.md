@@ -20,4 +20,4 @@ Install the app by simply downloading it from the store. You can also install it
 After installing the app you can view your Google PhotoSphere 360° images just by clicking on the file.
 
 ## Caveats
-* Currently the app is not compatible with the "Viewer"-app. As a temporary workaround please deactivate this app in your NC settings. This especially refers to NC16 or higher, where the "Viewer"-app is enabled by default.
+* At least the "old" [Gallery-App](https://github.com/nextcloud/gallery) or the "new" [Viewer-App](https://github.com/nextcloud/viewer) must be enabled (you can also enable both).

@@ -26,6 +26,11 @@
              */
             _frameId: 'photo-sphere-viewer-frame',
             _frameContainer: null,
+            
+            /*
+             *  Photosphere mime-type
+             */
+            _photoShpereMimeType: 'image/jpeg',
        
             /*
              * Actionhandler for image-click
@@ -51,7 +56,7 @@
                     displayName : "View in PhotoSphereViewer",
                     icon : "",
                     mime : "image/jpeg",
-                    name : "View",
+                    name : "view",
                     permissions : 1,
                     order: -1
                 };
@@ -154,9 +159,13 @@
                 }
                 
                 OCA.Files.fileActions.registerAction(this._getAction());
-    
+                OCA.Files.fileActions.setDefault(this._photoShpereMimeType, 'view');
+                
                 OCA.Files.fileActions.on('registerAction', function (e){
-                    if (e.action.mime === 'image/jpeg' && e.action.name === 'View'){
+                    if (e.action.mime === this._photoShpereMimeType && 
+                            e.action.name && 
+                            typeof(e.action.name) === "string" && 
+                            e.action.name.toLowerCase() === 'view'){
                         // Store the registered action in case
                         // the image isn't a photosphere-image
                         this._oldActionHandler = e.action.actionHandler;
@@ -220,7 +229,7 @@ $(document).ready(function(){
     } else {
         var mimeType = $('#mimetype').val();
         var fileName = $('#filename').val();
-        if(mimeType == 'image/jpeg' && window.photoSphereViewerFileAction.canShow(fileName)) {
+        if(mimeType === window.photoSphereViewerFileAction.__photoShpereMimeType && window.photoSphereViewerFileAction.canShow(fileName)) {
             var sharingToken = $('#sharingToken').val();
             var imageUrl = OC.generateUrl('/s/{token}/download', {token: sharingToken});
 
