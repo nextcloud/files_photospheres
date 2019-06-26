@@ -14,12 +14,12 @@
 
 namespace OCA\Files_PhotoSpheres\Service;
 
-interface IStorageService {
-
+interface IShareService {
+    
     /**
      * 
-     * @param int $fileId
-     * @return array
+     * @param string $shareToken
+     * @return array 
      */
-    function getXmpData($fileId);
+    function getXmpData($shareToken);
 }
