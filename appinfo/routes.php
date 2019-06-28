@@ -12,6 +12,7 @@ return [
     'routes' => [
         // Controllers
         ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-        ['name' => 'files#get_xmp_data', 'url' => '/files/xmpdata/{fileId}', 'verb' => 'GET'],
+        ['name' => 'userfiles#get_xmp_data', 'url' => '/userfiles/xmpdata/{fileId}', 'verb' => 'GET'],
+        ['name' => 'sharefiles#get_xmp_data', 'url' => '/sharefiles/xmpdata/{shareToken}', 'verb' => 'GET'],
     ]
 ];
