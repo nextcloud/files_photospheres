@@ -177,7 +177,7 @@
             OCA.Files.fileActions.registerAction(this._getAction());
 
             OCA.Files.fileActions.on('registerAction', function (e) {
-                if (e.action.mime === 'image/jpeg' && e.action.name === 'View') {
+                if (e.action.mime === 'image/jpeg' && e.action.name.toLowerCase() === 'view') {
                     // Store the registered action in case
                     // the image isn't a photosphere-image
                     this._oldActionHandler = e.action.actionHandler;
