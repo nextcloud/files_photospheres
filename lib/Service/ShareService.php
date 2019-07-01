@@ -17,6 +17,7 @@ namespace OCA\Files_PhotoSpheres\Service;
 use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use OCP\Share\IManager as ShareManager;
 use OCP\Share\Exceptions\ShareNotFound;
+use OCP\Files\NotFoundException;
 
 /**
  * class ShareService
@@ -44,15 +45,20 @@ class ShareService implements IShareService {
     /**
      * 
      * @param string $shareToken
-     * @return array|NULL
+     * @param string $filename 
+     * @param string $path 
+     * @return array
      */
-    public function getXmpData($shareToken): array {
-        // This part is taken from OCA\Files_Sharing\Controller
-        // Check whether share exists 
+    public function getXmpData($shareToken, $filename = '', $path = ''): array {
+        // This parts are adapted from OCA\Files_Sharing\Controller
         try {
             $share = $this->shareManager->getShareByToken($shareToken);
         } catch (ShareNotFound $e) {
             throw new \Exception('Share not found');
+        }
+
+        if (!($share->getPermissions() & \OCP\Constants::PERMISSION_READ)) {
+            return new \OCP\AppFramework\Http\DataResponse('Share is read-only');
         }
 
         if (!$this->validateShare($share)) {
@@ -61,7 +67,30 @@ class ShareService implements IShareService {
 
         $shareNode = $share->getNode();
 
-        return $this->xmpDataReader->readXmpDataFromFileObject($shareNode);
+        // Single file share
+        if ($shareNode instanceof \OCP\Files\File) {
+            return $this->xmpDataReader->readXmpDataFromFileObject($shareNode);
+        }
+        // Directory share
+        else {
+            if ($filename === '' || $path === '') {
+                throw new \Exception('Information must contain filename and path');
+            }
+
+            try {
+                /** @var \OCP\Files\Folder $shareNode */
+                $shareNode = $shareNode->get($path);
+            } catch (NotFoundException $e) {
+                throw new \Exception('Share not found');
+            }
+
+            if (!($shareNode instanceof \OCP\Files\File)){
+                // Directory containing the file -> read the file by name
+                $shareNode = $shareNode->get($filename);
+            }
+            
+            return $this->xmpDataReader->readXmpDataFromFileObject($shareNode);
+        }
     }
 
     /**
