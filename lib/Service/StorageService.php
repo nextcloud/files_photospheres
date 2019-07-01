@@ -50,7 +50,7 @@ class StorageService implements IStorageService {
     /**
      * 
      * @param int $fileId
-     * @return array|NULL
+     * @return array
      */
     public function getXmpData($fileId) : array {
         $arrFiles = $this->userFolder->getById($fileId);

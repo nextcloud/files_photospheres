@@ -8,6 +8,8 @@ the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library.
 ## Features
 * Interactive viewer to view PhotoSphere images in your Nextcloud instance
 * When clicking on an image it automaticlly detects the presence of XMP-data tags (which are used in photospheres).
+* Compatible with the "normal" user-view, single-file share and directory share.
+* Seamless integration with other file-viewer apps 
 
 ## Setup
 ### Install through the app store
@@ -26,6 +28,4 @@ You can manually install this app, by cloning the repository into your nextcloud
 After installing the app you can view your PhotoSphere 360° images by clicking on the file in the Nextcloud file browser. Note that opening PhotoSpheres from the gallery is currently not supported.
 
 ## Caveats
-* At least the "old" [Gallery-App](https://github.com/nextcloud/gallery) or the "new" [Viewer-App](https://github.com/nextcloud/viewer) must be enabled (you can also enable both).
 * It is not possible to open the photosphere viewer from the Gallery. You must use the file browser.
-* It is currently not possible to use the photosphere viewer in shared folders. You must share the photosphere individually to use this viewer.

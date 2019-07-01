@@ -43,13 +43,15 @@ class SharefilesController extends Controller {
      * @NoCSRFRequired
      * 
      * @param string $shareToken the token of the public share
+     * @param string $filename the filename (if we're dealing with a directory share)
+     * @param string $path the directory path, where the file is stored in (if we're dealing with a directory share)
      * @return \OCP\AppFramework\Http\JSONResponse
      */
-    public function getXmpData($shareToken): JSONResponse {
+    public function getXmpData($shareToken, $filename = '', $path = ''): JSONResponse {
         \OC_User::setIncognitoMode(true);
 
         try {
-            $xmpData = $this->shareService->getXmpData($shareToken);
+            $xmpData = $this->shareService->getXmpData($shareToken, $filename, $path);
             return new JSONResponse(
                     [
                 'data' => $xmpData,
