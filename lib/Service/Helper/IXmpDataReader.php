@@ -14,7 +14,9 @@
 
 namespace OCA\Files_PhotoSpheres\Service\Helper;
 
+use OCA\Files_PhotoSpheres\Model\XmpResultModel;
+
 interface IXmpDataReader {
     
-    function readXmpDataFromFileObject(\OCP\Files\File $file) : array;
+    function readXmpDataFromFileObject(\OCP\Files\File $file) : XmpResultModel;
 }

@@ -188,7 +188,7 @@
                 }
                 if (serverResponse.data &&
                         typeof (serverResponse.data) === 'object' &&
-                        !PhotosphereViewerFunctions.isEmpty(serverResponse.data)) {
+                        serverResponse.data.containsGpanoData) {
                     callback(true, serverResponse.data);
                     return;
                 }
