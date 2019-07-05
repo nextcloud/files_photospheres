@@ -14,12 +14,14 @@
 
 namespace OCA\Files_PhotoSpheres\Service;
 
+use OCA\Files_PhotoSpheres\Model\XmpResultModel;
+
 interface IStorageService {
 
     /**
      * 
      * @param int $fileId
-     * @return array
+     * @return XmpResultModel
      */
-    function getXmpData($fileId);
+    function getXmpData($fileId) : XmpResultModel;
 }

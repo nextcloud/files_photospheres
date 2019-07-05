@@ -18,6 +18,7 @@ use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use OCP\Share\IManager as ShareManager;
 use OCP\Share\Exceptions\ShareNotFound;
 use OCP\Files\NotFoundException;
+use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 
 /**
  * class ShareService
@@ -49,7 +50,7 @@ class ShareService implements IShareService {
      * @param string $path 
      * @return array
      */
-    public function getXmpData($shareToken, $filename = '', $path = ''): array {
+    public function getXmpData($shareToken, $filename = '', $path = ''): XmpResultModel {
         // This parts are adapted from OCA\Files_Sharing\Controller
         try {
             $share = $this->shareManager->getShareByToken($shareToken);

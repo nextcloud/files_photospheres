@@ -16,6 +16,7 @@ namespace OCA\Files_PhotoSpheres\Service;
 
 use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use \OCP\Files\Folder;
+use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 
 /**
  * class StorageService
@@ -52,7 +53,7 @@ class StorageService implements IStorageService {
      * @param int $fileId
      * @return array
      */
-    public function getXmpData($fileId) : array {
+    public function getXmpData($fileId) : XmpResultModel {
         $arrFiles = $this->userFolder->getById($fileId);
         if (!isset($arrFiles[0])) {
             throw new \Exception('Could not locate node linked to ID: ' . $fileId);
