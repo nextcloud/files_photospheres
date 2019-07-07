@@ -9,40 +9,24 @@
  *
  * @copyright Robin Windey 2019
  * 
- * Initializes the viewer-component with a given photospere-image
+ * Initializes the viewer-component with a given photospere-image-configuration
  */
-document.addEventListener("DOMContentLoaded", function(event) { 
-    
-    if (typeof(URLSearchParams) !== 'function'){
-        console.error('URLSearchParams is not available (Files_PhotoSpheres)');
-        return;
+
+class PhotoSphereViewerRenderer {
+    render(configObject) {
+        const defaults = {
+            container: 'viewer',
+            time_anim: false,
+            usexmpdata: false
+        };
+
+        // Merge with defaults
+        Object.assign(configObject, defaults);
+
+        const viewer = new PhotoSphereViewer(configObject);
+        window.photoSphereViewer = viewer;
     }
-    
-    var searchParams = new URLSearchParams(location.search);
-    var urlParam = searchParams.get('url');
-    if (!urlParam){
-        console.error('No URL for Files_PhotoSpheres provided');
-        return;
-    }
-    
-    var configObject = {
-        container: 'viewer',
-        time_anim: false,
-        panorama: urlParam
-    };
-    
-    var xmpData = PhotosphereViewerFunctions.getXmpDataFromUrlParams(searchParams);
-    if (xmpData){
-        configObject.usexmpdata = false;
-        configObject.pano_data = xmpData;
-    }
-    
-    var captionParam = searchParams.get('filename');
-    if (captionParam){
-        configObject.caption = captionParam;
-    }
-    
-    var viewer = new PhotoSphereViewer(configObject);
-    
-    window.photoSphereViewer = viewer;
-});
+}
+
+// Expose the renderer for the viewer to our parent
+window.photoSphereViewerRenderer = new PhotoSphereViewerRenderer();

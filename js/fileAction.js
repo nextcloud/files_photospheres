@@ -40,9 +40,9 @@
          * Actionhandler for image-click
          */
         _actionHandler: function (filename, context) {
-            this.canShow(filename, context, function (canShowImage, xmpDataObject) {
+            this.canShow(filename, context, function (canShowImage, xmpResultModel) {
                 if (canShowImage) {
-                    this.showImage(filename, context, xmpDataObject);
+                    this.showImage(filename, context, xmpResultModel);
                 } else if (typeof (this._oldActionHandler) === 'function') {
                     this._oldActionHandler(filename, context);
                 }
@@ -77,7 +77,7 @@
          * Generates the url and jumps
          * to the photosphere app
          */
-        _showImage: function (fileObject, xmpDataObject) {
+        _showImage: function (fileObject, xmpResultModel) {
             var imageUrl = '';
             if (!this._isDirectoryShare) {
                 // "normal" user-view
@@ -103,23 +103,48 @@
             };
 
             // Add xmpData to url-params, if we have some
-            if (xmpDataObject) {
-                urlParams = $.extend(urlParams, xmpDataObject);
+            if (xmpResultModel) {
+                urlParams = $.extend(urlParams, xmpResultModel);
             }
 
-            this.showFrame(urlParams, false);
+            this.showFrame(imageUrl, fileObject.name, xmpResultModel, false);
         },
 
         /*
          * Injects the iframe with the viewer into the current page. 
          * Suiteable for both the sharing option (based on a token) and the authenticated explorer view (filename).
+         * @param {string} imageUrl         - The url from which the panorama can be loaded 
+         * @param {string} imageFileName    - The name of the image. Used as caption in the viewer.
+         * @param {object} xmpResultModel   - The xmp-information, read from the server.
+         * @param {bool} isSharedViewer     - True, if we are on single-fileshare 
          */
-        showFrame: function (urlParams, isSharedViewer) {
+        showFrame: function (imageUrl, imageFileName, xmpResultModel, isSharedViewer) {
+
+            var configObject = {
+                panorama: imageUrl,
+                caption: imageFileName
+            };
+
+            // Add xmpData (cropping-info) to viewer-params, if we have some
+            if (xmpResultModel.containsCroppingConfig) {
+                var extendObject = {
+                    pano_data: xmpResultModel.croppingConfig
+                };
+                configObject = $.extend(configObject, extendObject);
+            }
 
             var appUrl = OC.generateUrl('apps/files_photospheres');
 
-            this._frameContainer = $('<iframe id="' + this._frameId + '" src="' + appUrl + '?' + $.param(urlParams) + '" allowfullscreen="true"/>');
+            this._frameContainer = $('<iframe id="' + this._frameId + '" src="' + appUrl + '" allowfullscreen="true"/>');
             $('#app-content').after(this._frameContainer);
+
+            this._frameContainer.on('load', function () {
+                // Viewer is rendered via helper-class in the
+                // iframe. After the frame has loaded, provide
+                // appropriate config object for rendering the component.
+                var frameWindow = this.contentWindow.window;
+                frameWindow.photoSphereViewerRenderer.render(configObject);
+            });
 
             if (isSharedViewer) {
                 $('footer').addClass('hidden');
@@ -279,13 +304,13 @@
             this._xmpDataBackendRequest(xmpBackendUrl, callback);
         },
 
-        showImage: function (filename, context, xmpDataObject) {
+        showImage: function (filename, context, xmpResultModel) {
             var file = this._getImageFileObject(filename, context);
             if (!file) {
                 PhotosphereViewerFunctions.notify(['Could not locate file']);
                 return;
             }
-            this._showImage(file, xmpDataObject);
+            this._showImage(file, xmpResultModel);
         }
     };
 
@@ -334,21 +359,10 @@ $(document).ready(function () {
 
         if(mimeType === window.photoSphereViewerFileAction._photoShpereMimeType) {
             $('#files-public-content').hide();
-            window.photoSphereViewerFileAction.canShowSingleFileShare(sharingToken, function (canShowImage, xmpDataObject) {
+            window.photoSphereViewerFileAction.canShowSingleFileShare(sharingToken, function (canShowImage, xmpResultModel) {
                 if (canShowImage) {
                     var imageUrl = OC.generateUrl('/s/{token}/download', { token: sharingToken });
-
-                    var urlParams = {
-                        url: imageUrl,
-                        filename: fileName
-                    };
-
-                    // Add xmpData to url-params, if we have some
-                    if (xmpDataObject) {
-                        urlParams = $.extend(urlParams, xmpDataObject);
-                    }
-
-                    window.photoSphereViewerFileAction.showFrame(urlParams, true);
+                    window.photoSphereViewerFileAction.showFrame(imageUrl, fileName, xmpResultModel, true);
                 }
                 else {
                     $('#files-public-content').show();
