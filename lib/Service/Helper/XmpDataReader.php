@@ -19,14 +19,15 @@ use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 class XmpDataReader implements IXmpDataReader {
     
     /**
-     * Read files in 100kb blocks
+     * Read files in 8kb blocks
      */
-    private static $CHUNK_SIZE = 1024 * 100;
+    private static $CHUNK_SIZE = 8192;
 
     /**
      * Maximum of blocks to read for xmp-data
+     * (read max 800kb of the file)
      */
-    private static $MAX_BLOCK_COUNT = 5;
+    private static $MAX_BLOCK_COUNT = 100;
 
     /**
      * XML-start-tag for xmp-data
@@ -104,22 +105,28 @@ class XmpDataReader implements IXmpDataReader {
         preg_match('/CroppedAreaTopPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaTopMatch);
 
         if (!empty($fullWithMatch)) {
-            $model->fullWidth = intval(end($fullWithMatch));
+            $model->croppingConfig->full_width = intval(end($fullWithMatch));
+            $model->containsCroppingConfig = true;
         }
         if (!empty($fullHeightMatch)) {
-            $model->fullHeight = intval(end($fullHeightMatch));
+            $model->croppingConfig->full_height = intval(end($fullHeightMatch));
+            $model->containsCroppingConfig = true;
         }
         if (!empty($croppedAreaWidthMatch)) {
-            $model->croppedWidth = intval(end($croppedAreaWidthMatch));
+            $model->croppingConfig->cropped_width = intval(end($croppedAreaWidthMatch));
+            $model->containsCroppingConfig = true;
         }
         if (!empty($croppedAreaHeightMatch)) {
-            $model->croppedHeight = intval(end($croppedAreaHeightMatch));
+            $model->croppingConfig->cropped_height = intval(end($croppedAreaHeightMatch));
+            $model->containsCroppingConfig = true;
         }
         if (!empty($croppedAreaLeftMatch)) {
-            $model->croppedX = intval(end($croppedAreaLeftMatch));
+            $model->croppingConfig->cropped_x = intval(end($croppedAreaLeftMatch));
+            $model->containsCroppingConfig = true;
         }
         if (!empty($croppedAreaTopMatch)) {
-            $model->croppedY = intval(end($croppedAreaTopMatch));
+            $model->croppingConfig->cropped_y = intval(end($croppedAreaTopMatch));
+            $model->containsCroppingConfig = true;
         }
     }
 }

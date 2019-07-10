@@ -15,24 +15,16 @@ namespace OCA\Files_PhotoSpheres\Model;
 
 class XmpResultModel {
     
-    /** @var int */
+    /** @var bool */
     public $containsGpanoData = FALSE;
 
-    /** @var int */
-    public $fullWidth;
+    /** @var bool */
+    public $containsCroppingConfig = FALSE;
 
-    /** @var int */
-    public $fullHeight;
+    /** @var CroppingConfigModel */
+    public $croppingConfig;
 
-    /** @var int */
-    public $croppedWidth;
-
-    /** @var int */
-    public $croppedHeight;
-
-    /** @var int */
-    public $croppedX;
-
-    /** @var int */
-    public $croppedY;
+    function __construct() {
+        $this->croppingConfig = new CroppingConfigModel();
+    }
 }
