@@ -42,7 +42,7 @@ class XmpDataReader implements IXmpDataReader {
     /**
      * XML-start-tag for GPano data
      */
-    private static $GPANO_START_TAG = 'GPano:';
+    private static $GPANO_START_TAG = 'GPano';
     
     function __construct() {
      
