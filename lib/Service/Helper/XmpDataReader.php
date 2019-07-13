@@ -104,29 +104,24 @@ class XmpDataReader implements IXmpDataReader {
         preg_match('/CroppedAreaLeftPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaLeftMatch);
         preg_match('/CroppedAreaTopPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaTopMatch);
 
-        if (!empty($fullWithMatch)) {
-            $model->croppingConfig->full_width = intval(end($fullWithMatch));
-            $model->containsCroppingConfig = true;
+        if (empty($fullWithMatch) || 
+            empty($fullHeightMatch) ||
+            empty($croppedAreaWidthMatch) ||
+            empty($croppedAreaHeightMatch) ||
+            empty($croppedAreaLeftMatch) ||
+            empty($croppedAreaTopMatch)){
+                // Invalid / incomplete xmp-data
+                $model->containsCroppingConfig = false;
+                return;
         }
-        if (!empty($fullHeightMatch)) {
-            $model->croppingConfig->full_height = intval(end($fullHeightMatch));
-            $model->containsCroppingConfig = true;
-        }
-        if (!empty($croppedAreaWidthMatch)) {
-            $model->croppingConfig->cropped_width = intval(end($croppedAreaWidthMatch));
-            $model->containsCroppingConfig = true;
-        }
-        if (!empty($croppedAreaHeightMatch)) {
-            $model->croppingConfig->cropped_height = intval(end($croppedAreaHeightMatch));
-            $model->containsCroppingConfig = true;
-        }
-        if (!empty($croppedAreaLeftMatch)) {
-            $model->croppingConfig->cropped_x = intval(end($croppedAreaLeftMatch));
-            $model->containsCroppingConfig = true;
-        }
-        if (!empty($croppedAreaTopMatch)) {
-            $model->croppingConfig->cropped_y = intval(end($croppedAreaTopMatch));
-            $model->containsCroppingConfig = true;
-        }
+
+        $model->containsCroppingConfig = true;
+
+        $model->croppingConfig->full_width = intval(end($fullWithMatch));
+        $model->croppingConfig->full_height = intval(end($fullHeightMatch));
+        $model->croppingConfig->cropped_width = intval(end($croppedAreaWidthMatch));
+        $model->croppingConfig->cropped_height = intval(end($croppedAreaHeightMatch));
+        $model->croppingConfig->cropped_x = intval(end($croppedAreaLeftMatch));
+        $model->croppingConfig->cropped_y = intval(end($croppedAreaTopMatch));
     }
 }
