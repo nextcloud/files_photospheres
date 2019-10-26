@@ -85,6 +85,15 @@ var PhotosphereViewerFunctions = {
                 return false;
         }
         return true;
+    },
+
+    showLoader: function(show) {
+        var $loadingPanel = $('#photo-sphere-viewer-loader');
+        if (!$loadingPanel.length){
+            $loadingPanel = $('<div id="photo-sphere-viewer-loader"></div>').addClass('icon-loading');
+            $('#app-content').after($loadingPanel);
+        }
+        $loadingPanel.toggleClass('hidden', !show);
     }
 }
 
