@@ -27,11 +27,11 @@
          */
         _frameId: 'photo-sphere-viewer-frame',
         _frameContainer: null,
-      
-         /*
-          *  Photosphere mime-type
-          */
-         _photoShpereMimeType: 'image/jpeg',
+
+        /*
+         *  Photosphere mime-type
+         */
+        _photoShpereMimeType: 'image/jpeg',
 
         _isDirectoryShare: false,
         _sharingToken: '',
@@ -82,19 +82,19 @@
             if (!this._isDirectoryShare) {
                 // "normal" user-view
                 imageUrl = OC.getRootPath() +
-                        '/remote.php/webdav' +
-                        fileObject.path +
-                        '/' +
-                        fileObject.name;
+                    '/remote.php/webdav' +
+                    fileObject.path +
+                    '/' +
+                    fileObject.name;
             } else {
                 // directory-share
                 imageUrl = OC.getRootPath() +
-                        '/index.php/s/' +
-                        this._sharingToken +
-                        '/download?path=' +
-                        this._getDirectorySharePathFromCurrentLocation() +
-                        '&files=' +
-                        fileObject.name;
+                    '/index.php/s/' +
+                    this._sharingToken +
+                    '/download?path=' +
+                    this._getDirectorySharePathFromCurrentLocation() +
+                    '&files=' +
+                    fileObject.name;
             }
 
             var urlParams = {
@@ -201,7 +201,7 @@
             }
             return null;
         },
-      
+
         _xmpDataBackendRequest: function (url, callback) {
             $.get(url, function (serverResponse) {
                 if (!serverResponse.success) {
@@ -212,16 +212,24 @@
                     return;
                 }
                 if (serverResponse.data &&
-                        typeof (serverResponse.data) === 'object' &&
-                        serverResponse.data.containsGpanoData) {
+                    typeof (serverResponse.data) === 'object' &&
+                    serverResponse.data.containsGpanoData) {
+                    // Its a photosphere but now
+                    // check WebGL2 support in browser, otherwise
+                    // the viewer can't be rendered
+                    if (!PhotosphereViewerFunctions.isWebGl2Supported()) {
+                        PhotosphereViewerFunctions.notify("Your browser doesn't support WebGL2. Please enable WebGL2 support in the browser settings.", "error");
+                        callback(false, null);
+                        return;
+                    }
                     callback(true, serverResponse.data);
                     return;
                 }
                 callback(false, null);
             })
-                    .fail(function (jqXHR, textStatus, errorThrown) {
-                        PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', errorThrown]);
-                    });
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', errorThrown]);
+                });
         },
 
         /*
@@ -240,10 +248,10 @@
             OCA.Files.fileActions.setDefault('image/jpeg', 'view');
 
             OCA.Files.fileActions.on('registerAction', function (e) {
-                if (e.action.mime === this._photoShpereMimeType && 
-                            e.action.name && 
-                            typeof(e.action.name) === "string" && 
-                            e.action.name.toLowerCase() === 'view') {
+                if (e.action.mime === this._photoShpereMimeType &&
+                    e.action.name &&
+                    typeof (e.action.name) === "string" &&
+                    e.action.name.toLowerCase() === 'view') {
                     // Store the registered action in case
                     // the image isn't a photosphere-image
                     this._oldActionHandler = e.action.actionHandler;
@@ -273,15 +281,15 @@
             if (!this._isDirectoryShare) {
                 // Normal user login-view
                 xmpBackendUrl = OC.generateUrl('apps/files_photospheres') +
-                        "/userfiles/xmpdata/" +
-                        file.id;
+                    "/userfiles/xmpdata/" +
+                    file.id;
             }
             else {
                 // shared directory view
                 xmpBackendUrl = OC.generateUrl('apps/files_photospheres') +
                     "/sharefiles/xmpdata/" +
                     this._sharingToken +
-                    "?filename=" + 
+                    "?filename=" +
                     filename +
                     "&path=" +
                     this._getDirectorySharePathFromCurrentLocation();
@@ -298,8 +306,8 @@
          */
         canShowSingleFileShare: function (shareToken, callback) {
             var xmpBackendUrl = OC.generateUrl('apps/files_photospheres') +
-                    "/sharefiles/xmpdata/" +
-                    shareToken;
+                "/sharefiles/xmpdata/" +
+                shareToken;
 
             this._xmpDataBackendRequest(xmpBackendUrl, callback);
         },
@@ -331,7 +339,7 @@ $(document).ready(function () {
         // Normal user-view or directory-share
         isDirectoryShare = isDirectoryShare ? true : false;
 
-        if (isDirectoryShare){
+        if (isDirectoryShare) {
             /*
              *  FIXME ::
              *  If we're dealing with a directory-share
@@ -348,16 +356,16 @@ $(document).ready(function () {
                 window.photoSphereViewerFileAction.init(isDirectoryShare, sharingToken);
             });
         }
-        else{
+        else {
             window.photoSphereViewerFileAction.init(isDirectoryShare, sharingToken);
         }
-        
+
     } else {
         // single file-share
         var mimeType = $('#mimetype').val();
         var fileName = $('#filename').val();
 
-        if(mimeType === window.photoSphereViewerFileAction._photoShpereMimeType) {
+        if (mimeType === window.photoSphereViewerFileAction._photoShpereMimeType) {
             $('#files-public-content').hide();
             window.photoSphereViewerFileAction.canShowSingleFileShare(sharingToken, function (canShowImage, xmpResultModel) {
                 if (canShowImage) {
@@ -369,5 +377,5 @@ $(document).ready(function () {
                 }
             });
         }
-    }  
+    }
 });
