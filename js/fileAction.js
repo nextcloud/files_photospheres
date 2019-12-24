@@ -208,6 +208,9 @@
                     if (serverResponse.message) {
                         PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', serverResponse.message]);
                     }
+                    else{
+                        PhotosphereViewerFunctions.notify('An unknown error occured while trying to read xmp-data.');
+                    }
                     callback(false, null);
                     return;
                 }
@@ -219,7 +222,6 @@
                     // the viewer can't be rendered
                     if (!PhotosphereViewerFunctions.isWebGl2Supported()) {
                         PhotosphereViewerFunctions.notify("Your browser doesn't support WebGL2. Please enable WebGL2 support in the browser settings.", "error");
-                        callback(false, null);
                         return;
                     }
                     callback(true, serverResponse.data);
