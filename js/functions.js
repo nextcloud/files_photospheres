@@ -90,12 +90,23 @@ var PhotosphereViewerFunctions = {
         return true;
     },
 
-    isWebGl2Supported: function(){
+    showLoader: function(show) {
+        var $loadingPanel = $('#photo-sphere-viewer-loader');
+        if (!$loadingPanel.length){
+            $loadingPanel = $('<div id="photo-sphere-viewer-loader"></div>').addClass('icon-loading');
+            $('#app-content').after($loadingPanel);
+        }
+        $loadingPanel.toggleClass('hidden', !show);
+    },
+
+    isWebGl2Supported: function() {
         try{
             var canvas = document.createElement('canvas');
             return !! (window.WebGL2RenderingContext && canvas.getContext('webgl2'));
         }
         catch(e){
+            console.log('Error when trying to check WebGL support. (files_photospheres)');
+            console.log(e);
             return false;
         }
     }

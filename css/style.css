@@ -10,7 +10,7 @@
  * @copyright Robin Windey 2019
  */
 
-#viewer {
+#viewer, #photo-sphere-viewer-loader {
     width: 100vw;
     height: calc(100vh - 50px);
   }
@@ -35,5 +35,16 @@
     width: 100%;
     height: 100%;
     top: 0;
+    z-index: 9998;
+}
+
+#photo-sphere-viewer-loader {
+    transition: width 0.5s, top 0.5s, height 0.5s, left 0.5s;
+    position: absolute;
+    top: 50px;
+    left: 0;
     z-index: 9999;
+    overflow: hidden;
+    background-color: #fff;
+    box-sizing: border-box;
 }

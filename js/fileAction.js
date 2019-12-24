@@ -40,11 +40,19 @@
          * Actionhandler for image-click
          */
         _actionHandler: function (filename, context) {
+            FileList.setViewerMode(true);
+            PhotosphereViewerFunctions.showLoader(true);
             this.canShow(filename, context, function (canShowImage, xmpResultModel) {
                 if (canShowImage) {
                     this.showImage(filename, context, xmpResultModel);
                 } else if (typeof (this._oldActionHandler) === 'function') {
+                    FileList.setViewerMode(false);
+                    PhotosphereViewerFunctions.showLoader(false);
                     this._oldActionHandler(filename, context);
+                } else {
+                    FileList.setViewerMode(false);
+                    PhotosphereViewerFunctions.showLoader(false);
+                    PhotosphereViewerFunctions.notify('No app is registered to show regular non-photosphere images');
                 }
             }.bind(this));
         },
@@ -144,15 +152,17 @@
                 // appropriate config object for rendering the component.
                 var frameWindow = this.contentWindow.window;
                 frameWindow.photoSphereViewerRenderer.render(configObject);
+                PhotosphereViewerFunctions.showLoader(false);
             });
 
             if (isSharedViewer) {
                 $('footer').addClass('hidden');
 
             } else {
-                // Provide controls to exit the viewer
+                // Hide fileslist
                 FileList.setViewerMode(true);
 
+                // Register 'esc' to exit the viewer
                 var self = this;
                 var onKeyUp = function (e) {
                     if (e.keyCode == 27) {
@@ -211,6 +221,8 @@
                     else{
                         PhotosphereViewerFunctions.notify('An unknown error occured while trying to read xmp-data.');
                     }
+                    PhotosphereViewerFunctions.showLoader(false);
+                    FileList.setViewerMode(false);
                     callback(false, null);
                     return;
                 }
@@ -222,6 +234,8 @@
                     // the viewer can't be rendered
                     if (!PhotosphereViewerFunctions.isWebGl2Supported()) {
                         PhotosphereViewerFunctions.notify("Your browser doesn't support WebGL2. Please enable WebGL2 support in the browser settings.", "error");
+                        PhotosphereViewerFunctions.showLoader(false);
+                        FileList.setViewerMode(false);
                         return;
                     }
                     callback(true, serverResponse.data);
@@ -231,6 +245,8 @@
             })
                 .fail(function (jqXHR, textStatus, errorThrown) {
                     PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', errorThrown]);
+                    PhotosphereViewerFunctions.showLoader(false);
+                    FileList.setViewerMode(false);
                 });
         },
 
@@ -318,6 +334,8 @@
             var file = this._getImageFileObject(filename, context);
             if (!file) {
                 PhotosphereViewerFunctions.notify(['Could not locate file']);
+                PhotosphereViewerFunctions.showLoader(false);
+                FileList.setViewerMode(false);
                 return;
             }
             this._showImage(file, xmpResultModel);
@@ -368,6 +386,7 @@ $(document).ready(function () {
         var fileName = $('#filename').val();
 
         if (mimeType === window.photoSphereViewerFileAction._photoShpereMimeType) {
+            PhotosphereViewerFunctions.showLoader(true);
             $('#files-public-content').hide();
             window.photoSphereViewerFileAction.canShowSingleFileShare(sharingToken, function (canShowImage, xmpResultModel) {
                 if (canShowImage) {
@@ -376,6 +395,7 @@ $(document).ready(function () {
                 }
                 else {
                     $('#files-public-content').show();
+                    PhotosphereViewerFunctions.showLoader(false);
                 }
             });
         }
