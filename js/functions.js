@@ -15,11 +15,12 @@
 var PhotosphereViewerFunctions = {
 
     /**
-     * Shows a (translated) notify message and hides it after 5s
+     * Shows a (translated) notify message and hides it after 7s
      * @param {string|array} message(s) (could have a translation each)
+     * @param {string} type of the notification (e.g. 'error'). If none provided it will be the default.
      * @returns {void}
      */
-    notify: function (message) {
+    notify: function (message, type) {
         var tmpMessage = '';
         if (typeof message === "string") {
             tmpMessage = t('files_photospheres', message);
@@ -31,10 +32,12 @@ var PhotosphereViewerFunctions = {
             throw "Function 'notify' needs a message argument";
         }
 
-        var notifyRow = OC.Notification.show(tmpMessage);
-        setTimeout(function () {
-            OC.Notification.hide(notifyRow);
-        }, 5000);
+        if (!type){
+            OC.Notification.showTemporary(tmpMessage);
+        }
+        else{
+            OC.Notification.showTemporary(tmpMessage, {type: type})
+        }
     },
 
     /*
@@ -94,6 +97,18 @@ var PhotosphereViewerFunctions = {
             $('#app-content').after($loadingPanel);
         }
         $loadingPanel.toggleClass('hidden', !show);
+    },
+
+    isWebGl2Supported: function() {
+        try{
+            var canvas = document.createElement('canvas');
+            return !! (window.WebGL2RenderingContext && canvas.getContext('webgl2'));
+        }
+        catch(e){
+            console.log('Error when trying to check WebGL support. (files_photospheres)');
+            console.log(e);
+            return false;
+        }
     }
 }
 
