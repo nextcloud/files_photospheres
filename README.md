@@ -33,3 +33,4 @@ After installing the app you can view your PhotoSphere 360° images by clicking 
 
 ## Caveats
 * It is not possible to open the photosphere viewer from the Gallery. You must use the file browser.
+* `WebGL`-support must be activated in your browser.
