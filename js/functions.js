@@ -102,7 +102,7 @@ var PhotosphereViewerFunctions = {
     isWebGl2Supported: function() {
         try{
             var canvas = document.createElement('canvas');
-            return !! (window.WebGL2RenderingContext && canvas.getContext('webgl2'));
+            return !! (window.WebGL2RenderingContext && canvas.getContext('webgl2') || window.WebGLRenderingContext && canvas.getContext('webgl'));
         }
         catch(e){
             console.log('Error when trying to check WebGL support. (files_photospheres)');

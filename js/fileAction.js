@@ -233,7 +233,7 @@
                     // check WebGL2 support in browser, otherwise
                     // the viewer can't be rendered
                     if (!PhotosphereViewerFunctions.isWebGl2Supported()) {
-                        PhotosphereViewerFunctions.notify("Your browser doesn't support WebGL2. Please enable WebGL2 support in the browser settings.", "error");
+                        PhotosphereViewerFunctions.notify("Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings.", "error");
                         PhotosphereViewerFunctions.showLoader(false);
                         FileList.setViewerMode(false);
                         return;
