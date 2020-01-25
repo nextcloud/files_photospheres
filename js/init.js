@@ -17,7 +17,9 @@ class PhotoSphereViewerRenderer {
         const defaults = {
             container: 'viewer',
             time_anim: false,
-            usexmpdata: false
+            usexmpdata: false,
+            // Fix iframe problem on Safari #32
+            with_credentials: true
         };
 
         // Merge with defaults
