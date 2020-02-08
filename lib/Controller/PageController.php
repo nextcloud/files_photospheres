@@ -37,13 +37,35 @@ class PageController extends Controller {
 	 * @NoCSRFRequired
          * @PublicPage
 	 */
-	public function index() {
+	public function image() {
+             return $this->showPage("image");   
+        }
+
+        /**
+	 * @NoCSRFRequired
+         * @PublicPage
+	 */
+        public function video() {
+                return $this->showPage("video");
+        }
+
+        private function showPage($type) {
                 $params = [
                         'urlGenerator' => $this->urlGenerator,
                         'appVersion' => \OC::$server->getAppManager()->getAppVersion(AppInfo\Application::APP_NAME),
                         'nounceManager' => \OC::$server->getContentSecurityPolicyNonceManager()
                 ];
-		$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer', $params, 'blank');  // templates/viewer.php
+                switch($type){
+                        case "image": 
+                                $response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer', $params, 'blank');  // templates/viewer.php
+                                break;
+                        case "video":
+                                $response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer_video', $params, 'blank');  // templates/viewer_video.php
+                                break;
+                        break;
+                        default: return null;
+                }
+
                 $this->setContentSecurityPolicy($response);  
                 return $response;
         }

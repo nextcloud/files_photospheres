@@ -12,7 +12,7 @@
  * Injected via the OCA\Files::loadAdditionalScripts-callback.
  * Used to hook into the actionhandler for images.
  */
-(function ($, OC, OCA, oc_requesttoken) {
+(function ($, OC, OCA) {
 
     "use strict";
     var photoSphereViewerFileAction = {
@@ -58,6 +58,14 @@
         },
 
         /*
+         * Actionhandler for video-click
+         */
+        _actionHandlerVideo: function(filename, context){
+            FileList.setViewerMode(true);
+            this._showVideo(filename, context);
+        },
+
+        /*
          * Default action
          */
         _getAction: function () {
@@ -72,6 +80,19 @@
             };
         },
 
+        _getVideoAction: function() {
+            return {
+                name: 'viewInThreeSixtyViewer',
+				displayName: "View in 360° viewer",
+				mime: 'video/mp4',
+				order: 1000,
+				permissions: OC.PERMISSION_READ,
+                actionHandler: this._actionHandlerVideo.bind(this),
+                iconClass: "icon-external"
+            }
+        }
+        ,
+
         _getDirectorySharePathFromCurrentLocation: function () {
             var searchParams = new URLSearchParams(document.location.search);
             var path = searchParams.get('path');
@@ -81,30 +102,27 @@
             return path;
         },
 
+        _getFileUrl(fileObject){
+            if (!this._isDirectoryShare) {
+                // "normal" user-view
+                var path = fileObject.path;
+                if (path == '/'){
+                    path = '';
+                }
+                return `${OC.getRootPath()}/remote.php/webdav${path}/${fileObject.name}`;
+            } else {
+                // directory-share
+                return `${OC.getRootPath()}/index.php/s/${this._sharingToken}/download?path=${this._getDirectorySharePathFromCurrentLocation()}&files=${fileObject.name}`;
+            }
+        },
+
         /*
          * Generates the url and jumps
          * to the photosphere app
          */
         _showImage: function (fileObject, xmpResultModel) {
-            var imageUrl = '';
-            if (!this._isDirectoryShare) {
-                // "normal" user-view
-                imageUrl = OC.getRootPath() +
-                    '/remote.php/webdav' +
-                    fileObject.path +
-                    '/' +
-                    fileObject.name;
-            } else {
-                // directory-share
-                imageUrl = OC.getRootPath() +
-                    '/index.php/s/' +
-                    this._sharingToken +
-                    '/download?path=' +
-                    this._getDirectorySharePathFromCurrentLocation() +
-                    '&files=' +
-                    fileObject.name;
-            }
-
+            var imageUrl = this._getFileUrl(fileObject);
+            
             var urlParams = {
                 url: imageUrl,
                 filename: fileObject.name
@@ -115,35 +133,60 @@
                 urlParams = $.extend(urlParams, xmpResultModel);
             }
 
-            this.showFrame(imageUrl, fileObject.name, xmpResultModel, false);
+            this.showFrame(imageUrl, fileObject.name, xmpResultModel, false, 'image');
         },
 
+        _showVideo: function(filename, context) {
+            var fileObject = this._getFileObject(filename, context);
+            if (!fileObject) {
+                PhotosphereViewerFunctions.notify(['Could not locate file']);
+                PhotosphereViewerFunctions.showLoader(false);
+                FileList.setViewerMode(false);
+                return;
+            }
+
+            var videoUrl = this._getFileUrl(fileObject);
+            this.showFrame(videoUrl, filename, null, false, 'video');
+        },
         /*
          * Injects the iframe with the viewer into the current page. 
          * Suiteable for both the sharing option (based on a token) and the authenticated explorer view (filename).
          * @param {string} imageUrl         - The url from which the panorama can be loaded 
-         * @param {string} imageFileName    - The name of the image. Used as caption in the viewer.
+         * @param {string} fileName    - The name of the image. Used as caption in the viewer.
          * @param {object} xmpResultModel   - The xmp-information, read from the server.
          * @param {bool} isSharedViewer     - True, if we are on single-fileshare 
+         * @param {string} frameType        - image or video
          */
-        showFrame: function (imageUrl, imageFileName, xmpResultModel, isSharedViewer) {
+        showFrame: function (imageUrl, fileName, xmpResultModel, isSharedViewer, frameType) {
+            var appUrl = '';
+            var configObject;
 
-            var configObject = {
-                panorama: imageUrl,
-                caption: imageFileName
-            };
+            switch(frameType){
+                case 'image':
+                    appUrl = OC.generateUrl('apps/files_photospheres');
+                    configObject = {
+                        panorama: imageUrl,
+                        caption: fileName
+                    };
+                    break;
+                case 'video':
+                    appUrl = OC.generateUrl('apps/files_photospheres/video');
+                    configObject = {
+                        url: imageUrl,
+                        caption: fileName
+                    };
+                    break;
+            }
 
-            // Add xmpData (cropping-info) to viewer-params, if we have some
-            if (xmpResultModel.containsCroppingConfig) {
+            // Add xmpData (cropping-info) to image-viewer-params, if we have some
+            if (frameType == 'image' && xmpResultModel && xmpResultModel.containsCroppingConfig) {
                 var extendObject = {
                     pano_data: xmpResultModel.croppingConfig
                 };
                 configObject = $.extend(configObject, extendObject);
             }
 
-            var appUrl = OC.generateUrl('apps/files_photospheres');
-
-            this._frameContainer = $('<iframe id="' + this._frameId + '" src="' + appUrl + '" allowfullscreen="true"/>');
+            this._frameContainer = $(`<iframe id="${this._frameId}" src="${appUrl}" allowfullscreen="true"/>`);
             $('#app-content').after(this._frameContainer);
 
             this._frameContainer.on('load', function () {
@@ -151,7 +194,16 @@
                 // iframe. After the frame has loaded, provide
                 // appropriate config object for rendering the component.
                 var frameWindow = this.contentWindow.window;
-                frameWindow.photoSphereViewerRenderer.render(configObject);
+
+                switch(frameType){
+                    case 'image':
+                        frameWindow.photoSphereViewerRenderer.render(configObject);
+                        break;
+                    case 'video':
+                        frameWindow.photoSphereVideoRenderer.render(configObject);
+                        break;
+                }
+
                 PhotosphereViewerFunctions.showLoader(false);
             });
 
@@ -200,7 +252,7 @@
             }
         },
 
-        _getImageFileObject: function (filename, context) {
+        _getFileObject: function (filename, context) {
             var fileList = context.fileList;
             var files = fileList.files;
             for (var i = 0; i < files.length; i++) {
@@ -263,6 +315,8 @@
             this._sharingToken = sharingToken;
 
             OCA.Files.fileActions.registerAction(this._getAction());
+            OCA.Files.fileActions.registerAction(this._getVideoAction());
+
             OCA.Files.fileActions.setDefault('image/jpeg', 'view');
 
             OCA.Files.fileActions.on('registerAction', function (e) {
@@ -289,7 +343,7 @@
         canShow: function (filename, context, callback) {
             // Trigger serverside function to
             // try to read xmp-data of the file
-            var file = this._getImageFileObject(filename, context);
+            var file = this._getFileObject(filename, context);
             if (!file) {
                 callback(false, null);
                 return;
@@ -331,7 +385,7 @@
         },
 
         showImage: function (filename, context, xmpResultModel) {
-            var file = this._getImageFileObject(filename, context);
+            var file = this._getFileObject(filename, context);
             if (!file) {
                 PhotosphereViewerFunctions.notify(['Could not locate file']);
                 PhotosphereViewerFunctions.showLoader(false);
@@ -344,7 +398,7 @@
 
     window.photoSphereViewerFileAction = photoSphereViewerFileAction;
 
-})(jQuery, OC, OCA, oc_requesttoken);
+})(jQuery, OC, OCA);
 
 $(document).ready(function () {
 
