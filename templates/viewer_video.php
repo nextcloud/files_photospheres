@@ -69,6 +69,7 @@
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/marzipano/multiResVideo.js')) ?>?v=<?php p($version) ?>"></script>
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/marzipano/colorEffects.js')) ?>?v=<?php p($version) ?>"></script>
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/marzipano/interface.js')) ?>?v=<?php p($version) ?>"></script>
+        <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/marzipano/attribution.js')) ?>?v=<?php p($version) ?>"></script>
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/marzipano/init.js')) ?>?v=<?php p($version) ?>"></script>
     </body>
 </html>

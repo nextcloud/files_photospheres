@@ -18,6 +18,9 @@ class PhotoSphereVideoRenderer {
     render(configObject) {
         threeSixtyVideo.play(configObject.url, function(err){
             console.log(err);
+            if (!err){
+                attribution(configObject.caption, '', '', 'topleft');
+            }
         });
     }
 }
