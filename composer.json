@@ -1,15 +1,24 @@
 {
-    "name": "Photo Sphere Viewer",
-    "description": "Enables viewing of google photosphere images",
+    "name": "nextcloud/files_photospheres",
+    "description": "Enables viewing of google photosphere images inside Nextcloud server.",
     "type": "project",
-    "license": "AGPL",
+    "license": "AGPLv3",
     "authors": [
         {
-            "name": "Robin Windey"
+            "name": "Robin Windey",
+            "email": "ro.windey@gmail.com"
         }
     ],
     "require": {},
     "require-dev": {
-        "phpunit/phpunit": "^6.5"
+        "phpunit/phpunit": "^6.5",
+        "jakub-onderka/php-parallel-lint": "^1.0.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "classmap-authoritative": true
+    },
+    "scripts": {
+        "lint": "find . -name \\*.php -not -path './vendor/*' -exec php -l \"{}\" \\;"
     }
 }
