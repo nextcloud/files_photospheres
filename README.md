@@ -1,6 +1,7 @@
 # Nextcloud - Files_PhotoSpheres
 
-![PHPUnit](https://github.com/nextcloud/files_photospheres/workflows/PHPUnit/badge.svg?branch=master)
+![PHPUnit](https://github.com/nextcloud/files_photospheres/workflows/PHPUnit/badge.svg)
+![Lint](https://github.com/nextcloud/files_photospheres/workflows/Lint/badge.svg)
 [![Generic badge](https://img.shields.io/github/v/release/nextcloud/files_photospheres)](https://github.com/nextcloud/files_photospheres/releases)
 [![Generic badge](https://img.shields.io/badge/Nextcloud-18-orange)](https://github.com/nextcloud/server)
 
