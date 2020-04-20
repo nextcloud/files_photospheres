@@ -14,17 +14,17 @@
 namespace OCA\Files_PhotoSpheres\Model;
 
 class XmpResultModel {
-    
-    /** @var bool */
-    public $containsGpanoData = FALSE;
+	
+	/** @var bool */
+	public $containsGpanoData = false;
 
-    /** @var bool */
-    public $containsCroppingConfig = FALSE;
+	/** @var bool */
+	public $containsCroppingConfig = false;
 
-    /** @var CroppingConfigModel */
-    public $croppingConfig;
+	/** @var CroppingConfigModel */
+	public $croppingConfig;
 
-    function __construct() {
-        $this->croppingConfig = new CroppingConfigModel();
-    }
+	public function __construct() {
+		$this->croppingConfig = new CroppingConfigModel();
+	}
 }

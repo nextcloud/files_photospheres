@@ -49,5 +49,5 @@ jobs:
     - name: Install dependencies
       run: composer i
 
-    - name: Run coding standards fix
-      run: composer run cs:fix
+    - name: Run coding standards check
+      run: composer run cs:check

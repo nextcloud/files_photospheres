@@ -18,7 +18,6 @@ use PHPUnit\Framework\TestCase;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCA\Files_PhotoSpheres\Controller\PageController;
 
-
 class PageControllerTest extends TestCase {
 
 	/** @var PageController */
@@ -29,7 +28,7 @@ class PageControllerTest extends TestCase {
 		$urlGenerator = $this->getMockBuilder('OCP\IURLGenerator')->getMock();
 
 		$this->controller = new PageController(
-                    AppInfo\Application::APP_NAME, $request, $urlGenerator
+					AppInfo\Application::APP_NAME, $request, $urlGenerator
 		);
 	}
 
@@ -41,9 +40,9 @@ class PageControllerTest extends TestCase {
 	}
 
 	public function testVideo() {
-			$result = $this->controller->video();
+		$result = $this->controller->video();
 
-			$this->assertEquals('viewer_video', $result->getTemplateName());
-			$this->assertTrue($result instanceof TemplateResponse);
+		$this->assertEquals('viewer_video', $result->getTemplateName());
+		$this->assertTrue($result instanceof TemplateResponse);
 	}
 }
