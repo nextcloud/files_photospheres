@@ -1,5 +1,6 @@
 # Nextcloud - Files_PhotoSpheres
 
+[![Build Status](https://drone.nextcloud.com/api/badges/nextcloud/files_photospheres/status.svg)](https://drone.nextcloud.com/nextcloud/files_photospheres)
 [![Generic badge](https://img.shields.io/github/v/release/nextcloud/files_photospheres)](https://github.com/nextcloud/files_photospheres/releases)
 [![Generic badge](https://img.shields.io/badge/Nextcloud-18-orange)](https://github.com/nextcloud/server)
 
