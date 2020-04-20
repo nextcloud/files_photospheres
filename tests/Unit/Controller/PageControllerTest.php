@@ -33,11 +33,17 @@ class PageControllerTest extends TestCase {
 		);
 	}
 
-	public function testIndex() {
-		$result = $this->controller->index();
+	public function testImage() {
+		$result = $this->controller->image();
 
-		$this->assertEquals('viewer', $result->getTemplateName());
+		$this->assertEquals('image', $result->getTemplateName());
 		$this->assertTrue($result instanceof TemplateResponse);
 	}
 
+	public function testVideo() {
+			$result = $this->controller->video();
+
+			$this->assertEquals('video', $result->getTemplateName());
+			$this->assertTrue($result instanceof TemplateResponse);
+	}
 }
