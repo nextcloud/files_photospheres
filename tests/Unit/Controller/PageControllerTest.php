@@ -36,14 +36,14 @@ class PageControllerTest extends TestCase {
 	public function testImage() {
 		$result = $this->controller->image();
 
-		$this->assertEquals('image', $result->getTemplateName());
+		$this->assertEquals('viewer', $result->getTemplateName());
 		$this->assertTrue($result instanceof TemplateResponse);
 	}
 
 	public function testVideo() {
 			$result = $this->controller->video();
 
-			$this->assertEquals('video', $result->getTemplateName());
+			$this->assertEquals('viewer_video', $result->getTemplateName());
 			$this->assertTrue($result instanceof TemplateResponse);
 	}
 }
