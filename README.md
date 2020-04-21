@@ -5,7 +5,8 @@
 
 
 Nextcloud app for viewing Google PhotoSphere 360° images (panorama-images). This app is based on 
-the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library.
+the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library. For 
+360° videos the library [marzipano](https://www.marzipano.net/) is used.
 
 **This version is tested for Nextcloud 18.**
 
@@ -13,7 +14,8 @@ the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library.
 * Interactive viewer to view PhotoSphere images in your Nextcloud instance
 * When clicking on an image it automaticlly detects the presence of XMP-data tags (which are used in photospheres).
 * Compatible with the "normal" user-view, single-file share and directory share.
-* Seamless integration with other file-viewer apps 
+* Seamless integration with other file-viewer apps.
+* Supports viewing of 360° videos in "normal" user-view via context menu. 
 
 ## Setup
 ### Install through the app store
@@ -34,3 +36,5 @@ After installing the app you can view your PhotoSphere 360° images by clicking 
 ## Caveats
 * It is not possible to open the photosphere viewer from the Gallery. You must use the file browser.
 * `WebGL`-support must be activated in your browser.
+* 360° videos can not be shown in shared views. It is only possible to open them by context menu 
+therefore the `files_rightclick` app has to be installed (see https://github.com/nextcloud/files_rightclick).
