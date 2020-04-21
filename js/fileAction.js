@@ -44,15 +44,19 @@
             PhotosphereViewerFunctions.showLoader(true);
             this.canShow(filename, context, function (canShowImage, xmpResultModel) {
                 if (canShowImage) {
+                    // It's a photosphere image, show it
                     this.showImage(filename, context, xmpResultModel);
                 } else if (typeof (this._oldActionHandler) === 'function') {
+                    // It's a normal image, call the default handler
                     FileList.setViewerMode(false);
                     PhotosphereViewerFunctions.showLoader(false);
                     this._oldActionHandler(filename, context);
                 } else {
+                    // If there is no default handler trigger download
                     FileList.setViewerMode(false);
                     PhotosphereViewerFunctions.showLoader(false);
-                    PhotosphereViewerFunctions.notify('No app is registered to show regular non-photosphere images');
+                    const fileObject = this._getFileObject(filename, context);
+                    window.location = this._getFileUrl(fileObject);
                 }
             }.bind(this));
         },
@@ -445,7 +449,7 @@ $(document).ready(function () {
             window.photoSphereViewerFileAction.canShowSingleFileShare(sharingToken, function (canShowImage, xmpResultModel) {
                 if (canShowImage) {
                     var imageUrl = OC.generateUrl('/s/{token}/download', { token: sharingToken });
-                    window.photoSphereViewerFileAction.showFrame(imageUrl, fileName, xmpResultModel, true);
+                    window.photoSphereViewerFileAction.showFrame(imageUrl, fileName, xmpResultModel, true, 'image');
                 }
                 else {
                     $('#files-public-content').show();
