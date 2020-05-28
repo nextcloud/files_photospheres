@@ -325,10 +325,10 @@
              *   1. the action is already registered before ours
              *   2. the action will be registered after ours
              */
-            const currAction = OCA.Files.fileActions.actions[this._photoShpereMimeType];
-            if (currAction && currAction.view) {
+            const currActions = OCA.Files.fileActions.getActions(this._photoShpereMimeType, 'file', OC.PERMISSION_READ);
+            if (currActions && currActions.view) {
                 // This is case (1)
-                this._oldActionHandler = currAction.view.action;
+                this._oldActionHandler = currActions.view.action;
             }
 
             OCA.Files.fileActions.registerAction(this._getAction());
