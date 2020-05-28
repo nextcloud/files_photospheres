@@ -318,18 +318,33 @@
             this._isDirectoryShare = isDirectoryShare;
             this._sharingToken = sharingToken;
 
+            /*
+             * Try to store the original actionhandler for the
+             * image in case it isn't a photosphere. Depending on the
+             * order in which the NC apps are loaded it could be that:
+             *   1. the action is already registered before ours
+             *   2. the action will be registered after ours
+             */
+            const currActions = OCA.Files.fileActions.getActions(this._photoShpereMimeType, 'file', OC.PERMISSION_READ);
+            if (currActions && currActions.view) {
+                // This is case (1)
+                this._oldActionHandler = currActions.view.action;
+            }
+
             OCA.Files.fileActions.registerAction(this._getAction());
             OCA.Files.fileActions.registerAction(this._getVideoAction());
 
-            OCA.Files.fileActions.setDefault('image/jpeg', 'view');
+            OCA.Files.fileActions.setDefault(this._photoShpereMimeType, 'view');
 
+            // Register listener after our registration
             OCA.Files.fileActions.on('registerAction', function (e) {
                 if (e.action.mime === this._photoShpereMimeType &&
                     e.action.name &&
                     typeof (e.action.name) === "string" &&
                     e.action.name.toLowerCase() === 'view') {
-                    // Store the registered action in case
-                    // the image isn't a photosphere-image
+                    // Override but store the registered action 
+                    // which was registered after ours. This is
+                    // case (2)
                     this._oldActionHandler = e.action.actionHandler;
                     e.action.actionHandler = this._actionHandler.bind(this);
                 }
