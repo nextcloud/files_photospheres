@@ -9,7 +9,7 @@
         integrating the photo-sphere-viewer.js component
         into your nextcloud instance.
     ]]></description>
-    <version>1.0.9</version>
+    <version>1.19.0</version>
     <licence>agpl</licence>
     <author mail="ro.windey@gmail.com" >Robin Windey</author>
     <namespace>Files_PhotoSpheres</namespace>
@@ -18,6 +18,6 @@
     <repository>https://github.com/nextcloud/files_photospheres.git</repository>
     <screenshot>https://user-images.githubusercontent.com/19730957/53694835-62a68a80-3db4-11e9-8c60-4ebdc02566d6.jpg</screenshot>
     <dependencies>
-        <nextcloud min-version="18" max-version="18"/>
+        <nextcloud min-version="19" max-version="19"/>
     </dependencies>
 </info>
