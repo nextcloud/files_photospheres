@@ -25,42 +25,42 @@ use OCA\Files_PhotoSpheres\Model\XmpResultModel;
  */
 class StorageService implements IStorageService {
 
-    /**
-     *
-     * @var Folder 
-     */
-    private $userFolder;
-    
-    /**
-     *
-     * @var IXmpDataReader
-     */
-    private $xmpDataReader;
+	/**
+	 *
+	 * @var Folder
+	 */
+	private $userFolder;
+	
+	/**
+	 *
+	 * @var IXmpDataReader
+	 */
+	private $xmpDataReader;
 
-    /**
-     * Constructor 
-     * 
-     * @param Folder $userFolder
-     * @param IXmpDataReader $xmpDataReader
-     */
-    public function __construct(Folder $userFolder, IXmpDataReader $xmpDataReader) {
-        $this->userFolder = $userFolder;
-        $this->xmpDataReader = $xmpDataReader;
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param Folder $userFolder
+	 * @param IXmpDataReader $xmpDataReader
+	 */
+	public function __construct(Folder $userFolder, IXmpDataReader $xmpDataReader) {
+		$this->userFolder = $userFolder;
+		$this->xmpDataReader = $xmpDataReader;
+	}
 
-    /**
-     * 
-     * @param int $fileId
-     * @return array
-     */
-    public function getXmpData($fileId) : XmpResultModel {
-        $arrFiles = $this->userFolder->getById($fileId);
-        if (!isset($arrFiles[0])) {
-            throw new \Exception('Could not locate node linked to ID: ' . $fileId);
-        }
+	/**
+	 *
+	 * @param int $fileId
+	 * @return array
+	 */
+	public function getXmpData($fileId) : XmpResultModel {
+		$arrFiles = $this->userFolder->getById($fileId);
+		if (!isset($arrFiles[0])) {
+			throw new \Exception('Could not locate node linked to ID: ' . $fileId);
+		}
 
-        $file = $arrFiles[0];
+		$file = $arrFiles[0];
 
-        return $this->xmpDataReader->readXmpDataFromFileObject($file);
-    }
+		return $this->xmpDataReader->readXmpDataFromFileObject($file);
+	}
 }

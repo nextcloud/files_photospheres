@@ -26,44 +26,42 @@ use OCP\AppFramework\Http\JSONResponse;
  */
 class SharefilesController extends Controller {
 
-    /**
-     * @var IShareService
-     */
-    private $shareService;
+	/**
+	 * @var IShareService
+	 */
+	private $shareService;
 
-    public function __construct($appName, IRequest $request, IShareService $shareService) {
+	public function __construct($appName, IRequest $request, IShareService $shareService) {
+		parent::__construct($appName, $request);
 
-        parent::__construct($appName, $request);
+		$this->shareService = $shareService;
+	}
 
-        $this->shareService = $shareService;
-    }
+	/**
+	 * @PublicPage
+	 * @NoCSRFRequired
+	 *
+	 * @param string $shareToken the token of the public share
+	 * @param string $filename the filename (if we're dealing with a directory share)
+	 * @param string $path the directory path, where the file is stored in (if we're dealing with a directory share)
+	 * @return \OCP\AppFramework\Http\JSONResponse
+	 */
+	public function getXmpData($shareToken, $filename = '', $path = ''): JSONResponse {
+		\OC_User::setIncognitoMode(true);
 
-    /**
-     * @PublicPage
-     * @NoCSRFRequired
-     * 
-     * @param string $shareToken the token of the public share
-     * @param string $filename the filename (if we're dealing with a directory share)
-     * @param string $path the directory path, where the file is stored in (if we're dealing with a directory share)
-     * @return \OCP\AppFramework\Http\JSONResponse
-     */
-    public function getXmpData($shareToken, $filename = '', $path = ''): JSONResponse {
-        \OC_User::setIncognitoMode(true);
-
-        try {
-            $xmpData = $this->shareService->getXmpData($shareToken, $filename, $path);
-            return new JSONResponse(
-                    [
-                'data' => $xmpData,
-                'success' => true
-            ]);
-        } catch (\Exception $e) {
-            return new JSONResponse(
-                    [
-                'message' => $e->getMessage(),
-                'success' => false
-            ]);
-        }
-    }
-
+		try {
+			$xmpData = $this->shareService->getXmpData($shareToken, $filename, $path);
+			return new JSONResponse(
+					[
+						'data' => $xmpData,
+						'success' => true
+					]);
+		} catch (\Exception $e) {
+			return new JSONResponse(
+					[
+						'message' => $e->getMessage(),
+						'success' => false
+					]);
+		}
+	}
 }

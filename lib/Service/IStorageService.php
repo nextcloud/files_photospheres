@@ -18,10 +18,10 @@ use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 
 interface IStorageService {
 
-    /**
-     * 
-     * @param int $fileId
-     * @return XmpResultModel
-     */
-    function getXmpData($fileId) : XmpResultModel;
+	/**
+	 *
+	 * @param int $fileId
+	 * @return XmpResultModel
+	 */
+	public function getXmpData($fileId) : XmpResultModel;
 }
