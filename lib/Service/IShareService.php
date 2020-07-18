@@ -17,11 +17,11 @@ namespace OCA\Files_PhotoSpheres\Service;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 
 interface IShareService {
-    
-    /**
-     * 
-     * @param string $shareToken
-     * @return XmpResultModel 
-     */
-    function getXmpData($shareToken) : XmpResultModel;
+	
+	/**
+	 *
+	 * @param string $shareToken
+	 * @return XmpResultModel
+	 */
+	public function getXmpData($shareToken) : XmpResultModel;
 }

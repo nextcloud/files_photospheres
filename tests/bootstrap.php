@@ -3,7 +3,7 @@
 use OCA\Files_PhotoSpheres\AppInfo;
 
 if (!defined('PHPUNIT_RUN')) {
-    define('PHPUNIT_RUN', 1);
+	define('PHPUNIT_RUN', 1);
 }
 
 require_once __DIR__.'/../../../lib/base.php';
@@ -14,8 +14,8 @@ require_once __DIR__.'/../../../lib/base.php';
 // Fix for "Autoload path not allowed: .../files_photospheres/tests/testcase.php"
 \OC_App::loadApp(AppInfo\Application::APP_NAME);
 
-if(!class_exists('PHPUnit\Framework\TestCase')) {
-    require_once('PHPUnit/Autoload.php');
+if (!class_exists('PHPUnit\Framework\TestCase')) {
+	require_once('PHPUnit/Autoload.php');
 }
 
 OC_Hook::clear();
