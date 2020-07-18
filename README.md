@@ -36,3 +36,10 @@ After installing the app you can view your PhotoSphere 360° images by clicking 
 ## Caveats
 * It is not possible to open the photosphere viewer from the Gallery. You must use the file browser.
 * `WebGL`-support must be activated in your browser.
+
+## Report an issue
+I rely on all kind of feedback so feel free to open an issue if you encounter any problems with this app but please pay attention to the following points:
+* If there is a problem with some images which aren't opened in this app but rather in the regular image viewer, please provide them via downloadlink if possible. Otherwise debugging and error-checking becomes quite hard. Please also check if the image you provide has correct XMP-metadata for being detected as photosphere image (like specified [here](https://developers.google.com/streetview/spherical-metadata#gpano_parameter_reference)). The image is only detected as photosphere if the XMP-metadata has the flag `GPano:UsePanoramaViewer` set explicitly to `true` or if `GPano:ProjectionType` is set to `equirectangular`. You can check these metadata information either with tools like [`exiftool`](https://exiftool.org/) or manually by opening the image with your favorite texteditor and scrolling throw the first few bytes. 
+* In the frontend this app is only an integration of different external components like [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) and [marzipano](https://www.marzipano.net/). Therefore problems regarding these libraries cannot be fixed in this app.
+
+Thanks for your support :smiley:
