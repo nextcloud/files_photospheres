@@ -16,6 +16,9 @@ namespace OCA\Files_PhotoSpheres\Service\Helper;
 
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 
+/*
+ *  See https://developers.google.com/streetview/spherical-metadata
+ */
 class XmpDataReader implements IXmpDataReader {
     
     /**
@@ -39,11 +42,6 @@ class XmpDataReader implements IXmpDataReader {
      */
     private static $XMP_END_TAG = '</x:xmpmeta>';
 
-    /**
-     * XML-start-tag for GPano data
-     */
-    private static $GPANO_START_TAG = 'GPano';
-    
     function __construct() {
      
     }
@@ -84,9 +82,8 @@ class XmpDataReader implements IXmpDataReader {
         if ($posStart === FALSE || $posEnd === FALSE)
             return $xmpResultModel;
 
-        // Check if we have some GPano data
-        $posGpano = strpos($fileString, self::$GPANO_START_TAG);
-        $xmpResultModel->containsGpanoData = $posGpano !== FALSE;
+        // Check if we should use panoramaviewer
+        $xmpResultModel->usePanoramaViewer = $this->readUsePanoramaViewerTag($fileString);
 
         $bufferCutStart = substr($fileString, $posStart);
         $buffer = substr($bufferCutStart, 0, $posEnd + 12);
@@ -94,6 +91,24 @@ class XmpDataReader implements IXmpDataReader {
         $this->fillXmpData($buffer, $xmpResultModel);
 
         return $xmpResultModel;
+    }
+
+    private function readUsePanoramaViewerTag($xmlString) : bool {
+        preg_match('/GPano:UsePanoramaViewer((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $usePanoViewerMatch);
+        
+        if (empty($usePanoViewerMatch)) {
+            // Since GPano:UsePanoramaViewer is optional, take a look at GPano:ProjectionType
+            preg_match('/GPano:ProjectionType((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $projectionTypeMatch);
+            
+            if (empty($projectionTypeMatch))
+                return false;
+            
+            $projectionTypeStr = strtolower(end($projectionTypeMatch));
+            return $projectionTypeStr === "equirectangular";
+        }
+        
+        $usePanoViewerStr = strtolower(end($usePanoViewerMatch));
+        return $usePanoViewerStr === "true";
     }
 
     private function fillXmpData($xmlString, XmpResultModel $model) {

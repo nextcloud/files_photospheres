@@ -16,7 +16,7 @@ namespace OCA\Files_PhotoSpheres\Model;
 class XmpResultModel {
     
     /** @var bool */
-    public $containsGpanoData = FALSE;
+    public $usePanoramaViewer = FALSE;
 
     /** @var bool */
     public $containsCroppingConfig = FALSE;

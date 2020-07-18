@@ -3,3 +3,4 @@ build
 /vendor
 .vscode
 composer.lock
+/.php_cs.cache
