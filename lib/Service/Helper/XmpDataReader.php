@@ -16,112 +16,128 @@ namespace OCA\Files_PhotoSpheres\Service\Helper;
 
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 
+/*
+ *  See https://developers.google.com/streetview/spherical-metadata
+ */
 class XmpDataReader implements IXmpDataReader {
-    
-    /**
-     * Read files in 8kb blocks
-     */
-    private static $CHUNK_SIZE = 8192;
+	
+	/**
+	 * Read files in 8kb blocks
+	 */
+	private static $CHUNK_SIZE = 8192;
 
-    /**
-     * Maximum of blocks to read for xmp-data
-     * (read max 800kb of the file)
-     */
-    private static $MAX_BLOCK_COUNT = 100;
+	/**
+	 * Maximum of blocks to read for xmp-data
+	 * (read max 800kb of the file)
+	 */
+	private static $MAX_BLOCK_COUNT = 100;
 
-    /**
-     * XML-start-tag for xmp-data
-     */
-    private static $XMP_START_TAG = '<x:xmpmeta';
+	/**
+	 * XML-start-tag for xmp-data
+	 */
+	private static $XMP_START_TAG = '<x:xmpmeta';
 
-    /**
-     * XML-end-tag for xmp-data
-     */
-    private static $XMP_END_TAG = '</x:xmpmeta>';
+	/**
+	 * XML-end-tag for xmp-data
+	 */
+	private static $XMP_END_TAG = '</x:xmpmeta>';
 
-    /**
-     * XML-start-tag for GPano data
-     */
-    private static $GPANO_START_TAG = 'GPano';
-    
-    function __construct() {
-     
-    }
-    
-    public function readXmpDataFromFileObject(\OCP\Files\File $file) : XmpResultModel {
-        $firstFileBytesString = $this->readFirstFileBlocks($file);
-        return $this->readXmpDataFromFileSting($firstFileBytesString);
-    }
+	public function __construct() {
+	}
+	
+	public function readXmpDataFromFileObject(\OCP\Files\File $file) : XmpResultModel {
+		$firstFileBytesString = $this->readFirstFileBlocks($file);
+		return $this->readXmpDataFromFileSting($firstFileBytesString);
+	}
 
-    private function readFirstFileBlocks(\OCP\Files\File $file) : string {
-        $fileHandle = $file->fopen('rb');
-        if (!$fileHandle) {
-            throw new \Exception('Could not open file');
-        }
+	private function readFirstFileBlocks(\OCP\Files\File $file) : string {
+		$fileHandle = $file->fopen('rb');
+		if (!$fileHandle) {
+			throw new \Exception('Could not open file');
+		}
 
-        $data = '';
-        $blocksRead = 0;
-        
-        while (!feof($fileHandle) && strpos($data, self::$XMP_END_TAG) === FALSE && $blocksRead < self::$MAX_BLOCK_COUNT) {
-            $chunk = fread($fileHandle, self::$CHUNK_SIZE);
-            if ($chunk !== FALSE) {
-                $data .= $chunk;
-            }
-            $blocksRead++;
-        }
-        fclose($fileHandle);
+		$data = '';
+		$blocksRead = 0;
+		
+		while (!feof($fileHandle) && strpos($data, self::$XMP_END_TAG) === false && $blocksRead < self::$MAX_BLOCK_COUNT) {
+			$chunk = fread($fileHandle, self::$CHUNK_SIZE);
+			if ($chunk !== false) {
+				$data .= $chunk;
+			}
+			$blocksRead++;
+		}
+		fclose($fileHandle);
 
-        return $data;
-    }
+		return $data;
+	}
 
-    private function readXmpDataFromFileSting($fileString) : XmpResultModel {
-        $posStart = strpos($fileString, self::$XMP_START_TAG);
-        $posEnd = strpos($fileString, self::$XMP_END_TAG);
+	private function readXmpDataFromFileSting($fileString) : XmpResultModel {
+		$posStart = strpos($fileString, self::$XMP_START_TAG);
+		$posEnd = strpos($fileString, self::$XMP_END_TAG);
 
-        $xmpResultModel = new XmpResultModel();
+		$xmpResultModel = new XmpResultModel();
 
-        // We need both the start and end tag
-        if ($posStart === FALSE || $posEnd === FALSE)
-            return $xmpResultModel;
+		// We need both the start and end tag
+		if ($posStart === false || $posEnd === false) {
+			return $xmpResultModel;
+		}
 
-        // Check if we have some GPano data
-        $posGpano = strpos($fileString, self::$GPANO_START_TAG);
-        $xmpResultModel->containsGpanoData = $posGpano !== FALSE;
+		// Check if we should use panoramaviewer
+		$xmpResultModel->usePanoramaViewer = $this->readUsePanoramaViewerTag($fileString);
 
-        $bufferCutStart = substr($fileString, $posStart);
-        $buffer = substr($bufferCutStart, 0, $posEnd + 12);
+		$bufferCutStart = substr($fileString, $posStart);
+		$buffer = substr($bufferCutStart, 0, $posEnd + 12);
 
-        $this->fillXmpData($buffer, $xmpResultModel);
+		$this->fillXmpData($buffer, $xmpResultModel);
 
-        return $xmpResultModel;
-    }
+		return $xmpResultModel;
+	}
 
-    private function fillXmpData($xmlString, XmpResultModel $model) {
-        preg_match('/FullPanoWidthPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $fullWithMatch);
-        preg_match('/FullPanoHeightPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $fullHeightMatch);
-        preg_match('/CroppedAreaImageWidthPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaWidthMatch);
-        preg_match('/CroppedAreaImageHeightPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaHeightMatch);
-        preg_match('/CroppedAreaLeftPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaLeftMatch);
-        preg_match('/CroppedAreaTopPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaTopMatch);
+	private function readUsePanoramaViewerTag($xmlString) : bool {
+		preg_match('/GPano:UsePanoramaViewer((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $usePanoViewerMatch);
+		
+		if (empty($usePanoViewerMatch)) {
+			// Since GPano:UsePanoramaViewer is optional, take a look at GPano:ProjectionType
+			preg_match('/GPano:ProjectionType((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $projectionTypeMatch);
+			
+			if (empty($projectionTypeMatch)) {
+				return false;
+			}
+			
+			$projectionTypeStr = strtolower(end($projectionTypeMatch));
+			return $projectionTypeStr === "equirectangular";
+		}
+		
+		$usePanoViewerStr = strtolower(end($usePanoViewerMatch));
+		return $usePanoViewerStr === "true";
+	}
 
-        if (empty($fullWithMatch) || 
-            empty($fullHeightMatch) ||
-            empty($croppedAreaWidthMatch) ||
-            empty($croppedAreaHeightMatch) ||
-            empty($croppedAreaLeftMatch) ||
-            empty($croppedAreaTopMatch)){
-                // Invalid / incomplete xmp-data
-                $model->containsCroppingConfig = false;
-                return;
-        }
+	private function fillXmpData($xmlString, XmpResultModel $model) {
+		preg_match('/FullPanoWidthPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $fullWithMatch);
+		preg_match('/FullPanoHeightPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $fullHeightMatch);
+		preg_match('/CroppedAreaImageWidthPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaWidthMatch);
+		preg_match('/CroppedAreaImageHeightPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaHeightMatch);
+		preg_match('/CroppedAreaLeftPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaLeftMatch);
+		preg_match('/CroppedAreaTopPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaTopMatch);
 
-        $model->containsCroppingConfig = true;
+		if (empty($fullWithMatch) ||
+			empty($fullHeightMatch) ||
+			empty($croppedAreaWidthMatch) ||
+			empty($croppedAreaHeightMatch) ||
+			empty($croppedAreaLeftMatch) ||
+			empty($croppedAreaTopMatch)) {
+			// Invalid / incomplete xmp-data
+			$model->containsCroppingConfig = false;
+			return;
+		}
 
-        $model->croppingConfig->full_width = intval(end($fullWithMatch));
-        $model->croppingConfig->full_height = intval(end($fullHeightMatch));
-        $model->croppingConfig->cropped_width = intval(end($croppedAreaWidthMatch));
-        $model->croppingConfig->cropped_height = intval(end($croppedAreaHeightMatch));
-        $model->croppingConfig->cropped_x = intval(end($croppedAreaLeftMatch));
-        $model->croppingConfig->cropped_y = intval(end($croppedAreaTopMatch));
-    }
+		$model->containsCroppingConfig = true;
+
+		$model->croppingConfig->full_width = intval(end($fullWithMatch));
+		$model->croppingConfig->full_height = intval(end($fullHeightMatch));
+		$model->croppingConfig->cropped_width = intval(end($croppedAreaWidthMatch));
+		$model->croppingConfig->cropped_height = intval(end($croppedAreaHeightMatch));
+		$model->croppingConfig->cropped_x = intval(end($croppedAreaLeftMatch));
+		$model->croppingConfig->cropped_y = intval(end($croppedAreaTopMatch));
+	}
 }

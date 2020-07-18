@@ -284,7 +284,7 @@
                 }
                 if (serverResponse.data &&
                     typeof (serverResponse.data) === 'object' &&
-                    serverResponse.data.containsGpanoData) {
+                    serverResponse.data.usePanoramaViewer) {
                     // Its a photosphere but now
                     // check WebGL2 support in browser, otherwise
                     // the viewer can't be rendered

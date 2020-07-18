@@ -1,9 +1,9 @@
 <?php
-    use OCA\Files_PhotoSpheres\AppInfo;
+	use OCA\Files_PhotoSpheres\AppInfo;
 
-    $urlGenerator = $_['urlGenerator'];
-    $version = $_['appVersion'];
-    $nounceManager = $_['nounceManager'];
+	$urlGenerator = $_['urlGenerator'];
+	$version = $_['appVersion'];
+	$nounceManager = $_['nounceManager'];
 ?>
 <!DOCTYPE html>
 <html>

@@ -28,49 +28,47 @@ use OCA\Files_PhotoSpheres\Service\Helper\XmpDataReader;
  * @package OCA\Files_PhotoSpheres\AppInfo
  */
 class Application extends App {
+	public const APP_NAME = 'files_photospheres';
 
-    const APP_NAME = 'files_photospheres';
+	public function __construct(array $urlParams = []) {
+		parent::__construct(self::APP_NAME, $urlParams);
+		$this->init();
+	}
 
-    public function __construct(array $urlParams = []) {
-        parent::__construct(self::APP_NAME, $urlParams);
-        $this->init();
-    }
+	private function init() {
+		$this->registerHooks();
+		$this->registerServices();
+	}
 
-    private function init() {
-        $this->registerHooks();
-        $this->registerServices();
-    }
+	private function registerHooks() {
+		$eventDispatcher = \OC::$server->getEventDispatcher();
 
-    private function registerHooks() {
-        $eventDispatcher = \OC::$server->getEventDispatcher();
+		$eventDispatcher->addListener('OCA\Files::loadAdditionalScripts', function () {
+			\OCP\Util::addScript(self::APP_NAME, 'fileAction');
+			\OCP\Util::addScript(self::APP_NAME, 'functions');
+			\OCP\Util::addStyle(self::APP_NAME, 'style');
+		});
 
-        $eventDispatcher->addListener('OCA\Files::loadAdditionalScripts', function() {
-            \OCP\Util::addScript(self::APP_NAME, 'fileAction');
-            \OCP\Util::addScript(self::APP_NAME, 'functions');
-            \OCP\Util::addStyle(self::APP_NAME, 'style');
-        });
+		$eventDispatcher->addListener('OCA\Files_Sharing::loadAdditionalScripts', function () {
+			\OCP\Util::addScript(self::APP_NAME, 'fileAction');
+			\OCP\Util::addScript(self::APP_NAME, 'functions');
+			\OCP\Util::addStyle(self::APP_NAME, 'style');
+		});
+	}
 
-        $eventDispatcher->addListener('OCA\Files_Sharing::loadAdditionalScripts', function() {
-            \OCP\Util::addScript(self::APP_NAME, 'fileAction');
-            \OCP\Util::addScript(self::APP_NAME, 'functions');
-            \OCP\Util::addStyle(self::APP_NAME, 'style');
-        });
-    }
+	private function registerServices() {
+		$container = $this->getContainer();
 
-    private function registerServices() {
-        $container = $this->getContainer();
+		$container->registerService(IStorageService::class, function ($c) {
+			return $c->query(StorageService::class);
+		});
 
-        $container->registerService(IStorageService::class, function($c) {
-            return $c->query(StorageService::class);
-        });
+		$container->registerService(IShareService::class, function ($c) {
+			return $c->query(ShareService::class);
+		});
 
-        $container->registerService(IShareService::class, function($c) {
-            return $c->query(ShareService::class);
-        });
-
-        $container->registerService(IXmpDataReader::class, function($c) {
-            return $c->query(XmpDataReader::class);
-        });
-    }
-
+		$container->registerService(IXmpDataReader::class, function ($c) {
+			return $c->query(XmpDataReader::class);
+		});
+	}
 }
