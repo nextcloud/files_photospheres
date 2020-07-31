@@ -1,6 +1,7 @@
 # Nextcloud - Files_PhotoSpheres
 
 ![PHPUnit](https://github.com/nextcloud/files_photospheres/workflows/PHPUnit/badge.svg)
+[![codecov](https://codecov.io/gh/nextcloud/files_photospheres/branch/master/graph/badge.svg)](https://codecov.io/gh/nextcloud/files_photospheres)
 ![Lint](https://github.com/nextcloud/files_photospheres/workflows/Lint/badge.svg)
 [![Generic badge](https://img.shields.io/github/v/release/nextcloud/files_photospheres)](https://github.com/nextcloud/files_photospheres/releases)
 [![Generic badge](https://img.shields.io/badge/Nextcloud-19-orange)](https://github.com/nextcloud/server)
