@@ -13,11 +13,14 @@
 
 namespace OCA\Files_PhotoSpheres\Tests\Unit\Service\Helper;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use OCA\Files_PhotoSpheres\Service\Helper\XmpDataReader;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
+use OCP\Files\File;
 
 class XmpDataReaderTest extends TestCase {
+	/** @var XmpDataReader */
 	private $xmpDataReader;
 
 	public function setUp() {
@@ -44,6 +47,47 @@ class XmpDataReaderTest extends TestCase {
 		$this->assertFalse($xmpResultModel->usePanoramaViewer);
 	}
 
+	public function testThrowsOnCannotOpenFile() {
+		$mockFile = $this->createMock(File::class);
+		$mockFile->expects($this->once())
+			->method('fopen')
+			->willReturn(false)
+			->withAnyParameters();
+
+		$exceptionThrown = false;
+		
+		try {
+			$this->xmpDataReader->readXmpDataFromFileObject($mockFile);
+		}	
+		catch(Exception $e) {
+			$exceptionThrown = true;
+			$this->assertTrue(strpos($e->getMessage(), 'not open file') > 0);
+		}	
+		
+		$this->assertTrue($exceptionThrown);
+	}
+
+	public function testReturnsFalseOnMissingXmpStartTag() {
+		$testFile = new TestFile('./tests/Testdata/missing_starttag.jpg');
+		/** @var XmpResultModel */
+		$xmpResultModel = $this->xmpDataReader->readXmpDataFromFileObject($testFile);
+		$this->assertFalse($xmpResultModel->usePanoramaViewer);
+	}
+
+	public function testReturnsFalseOnMissingXmpEndTag() {
+		$testFile = new TestFile('./tests/Testdata/missing_endtag.jpg');
+		/** @var XmpResultModel */
+		$xmpResultModel = $this->xmpDataReader->readXmpDataFromFileObject($testFile);
+		$this->assertFalse($xmpResultModel->usePanoramaViewer);
+	}
+
+	public function testReturnsFalseOnMissingXmpTags() {
+		$testFile = new TestFile('./tests/Testdata/missing_tags.jpg');
+		/** @var XmpResultModel */
+		$xmpResultModel = $this->xmpDataReader->readXmpDataFromFileObject($testFile);
+		$this->assertFalse($xmpResultModel->usePanoramaViewer);
+	}
+
 	public function dataProvider_Positive() {
 		$ret = [];
 		for ($i = 1; $i <= 9; $i++) {
@@ -63,7 +107,7 @@ class XmpDataReaderTest extends TestCase {
 	}
 }
 
-class TestFile implements \OCP\Files\File {
+class TestFile implements File {
 	private $filePath;
 	
 	public function __construct($filePath) {

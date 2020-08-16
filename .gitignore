@@ -4,4 +4,4 @@ build
 .vscode
 composer.lock
 /.php_cs.cache
-coverage*.xmls
+coverage*.xml
