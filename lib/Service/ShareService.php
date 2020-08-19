@@ -19,6 +19,7 @@ use OCP\Share\IManager;
 use OCP\Share\Exceptions\ShareNotFound;
 use OCP\Files\NotFoundException;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
+use OCP\Share\Exceptions\GenericShareException;
 
 /**
  * class ShareService
@@ -59,11 +60,11 @@ class ShareService implements IShareService {
 		}
 
 		if (!($share->getPermissions() & \OCP\Constants::PERMISSION_READ)) {
-			return new \OCP\AppFramework\Http\DataResponse('Share is read-only');
+			throw new GenericShareException('Share cannot be read');
 		}
 
 		if (!$this->validateShare($share)) {
-			throw new \Exception('Share not found');
+			throw new GenericShareException('Share permissions did not match');
 		}
 
 		$shareNode = $share->getNode();
