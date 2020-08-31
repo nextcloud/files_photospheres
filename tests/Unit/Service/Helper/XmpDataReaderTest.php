@@ -20,7 +20,8 @@ use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 class XmpDataReaderTest extends TestCase {
 	private $xmpDataReader;
 
-	public function setUp() {
+	public function setUp() : void {
+		parent::setUp();
 		$this->xmpDataReader = new XmpDataReader();
 	}
 	

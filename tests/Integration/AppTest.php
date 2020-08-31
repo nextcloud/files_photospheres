@@ -26,7 +26,7 @@ use PHPUnit\Framework\TestCase;
 class AppTest extends TestCase {
 	private $container;
 
-	public function setUp() {
+	public function setUp() : void {
 		parent::setUp();
 		$app = new App(AppInfo\Application::APP_NAME);
 		$this->container = $app->getContainer();

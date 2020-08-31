@@ -156,3 +156,26 @@ appstore:
 test: composer
 	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.xml
 	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml
+
+.PHONY: unittest
+unittest: composer
+	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.xml
+
+.PHONY: integrationtest
+integrationtest: composer
+	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml
+
+.PHONY: coverage
+coverage: composer
+	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.xml --coverage-php coverage_unittests.cov
+	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml --coverage-php coverage_integrationtests.cov
+	$(CURDIR)/vendor/phpunit/phpcov/phpcov merge --clover coverage.xml .
+
+.PHONY: lint
+lint: composer
+	composer run lint
+	composer run cs:check
+
+.PHONY: lint-fix
+lint-fix: composer
+	composer run cs:fix
