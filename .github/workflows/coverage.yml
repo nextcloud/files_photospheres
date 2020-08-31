@@ -63,12 +63,12 @@ jobs:
           ./occ app:enable ${{ env.APP_NAME }}
           php -S localhost:8080 &
 
-        - name: Run tests with coverage tracking
-          working-directory: apps/${{ env.APP_NAME }}
-          run: make coverage
+      - name: Run tests with coverage tracking
+        working-directory: apps/${{ env.APP_NAME }}
+        run: make coverage
   
-        - name: Upload coverage to Codecov
-          working-directory: ./apps/${{ env.APP_NAME }}
-          run: |
-            wget https://codecov.io/bash -O codecov.sh  
-            bash codecov.sh -f coverage.xml -Z -F php
+      - name: Upload coverage to Codecov
+        working-directory: ./apps/${{ env.APP_NAME }}
+        run: |
+          wget https://codecov.io/bash -O codecov.sh  
+          bash codecov.sh -f coverage.xml -Z -F php
