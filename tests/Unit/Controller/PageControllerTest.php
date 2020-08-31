@@ -23,7 +23,8 @@ class PageControllerTest extends TestCase {
 	/** @var PageController */
 	private $controller;
 
-	public function setUp() {
+	public function setUp() : void {
+		parent::setUp();
 		$request = $this->getMockBuilder('OCP\IRequest')->getMock();
 		$urlGenerator = $this->getMockBuilder('OCP\IURLGenerator')->getMock();
 
