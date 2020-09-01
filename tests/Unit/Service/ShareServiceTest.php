@@ -21,6 +21,7 @@ use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use OCA\Files_PhotoSpheres\Service\ShareService;
 use OCP\Files\File;
 use OCP\Files\Folder;
+use OCP\Files\NotFoundException;
 use OCP\Share\Exceptions\GenericShareException;
 use OCP\Share\Exceptions\ShareNotFound;
 use OCP\Share\IShare;
@@ -189,6 +190,98 @@ class ShareServiceTest extends TestCase {
 		$this->assertTrue(strpos($exception->getMessage(), 'permissions') !== false);
 	}
 
+	/**
+	 * @dataProvider dataProvider_MissingPathOrFilename_DirectoryTests
+	 */
+	public function testThrowsOnDirectoryShare_WithoutPathInfo($filename, $path) {
+		$sharingToken = 'myDirectoryToken';
+
+		$dirMock = $this->createMock(Folder::class);
+		$dirMock->method('isReadable')
+			->willReturn(true);
+		$dirMock->method('isShareable')
+			->willReturn(true);
+
+		$shareMock = $this->createMock(IShare::class);
+		$shareMock->expects($this->once())
+			->method('getPermissions')
+			->willReturn(\OCP\Constants::PERMISSION_READ);
+		$shareMock->method('getNode')
+			->willReturn($dirMock);
+
+		$innerDirMock = $this->createMock(Folder::class);
+		$dirMock->expects($this->never())
+			->method('get')
+			->with($path)
+			->willReturn($innerDirMock);
+		
+		$innerFileMock = $this->createMock(File::class);
+		$innerDirMock->expects($this->never())
+			->method('get')
+			->willReturn($filename)
+			->willReturn($innerFileMock);
+
+		$this->shareManager->expects($this->once())
+			->method('getShareByToken')
+			->with($sharingToken)
+			->willReturn($shareMock);
+
+		$this->xmpDataReader->expects($this->never())
+			 ->method('readXmpDataFromFileObject');
+
+		$thrown = false;
+		try {
+			$this->shareService->getXmpData($sharingToken, $filename, $path);
+		} catch (\Exception $ex) {
+			$this->assertStringContainsString('filename and path', $ex->getMessage());
+			$thrown = true;
+		}
+
+		$this->assertTrue($thrown);
+	}
+
+	public function testThrowsOnInnerDirectory_NotFound() {
+		$sharingToken = 'myDirectoryToken';
+		$path = '/admin/files/nonexisting';
+		$filename = 'somefile.pdf';
+
+		$dirMock = $this->createMock(Folder::class);
+		$dirMock->method('isReadable')
+			->willReturn(true);
+		$dirMock->method('isShareable')
+			->willReturn(true);
+
+		$shareMock = $this->createMock(IShare::class);
+		$shareMock->expects($this->once())
+			->method('getPermissions')
+			->willReturn(\OCP\Constants::PERMISSION_READ);
+		$shareMock->method('getNode')
+			->willReturn($dirMock);
+
+		$dirMock->expects($this->once())
+			->method('get')
+			->with($path)
+			->willThrowException(new NotFoundException());
+		
+		$this->shareManager->expects($this->once())
+			->method('getShareByToken')
+			->with($sharingToken)
+			->willReturn($shareMock);
+
+		$this->xmpDataReader->expects($this->never())
+			 ->method('readXmpDataFromFileObject');
+
+		$thrown = false;
+		try {
+			$this->shareService->getXmpData($sharingToken, $filename, $path);
+		} catch (\Exception $ex) {
+			$this->assertStringContainsString('not found', $ex->getMessage());
+			$thrown = true;
+		}
+
+		$this->assertTrue($thrown);
+	}
+
 	public function dataProvider_DirectoryTests() {
 		/* $filename, $path */
 		$arr = [
@@ -204,6 +297,15 @@ class ShareServiceTest extends TestCase {
 			[false, true],
 			[true, false],
 			[false, false]
+		];
+		return $arr;
+	}
+
+	public function dataProvider_MissingPathOrFilename_DirectoryTests() {
+		/* $filename, $path*/
+		$arr = [
+			['', '/somepath/somesubpath'],
+			['somefile.pdf', '']
 		];
 		return $arr;
 	}
