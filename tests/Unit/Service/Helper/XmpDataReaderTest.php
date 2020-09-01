@@ -23,7 +23,8 @@ class XmpDataReaderTest extends TestCase {
 	/** @var XmpDataReader */
 	private $xmpDataReader;
 
-	public function setUp() {
+	public function setUp() : void {
+		parent::setUp();
 		$this->xmpDataReader = new XmpDataReader();
 	}
 	

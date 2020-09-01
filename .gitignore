@@ -5,3 +5,5 @@ build
 composer.lock
 /.php_cs.cache
 coverage*.xml
+*.cov
+*.result.cache
