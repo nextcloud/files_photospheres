@@ -59,11 +59,10 @@ class XmpDataReaderTest extends TestCase {
 		
 		try {
 			$this->xmpDataReader->readXmpDataFromFileObject($mockFile);
-		}	
-		catch(Exception $e) {
+		} catch (Exception $e) {
 			$exceptionThrown = true;
 			$this->assertTrue(strpos($e->getMessage(), 'not open file') > 0);
-		}	
+		}
 		
 		$this->assertTrue($exceptionThrown);
 	}

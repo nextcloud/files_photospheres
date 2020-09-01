@@ -27,186 +27,184 @@ use OCP\Share\IShare;
 
 class ShareServiceTest extends TestCase {
 
-    /** @var IManager|MockObject */
-    private $shareManager;
+	/** @var IManager|MockObject */
+	private $shareManager;
 
-    /** @var IXmpDataReader|MockObject */
-    private $xmpDataReader;
+	/** @var IXmpDataReader|MockObject */
+	private $xmpDataReader;
 
-    /** @var ShareService */
-    private $shareService;
+	/** @var ShareService */
+	private $shareService;
 
-    public function setUp() {
-        $this->shareManager = $this->createMock(IManager::class);
-        $this->xmpDataReader = $this->createMock(IXmpDataReader::class);
-        $this->shareService = new ShareService($this->shareManager, $this->xmpDataReader);
-    }
+	public function setUp() : void {
+		$this->shareManager = $this->createMock(IManager::class);
+		$this->xmpDataReader = $this->createMock(IXmpDataReader::class);
+		$this->shareService = new ShareService($this->shareManager, $this->xmpDataReader);
+	}
 
-    public function testSingleFileShare() {
-        $sharingToken = 'myFileSharingToken';
-        $xmpResult = new XmpResultModel();
-        $xmpResult->croppingConfig->full_width = 100;
+	public function testSingleFileShare() {
+		$sharingToken = 'myFileSharingToken';
+		$xmpResult = new XmpResultModel();
+		$xmpResult->croppingConfig->full_width = 100;
 
-        $fileMock = $this->createMock(File::class);
-        $fileMock->method('isReadable')
-            ->willReturn(true);
-        $fileMock->method('isShareable')
-            ->willReturn(true);
+		$fileMock = $this->createMock(File::class);
+		$fileMock->method('isReadable')
+			->willReturn(true);
+		$fileMock->method('isShareable')
+			->willReturn(true);
 
-        $shareMock = $this->createMock(IShare::class);
-        $shareMock->expects($this->once())
-            ->method('getPermissions')
-            ->willReturn(\OCP\Constants::PERMISSION_READ);
-        $shareMock->method('getNode')
-            ->willReturn($fileMock);
+		$shareMock = $this->createMock(IShare::class);
+		$shareMock->expects($this->once())
+			->method('getPermissions')
+			->willReturn(\OCP\Constants::PERMISSION_READ);
+		$shareMock->method('getNode')
+			->willReturn($fileMock);
 
-        $this->shareManager->expects($this->once())
-            ->method('getShareByToken')
-            ->with($sharingToken)
-            ->willReturn($shareMock);
+		$this->shareManager->expects($this->once())
+			->method('getShareByToken')
+			->with($sharingToken)
+			->willReturn($shareMock);
 
-        $this->xmpDataReader->expects($this->once())
-            ->method('readXmpDataFromFileObject')
-            ->with($fileMock)
-            ->willReturn($xmpResult);
+		$this->xmpDataReader->expects($this->once())
+			->method('readXmpDataFromFileObject')
+			->with($fileMock)
+			->willReturn($xmpResult);
 
-        $returnedXmpResult = $this->shareService->getXmpData($sharingToken);
+		$returnedXmpResult = $this->shareService->getXmpData($sharingToken);
 
-        $this->assertEquals($xmpResult, $returnedXmpResult);
-        $this->assertEquals(100, $returnedXmpResult->croppingConfig->full_width);
-    }
+		$this->assertEquals($xmpResult, $returnedXmpResult);
+		$this->assertEquals(100, $returnedXmpResult->croppingConfig->full_width);
+	}
 
-    /**
+	/**
 	 * @dataProvider dataProvider_DirectoryTests
 	 */
-    public function testDirectoryShare($filename, $path) {
-        $sharingToken = 'myDirectoryToken';
-        $xmpResult = new XmpResultModel();
-        $xmpResult->croppingConfig->full_width = 100;
+	public function testDirectoryShare($filename, $path) {
+		$sharingToken = 'myDirectoryToken';
+		$xmpResult = new XmpResultModel();
+		$xmpResult->croppingConfig->full_width = 100;
 
-        $dirMock = $this->createMock(Folder::class);
-        $dirMock->method('isReadable')
-            ->willReturn(true);
-        $dirMock->method('isShareable')
-            ->willReturn(true);
+		$dirMock = $this->createMock(Folder::class);
+		$dirMock->method('isReadable')
+			->willReturn(true);
+		$dirMock->method('isShareable')
+			->willReturn(true);
 
-        $shareMock = $this->createMock(IShare::class);
-        $shareMock->expects($this->once())
-            ->method('getPermissions')
-            ->willReturn(\OCP\Constants::PERMISSION_READ);
-        $shareMock->method('getNode')
-            ->willReturn($dirMock);
+		$shareMock = $this->createMock(IShare::class);
+		$shareMock->expects($this->once())
+			->method('getPermissions')
+			->willReturn(\OCP\Constants::PERMISSION_READ);
+		$shareMock->method('getNode')
+			->willReturn($dirMock);
 
-        $innerDirMock = $this->createMock(Folder::class);
-        $dirMock->method('get')
-            ->with($path)
-            ->willReturn($innerDirMock);
-        
-        $innerFileMock = $this->createMock(File::class);
-        $innerDirMock->method('get')
-            ->willReturn($filename)
-            ->willReturn($innerFileMock);
+		$innerDirMock = $this->createMock(Folder::class);
+		$dirMock->method('get')
+			->with($path)
+			->willReturn($innerDirMock);
+		
+		$innerFileMock = $this->createMock(File::class);
+		$innerDirMock->method('get')
+			->willReturn($filename)
+			->willReturn($innerFileMock);
 
-        $this->shareManager->expects($this->once())
-            ->method('getShareByToken')
-            ->with($sharingToken)
-            ->willReturn($shareMock);
+		$this->shareManager->expects($this->once())
+			->method('getShareByToken')
+			->with($sharingToken)
+			->willReturn($shareMock);
 
-         $this->xmpDataReader->expects($this->once())
-             ->method('readXmpDataFromFileObject')
-             ->with($innerFileMock)
-             ->willReturn($xmpResult);
+		$this->xmpDataReader->expects($this->once())
+			 ->method('readXmpDataFromFileObject')
+			 ->with($innerFileMock)
+			 ->willReturn($xmpResult);
 
-        $returnedXmpResult = $this->shareService->getXmpData($sharingToken, $filename, $path);
+		$returnedXmpResult = $this->shareService->getXmpData($sharingToken, $filename, $path);
 
-        $this->assertEquals($xmpResult, $returnedXmpResult);
-        $this->assertEquals(100, $returnedXmpResult->croppingConfig->full_width);
-    }
+		$this->assertEquals($xmpResult, $returnedXmpResult);
+		$this->assertEquals(100, $returnedXmpResult->croppingConfig->full_width);
+	}
 
-    public function testThrowsOnShareNotFound() {
-        $this->shareManager->expects($this->once())
-            ->method('getShareByToken')
-            ->withAnyParameters()
-            ->willThrowException(new ShareNotFound('SomeMessage'));
-        $this->expectException(ShareNotFound::class);
-        $this->shareService->getXmpData('someToken');
-    }
+	public function testThrowsOnShareNotFound() {
+		$this->shareManager->expects($this->once())
+			->method('getShareByToken')
+			->withAnyParameters()
+			->willThrowException(new ShareNotFound('SomeMessage'));
+		$this->expectException(ShareNotFound::class);
+		$this->shareService->getXmpData('someToken');
+	}
 
-    public function testThrowsOnCannotReadShare() {
-        $shareMock = $this->createMock(IShare::class);
-        $shareMock->expects($this->once())
-            ->method('getPermissions')
-            ->willReturn(0);
+	public function testThrowsOnCannotReadShare() {
+		$shareMock = $this->createMock(IShare::class);
+		$shareMock->expects($this->once())
+			->method('getPermissions')
+			->willReturn(0);
 
-        $this->shareManager->expects($this->once())
-            ->method('getShareByToken')
-            ->withAnyParameters()
-            ->willReturn($shareMock);
-        
-        $exception = null;
-        try {
-            $this->shareService->getXmpData('someToken');
-        }
-        catch(GenericShareException $e) {
-            $exception = $e;
-        }
+		$this->shareManager->expects($this->once())
+			->method('getShareByToken')
+			->withAnyParameters()
+			->willReturn($shareMock);
+		
+		$exception = null;
+		try {
+			$this->shareService->getXmpData('someToken');
+		} catch (GenericShareException $e) {
+			$exception = $e;
+		}
 
-        $this->assertTrue($exception !== null);
-        $this->assertTrue(strpos($exception->getMessage(), 'cannot be read') !== false);
-    }
+		$this->assertTrue($exception !== null);
+		$this->assertTrue(strpos($exception->getMessage(), 'cannot be read') !== false);
+	}
 
-    /**
-     * @dataProvider dataProvider_ReadableShareableTests
-     */
-    public function testThrowsOnShare_NodeReadableOrShareable_ReturnsFalse($isReadable, $isShareable) {
-        $nodeMock = $this->createMock(File::class);
-        $nodeMock->expects($this->atMost(1))
-            ->method('isReadable')
-            ->willReturn($isReadable);
-        $nodeMock->expects($this->atMost(1))
-            ->method('isShareable')
-            ->willReturn($isShareable);
+	/**
+	 * @dataProvider dataProvider_ReadableShareableTests
+	 */
+	public function testThrowsOnShare_NodeReadableOrShareable_ReturnsFalse($isReadable, $isShareable) {
+		$nodeMock = $this->createMock(File::class);
+		$nodeMock->expects($this->atMost(1))
+			->method('isReadable')
+			->willReturn($isReadable);
+		$nodeMock->expects($this->atMost(1))
+			->method('isShareable')
+			->willReturn($isShareable);
 
-        $shareMock = $this->createMock(IShare::class);
-        $shareMock->expects($this->once())
-            ->method('getPermissions')
-            ->willReturn(\OCP\Constants::PERMISSION_READ);
-        $shareMock->method('getNode')
-            ->willReturn($nodeMock);
-        
-        $this->shareManager->expects($this->once())
-            ->method('getShareByToken')
-            ->withAnyParameters()
-            ->willReturn($shareMock);
+		$shareMock = $this->createMock(IShare::class);
+		$shareMock->expects($this->once())
+			->method('getPermissions')
+			->willReturn(\OCP\Constants::PERMISSION_READ);
+		$shareMock->method('getNode')
+			->willReturn($nodeMock);
+		
+		$this->shareManager->expects($this->once())
+			->method('getShareByToken')
+			->withAnyParameters()
+			->willReturn($shareMock);
 
-        $exception = null;
-        try {
-            $this->shareService->getXmpData('someToken');
-        }
-        catch(GenericShareException $e) {
-            $exception = $e;
-        }
+		$exception = null;
+		try {
+			$this->shareService->getXmpData('someToken');
+		} catch (GenericShareException $e) {
+			$exception = $e;
+		}
 
-        $this->assertTrue($exception !== null);
-        $this->assertTrue(strpos($exception->getMessage(), 'permissions') !== false);
-    }
+		$this->assertTrue($exception !== null);
+		$this->assertTrue(strpos($exception->getMessage(), 'permissions') !== false);
+	}
 
-    public function dataProvider_DirectoryTests() {
-        /* $filename, $path */
-        $arr = [
-            ['myFileInRoot.jpg', '/'],
-            ['myFileInSubFolder.jpg', '/mySubFolder']
-        ];
-        return $arr;
-    }
+	public function dataProvider_DirectoryTests() {
+		/* $filename, $path */
+		$arr = [
+			['myFileInRoot.jpg', '/'],
+			['myFileInSubFolder.jpg', '/mySubFolder']
+		];
+		return $arr;
+	}
 
-    public function dataProvider_ReadableShareableTests() {
-        /* $isReadable, $isShareable*/
-        $arr = [
-            [false, true],
-            [true, false],
-            [false, false]
-        ];
-        return $arr;
-    }
+	public function dataProvider_ReadableShareableTests() {
+		/* $isReadable, $isShareable*/
+		$arr = [
+			[false, true],
+			[true, false],
+			[false, false]
+		];
+		return $arr;
+	}
 }
