@@ -14,6 +14,7 @@
 namespace OCA\Files_PhotoSpheres\Controller;
 
 use OCA\Files_PhotoSpheres\AppInfo;
+use OCP\App\IAppManager;
 use OCP\IURLGenerator;
 use OCP\IRequest;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -26,11 +27,16 @@ use OCP\AppFramework\Http\ContentSecurityPolicy;
  * @package OCA\Files_PhotoSpheres\Controller
  */
 class PageController extends Controller {
-	private $userId;
+	
+	/** @var IURLGenerator */
+	private $urlGenerator;
+	/** @var IAppManager */
+	private $appManager;
 
-	public function __construct($AppName, IRequest $request, IURLGenerator $urlGenerator) {
+	public function __construct($AppName, IRequest $request, IURLGenerator $urlGenerator, IAppManager $appManager) {
 		parent::__construct($AppName, $request);
 		$this->urlGenerator = $urlGenerator;
+		$this->appManager = $appManager;
 	}
 
 	/**
@@ -49,24 +55,23 @@ class PageController extends Controller {
 		return $this->showPage("video");
 	}
 
-	private function showPage($type) {
+	private function showPage(string $type) {
 		$params = [
 			'urlGenerator' => $this->urlGenerator,
-			'appVersion' => \OC::$server->getAppManager()->getAppVersion(AppInfo\Application::APP_NAME),
+			'appVersion' => $this->appManager->getAppVersion(AppInfo\Application::APP_NAME),
 			'nounceManager' => \OC::$server->getContentSecurityPolicyNonceManager()
 		];
 		switch ($type) {
 						case "image":
 								$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer', $params, 'blank');  // templates/viewer.php
+								$this->setContentSecurityPolicy($response);
 								break;
 						case "video":
 								$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer_video', $params, 'blank');  // templates/viewer_video.php
 								break;
-						break;
 						default: return null;
 				}
-
-		$this->setContentSecurityPolicy($response);
+		
 		return $response;
 	}
 		
