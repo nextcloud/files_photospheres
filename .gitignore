@@ -1,9 +1,9 @@
 build
 /nbproject
 /vendor
-.vscode
 composer.lock
 /.php_cs.cache
 coverage*.xml
 *.cov
 *.result.cache
+coverage_html
