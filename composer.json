@@ -1,5 +1,5 @@
 {
-    "name": "files_photospheres",
+    "name": "nextcloud/files_photospheres",
     "description": "Enables viewing of google photosphere images",
     "type": "project",
     "license": "AGPL",
