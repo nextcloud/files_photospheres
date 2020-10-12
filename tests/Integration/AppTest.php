@@ -31,7 +31,7 @@ class AppTest extends TestCase {
 	/** @var IAppContainer */
 	private $container;
 	/** @var IAppManager */
-	private $appManager;	
+	private $appManager;
 
 	public function setUp() : void {
 		parent::setUp();
@@ -64,19 +64,19 @@ class AppTest extends TestCase {
 
 	private function runBootstrapRegistrations() {
 		$bootstrapCoordinator = $this->container->get(Coordinator::class);
-		
+
 		// HACK:: reset registrations and simulate request start
 		$reflectionClass = new ReflectionClass(Coordinator::class);
 		$regContextProp = $reflectionClass->getProperty('registrationContext');
 		$regContextProp->setAccessible(true);
 		$regContextProp->setValue($bootstrapCoordinator, null);
-		
+
 		$bootstrapCoordinator->runRegistration();
 
 		// Register some faked environment dependencies
 		/** @var IRegistrationContext */
 		/*$ctx = $this->container->get(IRegistrationContext::class);
-		
+
 		$ctx->registerService(Folder::class, function(){
 			return $this->createMock(Folder::class);;
 		});
