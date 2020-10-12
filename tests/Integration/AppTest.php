@@ -31,7 +31,7 @@ class AppTest extends TestCase {
 	/** @var IAppContainer */
 	private $container;
 	/** @var IAppManager */
-	private $appManager;	
+	private $appManager;
 
 	public function setUp() : void {
 		parent::setUp();
@@ -44,17 +44,16 @@ class AppTest extends TestCase {
 		$this->assertTrue($this->appManager->isInstalled(Application::APP_NAME));
 	}
 
-	// TODO ::
 	/**
 	 * @dataProvider dataProvider_InterfaceToClassMappings
 	 */
-	/*public function testCanResolveClasses_AfterRegistration(string $interfaceName, string $className) {
+	public function testCanResolveClasses_AfterRegistration(string $interfaceName, string $className) {
 		$this->runBootstrapRegistrations();
 		$object = $this->container->get($interfaceName);
 		$this->assertInstanceOf($className, $object);
 	}
 
-	public function dataProvider_InterfaceToClassMappings(){
+	public function dataProvider_InterfaceToClassMappings() {
 		$arr = [
 			[ IStorageService::class, StorageService::class ],
 			[ IShareService::class, ShareService::class ]
@@ -63,6 +62,7 @@ class AppTest extends TestCase {
 	}
 
 	private function runBootstrapRegistrations() {
+		/** @var Coordinator */
 		$bootstrapCoordinator = $this->container->get(Coordinator::class);
 		
 		// HACK:: reset registrations and simulate request start
@@ -71,15 +71,13 @@ class AppTest extends TestCase {
 		$regContextProp->setAccessible(true);
 		$regContextProp->setValue($bootstrapCoordinator, null);
 		
+		// Run registrations which build the DI container
 		$bootstrapCoordinator->runRegistration();
 
+		// TODO :: use NC20 compliant method for registering fakes in app-container (IRegistrationContext does not exist for tests)
 		// Register some faked environment dependencies
-		/** @var IRegistrationContext */
-		/*$ctx = $this->container->get(IRegistrationContext::class);
-		
-		$ctx->registerService(Folder::class, function(){
-			return $this->createMock(Folder::class);;
+		$this->container->registerService(Folder::class, function (IAppContainer $container) {
+			return $this->createMock(Folder::class);
 		});
-
-	}*/
+	}
 }
