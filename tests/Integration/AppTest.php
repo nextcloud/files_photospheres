@@ -64,7 +64,7 @@ class AppTest extends TestCase {
 	private function runBootstrapRegistrations() {
 		/** @var Coordinator */
 		$bootstrapCoordinator = $this->container->get(Coordinator::class);
-		
+
 		// HACK:: reset registrations and simulate request start
 		$reflectionClass = new ReflectionClass(Coordinator::class);
 		$regContextProp = $reflectionClass->getProperty('registrationContext');

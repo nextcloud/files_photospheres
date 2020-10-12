@@ -56,6 +56,5 @@ class Application extends App implements IBootstrap {
 	 * @inheritdoc
 	 */
 	public function boot(IBootContext $context): void {
-
 	}
 }

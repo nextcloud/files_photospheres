@@ -27,10 +27,6 @@ use PHPUnit\Framework\TestCase;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use PHPUnit\Framework\MockObject\MockObject;
 use oca\Files_PhotoSpheres\AppInfo\Application;
-use OCA\Files_PhotoSpheres\Service\IShareService;
-use OCA\Files_PhotoSpheres\Service\IStorageService;
-use OCA\Files_PhotoSpheres\Service\ShareService;
-use OCA\Files_PhotoSpheres\Service\StorageService;
 
 class ApplicationTest extends TestCase {
 	public function testBootDoesNothing_OnBootContext() {
