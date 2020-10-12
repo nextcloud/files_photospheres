@@ -14,6 +14,8 @@
 
 namespace OCA\Files_PhotoSpheres\AppInfo;
 
+use OCA\Files\Event\LoadAdditionalScriptsEvent;
+use OCA\Files_PhotoSpheres\Listener\AddScriptsAndStylesListener;
 use OCP\AppFramework\App;
 use OCA\Files_PhotoSpheres\Service\IStorageService;
 use OCA\Files_PhotoSpheres\Service\StorageService;
@@ -21,54 +23,38 @@ use OCA\Files_PhotoSpheres\Service\IShareService;
 use OCA\Files_PhotoSpheres\Service\ShareService;
 use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use OCA\Files_PhotoSpheres\Service\Helper\XmpDataReader;
+use OCA\Files_Sharing\Event\BeforeTemplateRenderedEvent;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
 /**
  * class Application
  *
  * @package OCA\Files_PhotoSpheres\AppInfo
  */
-class Application extends App {
+class Application extends App implements IBootstrap {
 	public const APP_NAME = 'files_photospheres';
 
 	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_NAME, $urlParams);
-		$this->init();
 	}
 
-	private function init() {
-		$this->registerHooks();
-		$this->registerServices();
+	/**
+	 * @inheritdoc
+	 */
+	public function register(IRegistrationContext $context): void {
+		$context->registerServiceAlias(IStorageService::class, StorageService::class);
+		$context->registerServiceAlias(IShareService::class, ShareService::class);
+		$context->registerServiceAlias(IXmpDataReader::class, XmpDataReader::class);
+
+		$context->registerEventListener(LoadAdditionalScriptsEvent::class, AddScriptsAndStylesListener::class);
+		$context->registerEventListener(BeforeTemplateRenderedEvent::class, AddScriptsAndStylesListener::class);
 	}
 
-	private function registerHooks() {
-		$eventDispatcher = \OC::$server->getEventDispatcher();
-
-		$eventDispatcher->addListener('OCA\Files::loadAdditionalScripts', function () {
-			\OCP\Util::addScript(self::APP_NAME, 'fileAction');
-			\OCP\Util::addScript(self::APP_NAME, 'functions');
-			\OCP\Util::addStyle(self::APP_NAME, 'style');
-		});
-
-		$eventDispatcher->addListener('OCA\Files_Sharing::loadAdditionalScripts', function () {
-			\OCP\Util::addScript(self::APP_NAME, 'fileAction');
-			\OCP\Util::addScript(self::APP_NAME, 'functions');
-			\OCP\Util::addStyle(self::APP_NAME, 'style');
-		});
-	}
-
-	private function registerServices() {
-		$container = $this->getContainer();
-
-		$container->registerService(IStorageService::class, function ($c) {
-			return $c->query(StorageService::class);
-		});
-
-		$container->registerService(IShareService::class, function ($c) {
-			return $c->query(ShareService::class);
-		});
-
-		$container->registerService(IXmpDataReader::class, function ($c) {
-			return $c->query(XmpDataReader::class);
-		});
+	/**
+	 * @inheritdoc
+	 */
+	public function boot(IBootContext $context): void {
 	}
 }

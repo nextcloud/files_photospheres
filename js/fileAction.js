@@ -419,7 +419,7 @@
 
 })(jQuery, OC, OCA);
 
-$(document).ready(function () {
+jQuery(function () {
 
     "use strict";
     // is the page visit from a shared file, or is this via the file explorer?

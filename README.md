@@ -4,14 +4,14 @@
 [![codecov](https://codecov.io/gh/nextcloud/files_photospheres/branch/master/graph/badge.svg)](https://codecov.io/gh/nextcloud/files_photospheres)
 ![Lint](https://github.com/nextcloud/files_photospheres/workflows/Lint/badge.svg)
 [![Generic badge](https://img.shields.io/github/v/release/nextcloud/files_photospheres)](https://github.com/nextcloud/files_photospheres/releases)
-[![Generic badge](https://img.shields.io/badge/Nextcloud-19-orange)](https://github.com/nextcloud/server)
+[![Generic badge](https://img.shields.io/badge/Nextcloud-20-orange)](https://github.com/nextcloud/server)
 
 
 Nextcloud app for viewing Google PhotoSphere 360° images (panorama-images). This app is based on 
 the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library. For 
 360° videos the library [marzipano](https://www.marzipano.net/) is used.
 
-**This version is tested for Nextcloud 19.**
+**This version is tested for Nextcloud 20.**
 
 ## Features
 * Interactive viewer to view PhotoSphere images in your Nextcloud instance
