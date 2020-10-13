@@ -13,8 +13,19 @@ the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library. For
 
 **This version is tested for Nextcloud 20.**
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Features](#features)
+- [Setup](#setup)
+  - [Install through the app store](#install-through-the-app-store)
+  - [Install manually](#install-manually)
+  - [Usage](#usage)
+- [Caveats](#caveats)
+- [Report an issue](#report-an-issue)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Features
 * Interactive viewer to view PhotoSphere images in your Nextcloud instance
