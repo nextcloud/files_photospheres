@@ -35,53 +35,53 @@ use OCP\Share\IShare;
 use PHPUnit\Framework\TestCase;
 
 class AddScriptsAndStylesListenerTest extends TestCase {
-    /**
-     * @dataProvider dataProvider_InvalidEvents
-     */
-    public function testHandleDoesNothing_OnInvalidEvent(Event $event){
-        $scriptCountBefore = count(\OC_Util::$scripts);
-        $styleCountBefore = count(\OC_Util::$styles);
+	/**
+	 * @dataProvider dataProvider_InvalidEvents
+	 */
+	public function testHandleDoesNothing_OnInvalidEvent(Event $event) {
+		$scriptCountBefore = count(\OC_Util::$scripts);
+		$styleCountBefore = count(\OC_Util::$styles);
 
-        $listener = new AddScriptsAndStylesListener();
-        $listener->handle($event);
+		$listener = new AddScriptsAndStylesListener();
+		$listener->handle($event);
 
-        $scriptCountAfter = count(\OC_Util::$scripts);
-        $styleCountAfter = count(\OC_Util::$styles);
+		$scriptCountAfter = count(\OC_Util::$scripts);
+		$styleCountAfter = count(\OC_Util::$styles);
 
-        $this->assertEquals($scriptCountBefore, $scriptCountAfter);
-        $this->assertEquals($styleCountBefore, $styleCountAfter);
-    }
+		$this->assertEquals($scriptCountBefore, $scriptCountAfter);
+		$this->assertEquals($styleCountBefore, $styleCountAfter);
+	}
 
-    /**
-     * @dataProvider dataProvider_ValidEvents
-     */
-    public function testAddsScriptAndStyles_OnValidEvent(Event $event){
-        \OC_Util::$scripts = [];
-        \OC_Util::$styles = [];
+	/**
+	 * @dataProvider dataProvider_ValidEvents
+	 */
+	public function testAddsScriptAndStyles_OnValidEvent(Event $event) {
+		\OC_Util::$scripts = [];
+		\OC_Util::$styles = [];
 
-        $listener = new AddScriptsAndStylesListener();
-        $listener->handle($event);
+		$listener = new AddScriptsAndStylesListener();
+		$listener->handle($event);
 
-        $scriptCountAfter = count(\OC_Util::$scripts);
-        $styleCountAfter = count(\OC_Util::$styles);
+		$scriptCountAfter = count(\OC_Util::$scripts);
+		$styleCountAfter = count(\OC_Util::$styles);
 
-        $this->assertEquals(3, $scriptCountAfter);
-        $this->assertEquals(1, $styleCountAfter);
-    }
+		$this->assertEquals(3, $scriptCountAfter);
+		$this->assertEquals(1, $styleCountAfter);
+	}
 
-    public function dataProvider_InvalidEvents() {
-        return  [
-            [ new LoadSidebar() ],
-            [ new Event() ]
-        ];
-    }
+	public function dataProvider_InvalidEvents() {
+		return  [
+			[ new LoadSidebar() ],
+			[ new Event() ]
+		];
+	}
 
-    public function dataProvider_ValidEvents() {
-        /** @var IShare */
-        $shareMock = $this->createMock(IShare::class);
-        return  [
-            [ new LoadAdditionalScriptsEvent() ],
-            [ new BeforeTemplateRenderedEvent($shareMock) ]
-        ];
-    }
+	public function dataProvider_ValidEvents() {
+		/** @var IShare */
+		$shareMock = $this->createMock(IShare::class);
+		return  [
+			[ new LoadAdditionalScriptsEvent() ],
+			[ new BeforeTemplateRenderedEvent($shareMock) ]
+		];
+	}
 }
