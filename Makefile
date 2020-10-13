@@ -153,26 +153,26 @@ appstore:
 	../$(app_name) \
 
 .PHONY: test
-test: composer
+test:
 	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.xml
 	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml
 
 .PHONY: unittest
-unittest: composer
+unittest:
 	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.xml
 
 .PHONY: integrationtest
-integrationtest: composer
+integrationtest:
 	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml
 
 .PHONY: coverage
-coverage: composer
+coverage:
 	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.xml --coverage-php coverage_unittests.cov
 	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml --coverage-php coverage_integrationtests.cov
 	$(CURDIR)/vendor/phpunit/phpcov/phpcov merge --clover coverage.xml .
 
 .PHONY: html-coverage
-html-coverage: composer
+html-coverage:
 	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.xml --coverage-php coverage_unittests.cov
 	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml --coverage-php coverage_integrationtests.cov
 	$(CURDIR)/vendor/phpunit/phpcov/phpcov merge --html coverage_html .
