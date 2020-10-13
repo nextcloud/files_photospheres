@@ -13,6 +13,9 @@ the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library. For
 
 **This version is tested for Nextcloud 20.**
 
+<!-- START doctoc -->
+<!-- END doctoc -->
+
 ## Features
 * Interactive viewer to view PhotoSphere images in your Nextcloud instance
 * When clicking on an image it automaticlly detects the presence of XMP-data tags (which are used in photospheres).
