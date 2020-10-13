@@ -47,8 +47,6 @@ class SharefilesController extends Controller {
 	 * @return \OCP\AppFramework\Http\JSONResponse
 	 */
 	public function getXmpData($shareToken, $filename = '', $path = ''): JSONResponse {
-		\OC_User::setIncognitoMode(true);
-
 		try {
 			$xmpData = $this->shareService->getXmpData($shareToken, $filename, $path);
 			return new JSONResponse(

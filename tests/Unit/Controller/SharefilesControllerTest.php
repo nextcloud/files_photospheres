@@ -83,6 +83,6 @@ class SharefilesControllerTest extends TestCase {
 	public function testGetXmpDataSetsIncognitoMode() {
 		$this->controller->getXmpData('token');
 
-		$this->assertTrue(\OC_User::isIncognitoMode());
+		$this->assertFalse(\OC_User::isIncognitoMode());
 	}
 }
