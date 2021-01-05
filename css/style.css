@@ -10,16 +10,18 @@
  * @copyright Robin Windey 2019
  */
 
-#viewer, #photo-sphere-viewer-loader {
+#photo-sphere-viewer-loader {
     width: 100vw;
     height: calc(100vh - 50px);
+    transition: width 0.5s, top 0.5s, height 0.5s, left 0.5s;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    z-index: 9999;
+    overflow: hidden;
+    background-color: #fff;
+    box-sizing: border-box;
   }
-  
-  /* Fix Nexcloud-Layout, affecting the photosphere-viewer js*/
-  #viewer .psv-navbar, #viewer .psv-navbar * {
-    -webkit-box-sizing: content-box;
-    box-sizing: content-box;
-}
 
 /* force full height on public template */
 .app-files_sharing {
@@ -36,15 +38,4 @@
     height: 100%;
     top: 0;
     z-index: 9998;
-}
-
-#photo-sphere-viewer-loader {
-    transition: width 0.5s, top 0.5s, height 0.5s, left 0.5s;
-    position: absolute;
-    top: 50px;
-    left: 0;
-    z-index: 9999;
-    overflow: hidden;
-    background-color: #fff;
-    box-sizing: border-box;
 }
