@@ -1,0 +1,8 @@
+OC.L10N.register(
+    "files_photospheres",
+    {
+    "Photo Sphere Viewer" : "Visualizadore Photo Sphere",
+    "Enables viewing of google photosphere images" : "Permitit de visualizare immàgines de google photosphere",
+    "Enables viewing of google photosphere images by \n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Permitit de visualizare immàgines \nintegrende su cumponente photo-sphere-viewer.js\nin s'istàntzia nextcloud tua."
+},
+"nplurals=2; plural=(n != 1);");
