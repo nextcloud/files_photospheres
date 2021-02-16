@@ -24,8 +24,7 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\IAppContainer;
 use OCP\Files\Folder;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
+use Test\TestCase;
 
 class AppTest extends TestCase {
 	/** @var IAppContainer */
@@ -47,32 +46,34 @@ class AppTest extends TestCase {
 	/**
 	 * @dataProvider dataProvider_InterfaceToClassMappings
 	 */
-	public function testCanResolveClasses_AfterRegistration(string $interfaceName, string $className) {
-		$this->runBootstrapRegistrations();
+	public function testCanResolveClasses_AfterRegistration(string $interfaceName, string $className, bool $lazyInit) {
+		$this->runBootstrapRegistrations($lazyInit);
 		$object = $this->container->get($interfaceName);
 		$this->assertInstanceOf($className, $object);
 	}
 
 	public function dataProvider_InterfaceToClassMappings() {
 		$arr = [
-			[ IStorageService::class, StorageService::class ],
-			[ IShareService::class, ShareService::class ]
+			[ IStorageService::class, StorageService::class, true ],
+			[ IShareService::class, ShareService::class, true ],
+			[ IStorageService::class, StorageService::class, false ],
+			[ IShareService::class, ShareService::class, false ]
 		];
 		return $arr;
 	}
 
-	private function runBootstrapRegistrations() {
+	private function runBootstrapRegistrations(bool $lazyInit) {
 		/** @var Coordinator */
 		$bootstrapCoordinator = $this->container->get(Coordinator::class);
 
-		// HACK:: reset registrations and simulate request start
-		$reflectionClass = new ReflectionClass(Coordinator::class);
-		$regContextProp = $reflectionClass->getProperty('registrationContext');
-		$regContextProp->setAccessible(true);
-		$regContextProp->setValue($bootstrapCoordinator, null);
-		
+		$this->invokePrivate($bootstrapCoordinator, 'registrationContext', [null]);
+
 		// Run registrations which build the DI container
-		$bootstrapCoordinator->runRegistration();
+		if ($lazyInit) {
+			$bootstrapCoordinator->runLazyRegistration(Application::APP_NAME);
+		} else {
+			$bootstrapCoordinator->runInitialRegistration();
+		}
 
 		// TODO :: use NC20 compliant method for registering fakes in app-container (IRegistrationContext does not exist for tests)
 		// Register some faked environment dependencies

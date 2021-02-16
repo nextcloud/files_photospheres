@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
       - name: Run Makefile
@@ -14,4 +14,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: files_photospheres.tar.gz
-          path: build/artifacts/appstore/files_photospheres.tar.gz        
+          path: build/artifacts/appstore/files_photospheres.tar.gz
