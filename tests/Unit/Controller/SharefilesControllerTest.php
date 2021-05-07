@@ -22,6 +22,7 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class SharefilesControllerTest extends TestCase {
 
@@ -31,6 +32,8 @@ class SharefilesControllerTest extends TestCase {
 	private $shareService;
 	/** @var SharefilesController|MockObject */
 	private $controller;
+	/** @var LoggerInterface|MockObject */
+	private $logger;
 
 	public function setUp() : void {
 		parent::setUp();
@@ -39,11 +42,14 @@ class SharefilesControllerTest extends TestCase {
 		$this->request = $this->createMock(IRequest::class);
 		/** @var IShareService|MockObject */
 		$this->shareService = $this->createMock(IShareService::class);
+		/** @var LoggerInterface|MockObject */
+		$this->logger = $this->createMock(LoggerInterface::class);
 
 		$this->controller = new SharefilesController(
 			Application::APP_NAME,
 			$this->request,
-			$this->shareService
+			$this->shareService,
+			$this->logger
 		);
 	}
 

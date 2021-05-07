@@ -423,17 +423,21 @@ jQuery(function () {
 
     "use strict";
     // is the page visit from a shared file, or is this via the file explorer?
-    var isSharedViewer = $('#isPublic').val();
+    var isSharedViewer = $('#isPublic').val() ? true : false;
     // Are we dealing with a shared directory or a single file?
-    var isDirectoryShare = $('#dir').val();
+    var isDirectoryShare = $('#dir').val() ? true : false;;
     var sharingToken = $('#sharingToken').val();
 
-    if (!isSharedViewer || isDirectoryShare) {
-        // Normal user-view or directory-share
-        isDirectoryShare = isDirectoryShare ? true : false;
+    // Regular user view
+    if (!sharingToken) {
+        console.log("Init regular user view");
+        window.photoSphereViewerFileAction.init(false, null);
+        return;
+    }
 
-        if (isDirectoryShare) {
-            /*
+    // Directory share
+    if (isDirectoryShare) {
+         /*
              *  FIXME ::
              *  If we're dealing with a directory-share
              *  we have to defer the initialization, because
@@ -445,16 +449,13 @@ jQuery(function () {
              *  Unfortunately this events aren't merged into the new
              *  object.
              */
-            _.defer(function () {
-                window.photoSphereViewerFileAction.init(isDirectoryShare, sharingToken);
-            });
-        }
-        else {
+        console.log("Init directory share view");
+        _.defer(function () {
             window.photoSphereViewerFileAction.init(isDirectoryShare, sharingToken);
-        }
-
+        });
     } else {
         // single file-share
+        console.log("Init single file share view");
         var mimeType = $('#mimetype').val();
         var fileName = $('#filename').val();
 
