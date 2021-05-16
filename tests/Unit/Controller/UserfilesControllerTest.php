@@ -22,6 +22,7 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class UserfilesControllerTest extends TestCase {
 
@@ -31,6 +32,9 @@ class UserfilesControllerTest extends TestCase {
 	private $storageService;
 	/** @var UserfilesController|MockObject */
 	private $controller;
+	/** @var LoggerInterface|MockObject */
+	private $logger;
+
 
 	public function setUp() : void {
 		parent::setUp();
@@ -39,12 +43,14 @@ class UserfilesControllerTest extends TestCase {
 		$this->request = $this->createMock(IRequest::class);
 		/** @var IStorageService|MockObject */
 		$this->storageService = $this->createMock(IStorageService::class);
+		/** @var LoggerInterface|MockObject */
+		$this->logger = $this->createMock(LoggerInterface::class);
 
 		$this->controller = new UserfilesController(
 			Application::APP_NAME,
 			$this->request,
 			$this->storageService,
-			42
+			$this->logger
 		);
 	}
 

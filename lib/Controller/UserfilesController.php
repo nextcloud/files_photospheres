@@ -18,6 +18,7 @@ use OCA\Files_PhotoSpheres\Service\IStorageService;
 use OCP\AppFramework\Controller;
 use OCP\IRequest;
 use OCP\AppFramework\Http\JSONResponse;
+use Psr\Log\LoggerInterface;
 
 /**
  * class UserfilesController
@@ -26,23 +27,17 @@ use OCP\AppFramework\Http\JSONResponse;
  */
 class UserfilesController extends Controller {
 
-	/**
-	 *
-	 * @var int
-	 */
-	private $userId;
-
-	/**
-	 * @var IStorageService
-	 */
+	/** @var IStorageService */
 	private $storageService;
 
-	public function __construct(
-	$AppName, IRequest $request, IStorageService $storageService, $UserId) {
+	/** @var LoggerInterface */
+	private $logger;
+
+	public function __construct($AppName, IRequest $request, IStorageService $storageService, LoggerInterface $logger) {
 		parent::__construct($AppName, $request);
 
-		$this->userId = $UserId;
 		$this->storageService = $storageService;
+		$this->logger = $logger;
 	}
 
 	/**
@@ -53,6 +48,7 @@ class UserfilesController extends Controller {
 	 */
 	public function getXmpData($fileId): JSONResponse {
 		try {
+			$this->logger->info("Reading XMP data for file id $fileId");
 			$xmpData = $this->storageService->getXmpData($fileId);
 			return new JSONResponse(
 					[
@@ -60,6 +56,7 @@ class UserfilesController extends Controller {
 						'success' => true
 					]);
 		} catch (\Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			return new JSONResponse(
 					[
 						'message' => $e->getMessage(),
