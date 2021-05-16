@@ -18,6 +18,7 @@ use \OCA\Files_PhotoSpheres\Service\IShareService;
 use OCP\AppFramework\Controller;
 use OCP\IRequest;
 use OCP\AppFramework\Http\JSONResponse;
+use Psr\Log\LoggerInterface;
 
 /**
  * class SharefilesController
@@ -26,15 +27,17 @@ use OCP\AppFramework\Http\JSONResponse;
  */
 class SharefilesController extends Controller {
 
-	/**
-	 * @var IShareService
-	 */
+	/** @var IShareService */
 	private $shareService;
 
-	public function __construct($appName, IRequest $request, IShareService $shareService) {
+	/** @var LoggerInterface */
+	private $logger;
+
+	public function __construct($appName, IRequest $request, IShareService $shareService, LoggerInterface $logger) {
 		parent::__construct($appName, $request);
 
 		$this->shareService = $shareService;
+		$this->logger = $logger;
 	}
 
 	/**
@@ -48,6 +51,7 @@ class SharefilesController extends Controller {
 	 */
 	public function getXmpData($shareToken, $filename = '', $path = ''): JSONResponse {
 		try {
+			$this->logger->info("Reading XMP data for shared file with token $shareToken, filename: $filename, path: $path");
 			$xmpData = $this->shareService->getXmpData($shareToken, $filename, $path);
 			return new JSONResponse(
 					[
@@ -55,6 +59,7 @@ class SharefilesController extends Controller {
 						'success' => true
 					]);
 		} catch (\Exception $e) {
+			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			return new JSONResponse(
 					[
 						'message' => $e->getMessage(),
