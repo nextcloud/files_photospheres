@@ -20,30 +20,45 @@ namespace OCA\Files_PhotoSpheres\Model;
 
 class CroppingConfigModel {
 	/*
-		This is the structure in JS:
-		full_width: 6000,
-		full_height: 3000,
-		cropped_width: 4000,
-		cropped_height: 2000,
-		cropped_x: 1000,
-		cropped_y: 500
+		This is the structure in JS (see TextureLoader.js line 243):
+
+		{
+			fullWidth,
+			fullHeight,
+			croppedWidth,
+			croppedHeight,
+			croppedX,
+			croppedY,
+			poseHeading,
+			posePitch,
+			poseRoll
+		}
 	*/
 
-	/** @var int */
-	public $full_width;
+	/** @var int|null */
+	public $fullWidth;
 
-	/** @var int */
-	public $full_height;
+	/** @var int|null */
+	public $fullHeight;
 
-	/** @var int */
-	public $cropped_width;
+	/** @var int|null */
+	public $croppedWidth;
 
-	/** @var int */
-	public $cropped_height;
+	/** @var int|null */
+	public $croppedHeight;
 
-	/** @var int */
-	public $cropped_x;
+	/** @var int|null */
+	public $croppedX;
 
-	/** @var int */
-	public $cropped_y;
+	/** @var int|null */
+	public $croppedY;
+
+	/** @var float|null */
+	public $poseHeading;
+
+	/** @var float|null */
+	public $posePitch;
+
+	/** @var float|null */
+	public $poseRoll;
 }

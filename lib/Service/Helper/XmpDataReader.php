@@ -15,6 +15,7 @@
 namespace OCA\Files_PhotoSpheres\Service\Helper;
 
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
+use Psr\Log\LoggerInterface;
 
 /*
  *  See https://developers.google.com/streetview/spherical-metadata
@@ -42,7 +43,15 @@ class XmpDataReader implements IXmpDataReader {
 	 */
 	private static $XMP_END_TAG = '</x:xmpmeta>';
 
-	public function __construct() {
+	/** @var LoggerInterface */
+	private $logger;
+
+	/** @var IRegexMatcher */
+	private $regexMatcher;
+
+	public function __construct(LoggerInterface $logger, IRegexMatcher $regexMatcher) {
+		$this->logger = $logger;
+		$this->regexMatcher = $regexMatcher;
 	}
 	
 	public function readXmpDataFromFileObject(\OCP\Files\File $file) : XmpResultModel {
@@ -83,7 +92,7 @@ class XmpDataReader implements IXmpDataReader {
 		}
 
 		// Check if we should use panoramaviewer
-		$xmpResultModel->usePanoramaViewer = $this->readUsePanoramaViewerTag($fileString);
+		$xmpResultModel->usePanoramaViewer = $this->shouldUsePanoramaViewer($fileString);
 
 		$bufferCutStart = substr($fileString, $posStart);
 		$buffer = substr($bufferCutStart, 0, $posEnd + 12);
@@ -93,51 +102,82 @@ class XmpDataReader implements IXmpDataReader {
 		return $xmpResultModel;
 	}
 
-	private function readUsePanoramaViewerTag($xmlString) : bool {
-		preg_match('/GPano:UsePanoramaViewer((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $usePanoViewerMatch);
-		
-		if (empty($usePanoViewerMatch)) {
-			// Since GPano:UsePanoramaViewer is optional, take a look at GPano:ProjectionType
-			preg_match('/GPano:ProjectionType((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $projectionTypeMatch);
-			
-			if (empty($projectionTypeMatch)) {
-				return false;
-			}
-			
-			$projectionTypeStr = strtolower(end($projectionTypeMatch));
-			return $projectionTypeStr === "equirectangular";
+	private function shouldUsePanoramaViewer($xmlString) : bool {
+		// GPano:UsePanoramaViewer tag (optional)
+		$usePanoViewerStr = $this->getXmpStringValue($xmlString, 'UsePanoramaViewer');
+		if ($usePanoViewerStr !== null) {
+			return strtolower($usePanoViewerStr) === "true";
 		}
-		
-		$usePanoViewerStr = strtolower(end($usePanoViewerMatch));
-		return $usePanoViewerStr === "true";
+
+		// Since GPano:UsePanoramaViewer is optional, take a look at GPano:ProjectionType
+		$projectionTypeStr = $this->getXmpStringValue($xmlString, 'ProjectionType');
+		if ($projectionTypeStr !== null) {
+			return strtolower($projectionTypeStr) === "equirectangular";
+		}
+
+		/*
+			We also support VR180. These cameras often don't set the
+			 ProjectionType but it's mandatory to set GImage:Mime
+			(see https://developers.google.com/vr/reference/cardboard-camera-vr-photo-format).
+			So if that tag is set to image/jpg in the first xmpdata block,
+			we can guess that it's a VR180 image which can be shown by our app.
+		*/
+		$gImageMimeStr = $this->getXmpStringValue($xmlString, 'Mime', 'GImage');
+		if ($gImageMimeStr !== null) {
+			return strtolower($gImageMimeStr) === "image/jpeg";
+		}
+
+		return false;
 	}
 
 	private function fillXmpData($xmlString, XmpResultModel $model) {
-		preg_match('/FullPanoWidthPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $fullWithMatch);
-		preg_match('/FullPanoHeightPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $fullHeightMatch);
-		preg_match('/CroppedAreaImageWidthPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaWidthMatch);
-		preg_match('/CroppedAreaImageHeightPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaHeightMatch);
-		preg_match('/CroppedAreaLeftPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaLeftMatch);
-		preg_match('/CroppedAreaTopPixels((.?=.?"(.*?)")|(>(.*?)<))/', $xmlString, $croppedAreaTopMatch);
-
-		if (empty($fullWithMatch) ||
-			empty($fullHeightMatch) ||
-			empty($croppedAreaWidthMatch) ||
-			empty($croppedAreaHeightMatch) ||
-			empty($croppedAreaLeftMatch) ||
-			empty($croppedAreaTopMatch)) {
-			// Invalid / incomplete xmp-data
-			$model->containsCroppingConfig = false;
+		/*
+			This logic is mainly taken from photo-sphere-viewer.js -> TextureLoader.js
+		*/
+		$gPanoMatch = $this->regexMatcher->preg_match('/GPano:/', $xmlString);
+		if ($gPanoMatch === false) {
+			$this->logger->warning("Regex match on 'GPano:' failed");
+			return;
+		}
+		if ($gPanoMatch === 0) {
+			// containsCroppingConfig is false here
 			return;
 		}
 
 		$model->containsCroppingConfig = true;
 
-		$model->croppingConfig->full_width = intval(end($fullWithMatch));
-		$model->croppingConfig->full_height = intval(end($fullHeightMatch));
-		$model->croppingConfig->cropped_width = intval(end($croppedAreaWidthMatch));
-		$model->croppingConfig->cropped_height = intval(end($croppedAreaHeightMatch));
-		$model->croppingConfig->cropped_x = intval(end($croppedAreaLeftMatch));
-		$model->croppingConfig->cropped_y = intval(end($croppedAreaTopMatch));
+		$model->croppingConfig->fullWidth = $this->getXmpIntValue($xmlString, 'FullPanoWidthPixels');
+		$model->croppingConfig->fullHeight = $this->getXmpIntValue($xmlString, 'FullPanoHeightPixels');
+		$model->croppingConfig->croppedWidth = $this->getXmpIntValue($xmlString, 'CroppedAreaImageWidthPixels');
+		$model->croppingConfig->croppedHeight = $this->getXmpIntValue($xmlString, 'CroppedAreaImageHeightPixels');
+		$model->croppingConfig->croppedX = $this->getXmpIntValue($xmlString, 'CroppedAreaLeftPixels');
+		$model->croppingConfig->croppedY = $this->getXmpIntValue($xmlString, 'CroppedAreaTopPixels');
+		$model->croppingConfig->poseHeading = $this->getXmpFloatValue($xmlString, 'PoseHeadingDegrees');
+		$model->croppingConfig->posePitch = $this->getXmpFloatValue($xmlString, 'PosePitchDegrees');
+		$model->croppingConfig->poseRoll = $this->getXmpFloatValue($xmlString, 'PoseRollDegrees');
+	}
+
+	private function getXmpStringValue(string $xmlString, string $xmpKey, string $xmlNs = 'GPano') : ?string {
+		// XMP data can be stored in attributes or separate nodes
+		$matchResult = $this->regexMatcher->preg_match("/$xmlNs:$xmpKey((.?=.?\"(.*?)\")|(>(.*?)<))/", $xmlString, $matchValues);
+
+		if ($matchResult === false) {
+			$this->logger->warning("Regex match on XMP metadata '$xmpKey' failed");
+			return null;
+		}
+
+		return $matchResult === 1 ? end($matchValues) : null;
+	}
+
+	private function getXmpIntValue(string $xmlString, string $xmpKey) : ?int {
+		$str = $this->getXmpStringValue($xmlString, $xmpKey);
+
+		return $str !== null ? intval($str) : null;
+	}
+
+	private function getXmpFloatValue(string $xmlString, string $xmpKey) : ?float {
+		$str = $this->getXmpStringValue($xmlString, $xmpKey);
+
+		return $str !== null ? floatval($str) : null;
 	}
 }

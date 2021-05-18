@@ -15,8 +15,7 @@
         <link rel="stylesheet" href="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'css/viewer.css')) ?>?v=<?php p($version) ?>"/>
         <link rel="stylesheet" href="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'css/photo-sphere-viewer.min.css')) ?>?v=<?php p($version) ?>"/>
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/three.min.js')) ?>?v=<?php p($version) ?>"></script>
-        <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/doT.min.js')) ?>?v=<?php p($version) ?>"></script>
-        <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/uevent.min.js')) ?>?v=<?php p($version) ?>"></script>
+        <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/browser.min.js')) ?>?v=<?php p($version) ?>"></script>
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/photo-sphere-viewer.min.js')) ?>?v=<?php p($version) ?>"></script>
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/init.js')) ?>?v=<?php p($version) ?>"></script>
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/functions.js')) ?>?v=<?php p($version) ?>"></script>
