@@ -74,13 +74,13 @@
          */
         _getAction: function () {
             return {
-                actionHandler: this._actionHandler.bind(this),
+                name: 'viewInPhotosphereViewer',
                 displayName: "View in PhotoSphereViewer",
-                icon: "",
                 mime: "image/jpeg",
-                name: "view",
-                permissions: 1,
-                order: -1
+                order: 1000,
+                permissions: OC.PERMISSION_READ,
+                actionHandler: this._actionHandler.bind(this),
+                iconClass: "icon-external"
             };
         },
 
