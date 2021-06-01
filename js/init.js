@@ -8,24 +8,24 @@
  * @author Robin Windey <ro.windey@gmail.com>
  *
  * @copyright Robin Windey 2019
- * 
+ *
  * Initializes the viewer-component with a given photospere-image-configuration
  */
 
 class PhotoSphereViewerRenderer {
     render(configObject) {
         const defaults = {
-            container: 'viewer',
-            time_anim: false,
-            usexmpdata: false,
+            container: document.querySelector('#viewer'),
+            autorotateDelay: false,
+            useXmpData: false,
             // Fix iframe problem on Safari #32
-            with_credentials: true
+            withCredentials: true
         };
 
         // Merge with defaults
         Object.assign(configObject, defaults);
 
-        const viewer = new PhotoSphereViewer(configObject);
+        const viewer = new PhotoSphereViewer.Viewer(configObject);
         window.photoSphereViewer = viewer;
     }
 }

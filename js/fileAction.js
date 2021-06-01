@@ -8,7 +8,7 @@
  * @author Robin Windey <ro.windey@gmail.com>
  *
  * @copyright Robin Windey 2019
- * 
+ *
  * Injected via the OCA\Files::loadAdditionalScripts-callback.
  * Used to hook into the actionhandler for images.
  */
@@ -126,7 +126,7 @@
          */
         _showImage: function (fileObject, xmpResultModel) {
             var imageUrl = this._getFileUrl(fileObject);
-            
+
             var urlParams = {
                 url: imageUrl,
                 filename: fileObject.name
@@ -153,12 +153,12 @@
             this.showFrame(videoUrl, filename, null, false, 'video');
         },
         /*
-         * Injects the iframe with the viewer into the current page. 
+         * Injects the iframe with the viewer into the current page.
          * Suiteable for both the sharing option (based on a token) and the authenticated explorer view (filename).
-         * @param {string} imageUrl         - The url from which the panorama can be loaded 
+         * @param {string} imageUrl         - The url from which the panorama can be loaded
          * @param {string} fileName    - The name of the image. Used as caption in the viewer.
          * @param {object} xmpResultModel   - The xmp-information, read from the server.
-         * @param {bool} isSharedViewer     - True, if we are on single-fileshare 
+         * @param {bool} isSharedViewer     - True, if we are on single-fileshare
          * @param {string} frameType        - image or video
          */
         showFrame: function (imageUrl, fileName, xmpResultModel, isSharedViewer, frameType) {
@@ -185,7 +185,7 @@
             // Add xmpData (cropping-info) to image-viewer-params, if we have some
             if (frameType == 'image' && xmpResultModel && xmpResultModel.containsCroppingConfig) {
                 var extendObject = {
-                    pano_data: xmpResultModel.croppingConfig
+                    panoData: xmpResultModel.croppingConfig
                 };
                 configObject = $.extend(configObject, extendObject);
             }
@@ -307,7 +307,7 @@
         },
 
         /*
-         * Initialize action callbacks. "Override" 
+         * Initialize action callbacks. "Override"
          * the action for image/jpeg
          */
         init: function (isDirectoryShare, sharingToken) {
@@ -342,7 +342,7 @@
                     e.action.name &&
                     typeof (e.action.name) === "string" &&
                     e.action.name.toLowerCase() === 'view') {
-                    // Override but store the registered action 
+                    // Override but store the registered action
                     // which was registered after ours. This is
                     // case (2)
                     this._oldActionHandler = e.action.actionHandler;
@@ -355,9 +355,9 @@
         /*
          * Determines, if a file is a photosphere.
          * The file must be a normal user-file (normal login required).
-         * @param {string} filename 
+         * @param {string} filename
          * @param {object} context
-         * @param {function} callback  
+         * @param {function} callback
          */
         canShow: function (filename, context, callback) {
             // Trigger serverside function to
@@ -392,8 +392,8 @@
         /*
          * Determines, if a file is a photosphere.
          * The file must single-shared file.
-         * @param {string} shareToken 
-         * @param {function} callback  
+         * @param {string} shareToken
+         * @param {function} callback
          */
         canShowSingleFileShare: function (shareToken, callback) {
             var xmpBackendUrl = OC.generateUrl('apps/files_photospheres') +
@@ -422,8 +422,6 @@
 jQuery(function () {
 
     "use strict";
-    // is the page visit from a shared file, or is this via the file explorer?
-    var isSharedViewer = $('#isPublic').val() ? true : false;
     // Are we dealing with a shared directory or a single file?
     var isDirectoryShare = $('#dir').val() ? true : false;;
     var sharingToken = $('#sharingToken').val();
