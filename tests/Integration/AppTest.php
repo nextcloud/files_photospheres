@@ -26,6 +26,9 @@ use OCP\AppFramework\IAppContainer;
 use OCP\Files\Folder;
 use Test\TestCase;
 
+/**
+ * @group DB
+ */
 class AppTest extends TestCase {
 	/** @var IAppContainer */
 	private $container;
