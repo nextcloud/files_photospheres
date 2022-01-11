@@ -3,7 +3,6 @@ OC.L10N.register(
     {
     "Photo Sphere Viewer" : "Προβολή φωτογραφιών Sphere",
     "Enables viewing of google photosphere images" : "Ενεργοποίηση προβολής φωτογραφιών του google photosphere",
-    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Ενεργοποίηση προβολής των φωτογραφιών google photosphere με\n        την ενσωμάτωση του προσθέτου photo-sphere-viewer.js\n        στην εγκατάσταση Nextcloud σας.",
-    "Enables viewing of google photosphere images by \n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Ενεργοποίηση προβολής των φωτογραφιών google photosphere με \n        την ενσωμάτωση του προσθέτου photo-sphere-viewer.js\n        στην εγκατάσταση extcloud σας."
+    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Ενεργοποίηση προβολής των φωτογραφιών google photosphere με\n        την ενσωμάτωση του προσθέτου photo-sphere-viewer.js\n        στην εγκατάσταση Nextcloud σας."
 },
 "nplurals=2; plural=(n != 1);");
