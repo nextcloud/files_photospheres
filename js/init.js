@@ -19,7 +19,11 @@ class PhotoSphereViewerRenderer {
             autorotateDelay: false,
             useXmpData: false,
             // Fix iframe problem on Safari #32
-            withCredentials: true
+            withCredentials: true,
+            plugins: [
+                PhotoSphereViewer.GyroscopePlugin,
+                PhotoSphereViewer.StereoPlugin,
+            ]
         };
 
         // Merge with defaults

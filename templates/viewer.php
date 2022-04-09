@@ -19,6 +19,8 @@
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/photo-sphere-viewer.min.js')) ?>?v=<?php p($version) ?>"></script>
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/init.js')) ?>?v=<?php p($version) ?>"></script>
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/functions.js')) ?>?v=<?php p($version) ?>"></script>
+        <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/gyroscope.min.js')) ?>?v=<?php p($version) ?>"></script>
+        <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/stereo.min.js')) ?>?v=<?php p($version) ?>"></script>
     </head>
     <body id="body-public">
         <div id="viewer"></div>
