@@ -21,7 +21,6 @@ use OCA\Files_PhotoSpheres\Service\ShareService;
 use OCA\Files_PhotoSpheres\Service\StorageService;
 use OCP\App\IAppManager;
 use OCP\AppFramework\App;
-use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\IAppContainer;
 use OCP\Files\Folder;
 use Test\TestCase;

@@ -1,8 +1,8 @@
 build
 /nbproject
 /vendor
-composer.lock
 /.php_cs.cache
+/.php-cs-fixer.cache
 coverage*.xml
 *.cov
 *.result.cache

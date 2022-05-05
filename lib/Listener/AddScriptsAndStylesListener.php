@@ -31,6 +31,7 @@ use OCA\Files_PhotoSpheres\AppInfo\Application;
 use OCA\Files_Sharing\Event\BeforeTemplateRenderedEvent;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
+use OCP\Util;
 
 class AddScriptsAndStylesListener implements IEventListener {
 	public function handle(Event $event) : void {
@@ -38,8 +39,8 @@ class AddScriptsAndStylesListener implements IEventListener {
 			return;
 		}
 
-		\OCP\Util::addScript(Application::APP_NAME, 'functions');
-		\OCP\Util::addScript(Application::APP_NAME, 'fileAction');
-		\OCP\Util::addStyle(Application::APP_NAME, 'style');
+		Util::addScript(Application::APP_NAME, 'functions');
+		Util::addScript(Application::APP_NAME, 'fileAction');
+		Util::addStyle(Application::APP_NAME, 'style');
 	}
 }

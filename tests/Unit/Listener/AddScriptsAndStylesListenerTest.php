@@ -31,21 +31,27 @@ use OCA\Files\Event\LoadSidebar;
 use OCA\Files_PhotoSpheres\Listener\AddScriptsAndStylesListener;
 use OCA\Files_Sharing\Event\BeforeTemplateRenderedEvent;
 use OCP\EventDispatcher\Event;
+use OCP\Util;
 use OCP\Share\IShare;
-use PHPUnit\Framework\TestCase;
+use Test\TestCase;
 
 class AddScriptsAndStylesListenerTest extends TestCase {
+	protected function setUp(): void {
+		parent::setUp();
+		$this->resetStylesAndScripts();
+	}
+
 	/**
 	 * @dataProvider dataProvider_InvalidEvents
 	 */
 	public function testHandleDoesNothing_OnInvalidEvent(Event $event) {
-		$scriptCountBefore = count(\OC_Util::$scripts);
+		$scriptCountBefore = count(Util::getScripts());
 		$styleCountBefore = count(\OC_Util::$styles);
 
 		$listener = new AddScriptsAndStylesListener();
 		$listener->handle($event);
 
-		$scriptCountAfter = count(\OC_Util::$scripts);
+		$scriptCountAfter = count(Util::getScripts());
 		$styleCountAfter = count(\OC_Util::$styles);
 
 		$this->assertEquals($scriptCountBefore, $scriptCountAfter);
@@ -56,17 +62,32 @@ class AddScriptsAndStylesListenerTest extends TestCase {
 	 * @dataProvider dataProvider_ValidEvents
 	 */
 	public function testAddsScriptAndStyles_OnValidEvent(Event $event) {
-		\OC_Util::$scripts = [];
-		\OC_Util::$styles = [];
-
 		$listener = new AddScriptsAndStylesListener();
 		$listener->handle($event);
 
-		$scriptCountAfter = count(\OC_Util::$scripts);
-		$styleCountAfter = count(\OC_Util::$styles);
+		$functionJsCnt = 0;
+		$fileActionJsCnt = 0;
+		$styleCssCnt = 0;
 
-		$this->assertEquals(3, $scriptCountAfter);
-		$this->assertEquals(1, $styleCountAfter);
+		$scripts = Util::getScripts();
+		foreach ($scripts as $script) {
+			if (strpos($script, 'js/functions') !== false) {
+				$functionJsCnt++;
+			}
+			if (strpos($script, 'js/fileAction') !== false) {
+				$fileActionJsCnt++;
+			}
+		}
+
+		foreach (\OC_Util::$styles as $style) {
+			if ($style === 'files_photospheres/css/style') {
+				$styleCssCnt++;
+			}
+		}
+		
+		$this->assertEquals(1, $functionJsCnt);
+		$this->assertEquals(1, $fileActionJsCnt);
+		$this->assertEquals(1, $styleCssCnt);
 	}
 
 	public function dataProvider_InvalidEvents() {
@@ -83,5 +104,12 @@ class AddScriptsAndStylesListenerTest extends TestCase {
 			[ new LoadAdditionalScriptsEvent() ],
 			[ new BeforeTemplateRenderedEvent($shareMock) ]
 		];
+	}
+
+	private function resetStylesAndScripts() {
+		$this->invokePrivate(Util::class, '$scripts', []);
+		$this->invokePrivate(Util::class, '$scriptDeps', []);
+		$this->invokePrivate(Util::class, '$sortedScriptDeps', []);
+		\OC_Util::$styles = [];
 	}
 }
