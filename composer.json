@@ -15,7 +15,8 @@
         "phpunit/phpunit": "^9.5",
         "phpunit/php-code-coverage": "9.2.5",
         "phpunit/phpcov": "^8.2",
-        "nextcloud/coding-standard": "^1.0"
+        "nextcloud/coding-standard": "^1.0",
+        "netresearch/jsonmapper": "^4.0"
     },
     "config": {
         "optimize-autoloader": true,

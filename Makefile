@@ -81,6 +81,12 @@ else
 	composer update --prefer-dist
 endif
 
+# Installs composer dependencies for building the app and
+# wipes out unused composer files.
+.PHONY: composer-build
+composer-build:
+	composer install --no-dev --prefer-dist
+
 # Installs npm dependencies
 .PHONY: npm
 npm:
@@ -126,6 +132,8 @@ source:
 # Builds the source package for the app store, ignores php and js tests
 .PHONY: appstore
 appstore:
+	make distclean
+	make composer-build
 	rm -rf $(appstore_build_directory)
 	mkdir -p $(appstore_build_directory)
 	tar cvzf $(appstore_package_name).tar.gz \

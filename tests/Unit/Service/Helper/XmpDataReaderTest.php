@@ -14,18 +14,27 @@
 namespace OCA\Files_PhotoSpheres\Tests\Unit\Service\Helper;
 
 use Exception;
+use JsonMapper;
+use OCA\Files_PhotoSpheres\Model\CroppingConfigModel;
 use PHPUnit\Framework\TestCase;
 use OCA\Files_PhotoSpheres\Service\Helper\XmpDataReader;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
+use OCA\Files_PhotoSpheres\Service\Helper\IRegexMatcher;
+use OCA\Files_PhotoSpheres\Service\Helper\RegexMatcher;
 use OCP\Files\File;
+use Psr\Log\LoggerInterface;
 
 class XmpDataReaderTest extends TestCase {
 	/** @var XmpDataReader */
 	private $xmpDataReader;
 
+	/** @var LoggerInterface|MockObject */
+	private $logger;
+
 	public function setUp() : void {
 		parent::setUp();
-		$this->xmpDataReader = new XmpDataReader();
+		$this->logger = $this->createMock(LoggerInterface::class);
+		$this->xmpDataReader = new XmpDataReader($this->logger, new RegexMatcher());
 	}
 	
 	/**
@@ -36,6 +45,15 @@ class XmpDataReaderTest extends TestCase {
 		/** @var XmpResultModel */
 		$xmpResultModel = $this->xmpDataReader->readXmpDataFromFileObject($testFile);
 		$this->assertTrue($xmpResultModel->usePanoramaViewer);
+
+		$testFileInfo = pathinfo($path);
+		$jsonFile = $testFileInfo['dirname'].'/'.$testFileInfo['filename'].'.json';
+		if (file_exists($jsonFile)) {
+			// If we have the data payload as JSON we can check that, too
+			$jsonMapper = new JsonMapper();
+			$expectedCroppingConfig = $jsonMapper->map(json_decode(file_get_contents($jsonFile)), new CroppingConfigModel());
+			$this->assertEquals($expectedCroppingConfig, $xmpResultModel->croppingConfig);
+		}
 	}
 
 	/**
@@ -88,19 +106,62 @@ class XmpDataReaderTest extends TestCase {
 		$this->assertFalse($xmpResultModel->usePanoramaViewer);
 	}
 
+	public function testLogsWarningOnRegexError_GpanoTag() {
+		$loggerMock = $this->createMock(LoggerInterface::class);
+		$loggerMock->expects($this->once())
+			->method('warning');
+
+		$gPanoMatchCnt = 0;
+		$realMatcher = new RegexMatcher();
+		$regexMatcherMock = $this->createMock(IRegexMatcher::class);
+		$regexMatcherMock
+			->method('preg_match')
+			->willReturnCallback(function (string $pattern, string $subject, array &$matches = null, int $flags = 0, int $offset = 0) use ($gPanoMatchCnt, $realMatcher) {
+				// Fake gpano match does not succeed
+				if ($pattern === '/GPano:/') {
+					return false;
+				}
+				// Proxy to real regex match
+				return $realMatcher->preg_match($pattern, $subject, $matches);
+			});
+
+		$testFile = new TestFile('./tests/Testdata/pos1.jpg');
+
+		$reader = new XmpDataReader($loggerMock, $regexMatcherMock);
+		$reader->readXmpDataFromFileObject($testFile);
+	}
+
+	public function testLogsWarningOnRegexError_XmpMetadata() {
+		$loggerMock = $this->createMock(LoggerInterface::class);
+		$loggerMock->expects($this->atLeast(1))
+			->method('warning');
+
+		$regexMatcherMock = $this->createMock(IRegexMatcher::class);
+		$regexMatcherMock
+			->method('preg_match')
+			->willReturnCallback(function () {
+				$args = func_get_args();
+				// Fake gpano match succeeds
+				return $args[0] === '/GPano:/';
+			});
+
+		$testFile = new TestFile('./tests/Testdata/pos1.jpg');
+
+		$reader = new XmpDataReader($loggerMock, $regexMatcherMock);
+		$reader->readXmpDataFromFileObject($testFile);
+	}
+
 	public function dataProvider_Positive() {
-		$ret = [];
-		for ($i = 1; $i <= 9; $i++) {
-			$path = realpath("./tests/Testdata/pos$i.jpg");
-			$ret[] = [ $path ];
-		}
-		return $ret;
+		return $this->readTestFiles("pos*.jpg");
 	}
 
 	public function dataProvider_Negative() {
+		return $this->readTestFiles("neg*.jpg");
+	}
+
+	private function readTestFiles(string $globPattern) {
 		$ret = [];
-		for ($i = 1; $i <= 2; $i++) {
-			$path = realpath("./tests/Testdata/neg$i.jpg");
+		foreach (glob(realpath("./tests/Testdata") . "/$globPattern") as $path) {
 			$ret[] = [ $path ];
 		}
 		return $ret;
