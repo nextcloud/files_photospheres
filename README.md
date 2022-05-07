@@ -15,7 +15,7 @@ the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library. For
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+## Table of contents
 
 - [Features](#features)
 - [Setup](#setup)
