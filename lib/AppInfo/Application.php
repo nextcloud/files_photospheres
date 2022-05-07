@@ -16,12 +16,14 @@ namespace OCA\Files_PhotoSpheres\AppInfo;
 
 use OCA\Files\Event\LoadAdditionalScriptsEvent;
 use OCA\Files_PhotoSpheres\Listener\AddScriptsAndStylesListener;
+use OCA\Files_PhotoSpheres\Service\Helper\IRegexMatcher;
 use OCP\AppFramework\App;
 use OCA\Files_PhotoSpheres\Service\IStorageService;
 use OCA\Files_PhotoSpheres\Service\StorageService;
 use OCA\Files_PhotoSpheres\Service\IShareService;
 use OCA\Files_PhotoSpheres\Service\ShareService;
 use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
+use OCA\Files_PhotoSpheres\Service\Helper\RegexMatcher;
 use OCA\Files_PhotoSpheres\Service\Helper\XmpDataReader;
 use OCA\Files_Sharing\Event\BeforeTemplateRenderedEvent;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -46,6 +48,7 @@ class Application extends App implements IBootstrap {
 	public function register(IRegistrationContext $context): void {
 		$context->registerServiceAlias(IStorageService::class, StorageService::class);
 		$context->registerServiceAlias(IShareService::class, ShareService::class);
+		$context->registerServiceAlias(IRegexMatcher::class, RegexMatcher::class);
 		$context->registerServiceAlias(IXmpDataReader::class, XmpDataReader::class);
 
 		$context->registerEventListener(LoadAdditionalScriptsEvent::class, AddScriptsAndStylesListener::class);
