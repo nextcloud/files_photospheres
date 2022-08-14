@@ -14,7 +14,7 @@
     width: 100vw;
     height: calc(100vh - 50px);
     transition: width 0.5s, top 0.5s, height 0.5s, left 0.5s;
-    position: absolute;
+    position: fixed;
     top: 50px;
     left: 0;
     z-index: 9999;
@@ -33,9 +33,14 @@
 
 #photo-sphere-viewer-frame {
     display: block;
-    position: absolute;
-    width: 100%;
-    height: 100%;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
     top: 0;
     z-index: 9998;
+}
+
+/* Hide scrollbars when showing viewer frame (fullscreen) */
+.showing-photo-sphere-viewer-frame {
+    overflow: hidden;
 }
