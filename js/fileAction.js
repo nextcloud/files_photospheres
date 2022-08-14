@@ -40,7 +40,6 @@
          * Actionhandler for image-click
          */
         _actionHandler: function (filename, context) {
-            FileList.setViewerMode(true);
             PhotosphereViewerFunctions.showLoader(true);
             this.canShow(filename, context, function (canShowImage, xmpResultModel) {
                 if (canShowImage) {
@@ -48,12 +47,10 @@
                     this.showImage(filename, context, xmpResultModel);
                 } else if (typeof (this._oldActionHandler) === 'function') {
                     // It's a normal image, call the default handler
-                    FileList.setViewerMode(false);
                     PhotosphereViewerFunctions.showLoader(false);
                     this._oldActionHandler(filename, context);
                 } else {
                     // If there is no default handler trigger download
-                    FileList.setViewerMode(false);
                     PhotosphereViewerFunctions.showLoader(false);
                     const fileObject = this._getFileObject(filename, context);
                     window.location = this._getFileUrl(fileObject);
@@ -65,7 +62,6 @@
          * Actionhandler for video-click
          */
         _actionHandlerVideo: function(filename, context){
-            FileList.setViewerMode(true);
             this._showVideo(filename, context);
         },
 
@@ -145,7 +141,6 @@
             if (!fileObject) {
                 PhotosphereViewerFunctions.notify(['Could not locate file']);
                 PhotosphereViewerFunctions.showLoader(false);
-                FileList.setViewerMode(false);
                 return;
             }
 
@@ -208,6 +203,7 @@
                         break;
                 }
 
+                $('body').addClass('showing-photo-sphere-viewer-frame');
                 PhotosphereViewerFunctions.showLoader(false);
             });
 
@@ -215,9 +211,6 @@
                 $('footer').addClass('hidden');
 
             } else {
-                // Hide fileslist
-                FileList.setViewerMode(true);
-
                 // Register 'esc' to exit the viewer
                 var self = this;
                 var onKeyUp = function (e) {
@@ -252,7 +245,7 @@
             if (this._frameContainer != null && document.contains(this._frameContainer[0])) {
                 this._frameContainer.detach();
                 this._frameContainer = null;
-                FileList.setViewerMode(false);
+                $('body').removeClass('showing-photo-sphere-viewer-frame');
             }
         },
 
@@ -278,7 +271,6 @@
                         PhotosphereViewerFunctions.notify('An unknown error occured while trying to read xmp-data.');
                     }
                     PhotosphereViewerFunctions.showLoader(false);
-                    FileList.setViewerMode(false);
                     callback(false, null);
                     return;
                 }
@@ -291,7 +283,6 @@
                     if (!PhotosphereViewerFunctions.isWebGl2Supported()) {
                         PhotosphereViewerFunctions.notify("Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings.", "error");
                         PhotosphereViewerFunctions.showLoader(false);
-                        FileList.setViewerMode(false);
                         return;
                     }
                     callback(true, serverResponse.data);
@@ -302,7 +293,6 @@
                 .fail(function (jqXHR, textStatus, errorThrown) {
                     PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', errorThrown]);
                     PhotosphereViewerFunctions.showLoader(false);
-                    FileList.setViewerMode(false);
                 });
         },
 
@@ -408,7 +398,6 @@
             if (!file) {
                 PhotosphereViewerFunctions.notify(['Could not locate file']);
                 PhotosphereViewerFunctions.showLoader(false);
-                FileList.setViewerMode(false);
                 return;
             }
             this._showImage(file, xmpResultModel);
