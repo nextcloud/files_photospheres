@@ -234,6 +234,13 @@
                     // Register on iframe document
                     var frameBody = this.contentWindow.document;
                     $(frameBody).keyup(onKeyUp);
+
+                    // Add "close"-button
+                    var closeBtn = $(`<button id="close-photosphere-viewer" class="icon-close" title="Close"></button>`);
+                    closeBtn.on('click', function () {
+                        self.hideFrame();
+                    });
+                    $('#app-content').after(closeBtn);
                 });
             }
         },
@@ -246,6 +253,7 @@
                 this._frameContainer.detach();
                 this._frameContainer = null;
                 $('body').removeClass('showing-photo-sphere-viewer-frame');
+                $("#close-photosphere-viewer").remove();
             }
         },
 
