@@ -29,6 +29,14 @@ class PhotoSphereViewerRenderer {
         // Merge with defaults
         Object.assign(configObject, defaults);
 
+        // Add close button to iframe
+        var closeBtn = '<button id="close-photosphere-viewer" class="icon-close" title="Close"></button>';
+        document.querySelector('#viewer').insertAdjacentHTML('beforeend', closeBtn);
+
+        document.querySelector('#close-photosphere-viewer').onclick = function () {
+            window.top.postMessage('closePhotosphereViewer', '*');
+        };
+
         const viewer = new PhotoSphereViewer.Viewer(configObject);
         window.photoSphereViewer = viewer;
     }
