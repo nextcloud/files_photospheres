@@ -147,6 +147,14 @@
             var videoUrl = this._getFileUrl(fileObject);
             this.showFrame(videoUrl, filename, null, false, 'video');
         },
+
+        _listenForCloseMessage: function (msg) {
+            if (msg.data === 'closePhotosphereViewer') {
+                this.hideFrame();
+                window.removeEventListener("message", this._listenForCloseMessage, false);
+            }
+        },
+
         /*
          * Injects the iframe with the viewer into the current page.
          * Suiteable for both the sharing option (based on a token) and the authenticated explorer view (filename).
@@ -231,16 +239,12 @@
                 }
 
                 this._frameContainer.on('load', function () {
-                    // Register on iframe document
+                    // Register 'esc'-key on iframe document
                     var frameBody = this.contentWindow.document;
                     $(frameBody).keyup(onKeyUp);
 
-                    // Add "close"-button
-                    var closeBtn = $(`<button id="close-photosphere-viewer" class="icon-close" title="Close"></button>`);
-                    closeBtn.on('click', function () {
-                        self.hideFrame();
-                    });
-                    $('#app-content').after(closeBtn);
+                    // Listen for close-button click (button lives inside the iframe)
+                    window.addEventListener("message", self._listenForCloseMessage.bind(self), false);
                 });
             }
         },
