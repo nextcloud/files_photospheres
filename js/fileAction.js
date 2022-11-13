@@ -194,7 +194,7 @@
             }
 
             this._frameContainer = $(`<iframe id="${this._frameId}" src="${appUrl}" allowfullscreen="true"/>`);
-            $('#app-content').after(this._frameContainer);
+            $('body').after(this._frameContainer);
 
             this._frameContainer.on('load', function () {
                 // Viewer is rendered via helper-class in the
