@@ -423,18 +423,17 @@
 jQuery(function () {
 
     "use strict";
-    // Are we dealing with a shared directory or a single file?
-    var isDirectoryShare = $('#dir').val() ? true : false;;
+    
+    // Regular user view or shared view?
     var sharingToken = $('#sharingToken').val();
-
-    // Regular user view
     if (!sharingToken) {
         console.log("Init regular user view");
         window.photoSphereViewerFileAction.init(false, null);
         return;
     }
 
-    // Directory share
+    // Are we dealing with a shared directory or a single file?
+    var isDirectoryShare = $.find('.files-filestable').length > 0 ? true : false;;
     if (isDirectoryShare) {
          /*
              *  FIXME ::
