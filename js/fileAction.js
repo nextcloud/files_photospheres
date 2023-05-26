@@ -103,17 +103,18 @@
         },
 
         _getFileUrl(fileObject){
+            var file = encodeURIComponent(fileObject.name);
             if (!this._isDirectoryShare) {
                 // "normal" user-view
                 var path = fileObject.path;
                 if (path == '/'){
                     path = '';
                 }
-                return `${OC.getRootPath()}/remote.php/webdav${path}/${fileObject.name}`;
-            } else {
-                // directory-share
-                return `${OC.getRootPath()}/index.php/s/${this._sharingToken}/download?path=${this._getDirectorySharePathFromCurrentLocation()}&files=${fileObject.name}`;
-            }
+                return `${OC.getRootPath()}/remote.php/webdav${path}/${file}`;
+            } 
+            // directory-share
+            var path = encodeURIComponent(this._getDirectorySharePathFromCurrentLocation());
+            return `${OC.getRootPath()}/index.php/s/${this._sharingToken}/download?path=${path}&files=${file}`;
         },
 
         /*
@@ -383,9 +384,9 @@
                     "/sharefiles/xmpdata/" +
                     this._sharingToken +
                     "?filename=" +
-                    filename +
+                    encodeURIComponent(filename) +
                     "&path=" +
-                    this._getDirectorySharePathFromCurrentLocation();
+                    encodeURIComponent(this._getDirectorySharePathFromCurrentLocation());
             }
 
             this._xmpDataBackendRequest(xmpBackendUrl, callback);
