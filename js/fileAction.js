@@ -59,6 +59,13 @@
         },
 
         /*
+         *  Actionhandler if the user clicks on the context-menu "open in photosphere viewer"
+         */
+        _actionHandlerImageContextMenu: function (filename, context) {
+            this.showImage(filename, context, null);
+        },
+
+        /*
          * Actionhandler for video-click
          */
         _actionHandlerVideo: function(filename, context){
@@ -70,23 +77,23 @@
          */
         _getAction: function () {
             return {
-                actionHandler: this._actionHandler.bind(this),
+                name: "viewInPhotosphereViewer",
                 displayName: "View in PhotoSphereViewer",
-                icon: "",
                 mime: "image/jpeg",
-                name: "view",
-                permissions: 1,
-                order: -1
+                order: 1000,
+                permissions: OC.PERMISSION_READ,
+                actionHandler: this._actionHandlerImageContextMenu.bind(this),
+                iconClass: "icon-external"
             };
         },
 
         _getVideoAction: function() {
             return {
                 name: 'viewInThreeSixtyViewer',
-				displayName: "View in 360° viewer",
-				mime: 'video/mp4',
-				order: 1000,
-				permissions: OC.PERMISSION_READ,
+                displayName: "View in 360° viewer",
+                mime: 'video/mp4',
+                order: 1000,
+                permissions: OC.PERMISSION_READ,
                 actionHandler: this._actionHandlerVideo.bind(this),
                 iconClass: "icon-external"
             }
