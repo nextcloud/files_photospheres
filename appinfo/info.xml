@@ -9,7 +9,7 @@
         integrating the photo-sphere-viewer.js component
         into your nextcloud instance.
     ]]></description>
-    <version>1.26.2</version>
+    <version>1.26.3</version>
     <licence>agpl</licence>
     <author mail="ro.windey@gmail.com" >Robin Windey</author>
     <namespace>Files_PhotoSpheres</namespace>
