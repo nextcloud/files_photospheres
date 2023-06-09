@@ -77,6 +77,21 @@
          */
         _getAction: function () {
             return {
+                actionHandler: this._actionHandler.bind(this),
+                displayName: "PhotoSphereViewer",
+                icon: "",
+                mime: "image/jpeg",
+                name: "view",
+                permissions: 1,
+                order: -1
+            };
+        },
+
+        /*
+         * Action for "Open in PhotoSphereViewer"
+         */
+        _getContextMenuAction: function() {
+            return {
                 name: "viewInPhotosphereViewer",
                 displayName: "View in PhotoSphereViewer",
                 mime: "image/jpeg",
@@ -341,8 +356,9 @@
                 this._oldActionHandler = currActions.view.action;
             }
 
-            OCA.Files.fileActions.registerAction(this._getAction());
-            OCA.Files.fileActions.registerAction(this._getVideoAction());
+            OCA.Files.fileActions.registerAction(this._getAction());            // Check for PhotoSphere on image click
+            OCA.Files.fileActions.registerAction(this._getContextMenuAction()); // Force open in PhotoSphereViewer via contextmenu
+            OCA.Files.fileActions.registerAction(this._getVideoAction());       // Open 360 video via contextmenu
 
             OCA.Files.fileActions.setDefault(this._photoShpereMimeType, 'view');
 
