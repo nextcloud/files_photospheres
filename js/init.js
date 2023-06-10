@@ -16,14 +16,17 @@ class PhotoSphereViewerRenderer {
     render(configObject) {
         const defaults = {
             container: document.querySelector('#viewer'),
-            autorotateDelay: false,
             useXmpData: false,
             // Fix iframe problem on Safari #32
             withCredentials: true,
-            // plugins: [
-            //     PhotoSphereViewer.GyroscopePlugin,
-            //     PhotoSphereViewer.StereoPlugin,
-            // ]
+            plugins: [
+                PhotoSphereViewer.GyroscopePlugin,
+                PhotoSphereViewer.StereoPlugin,
+                [PhotoSphereViewer.AutorotatePlugin, {
+                    autostartOnIdle: false,
+                    autostartDelay: null,
+                }],
+            ]
         };
 
         // Merge with defaults
