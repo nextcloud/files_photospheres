@@ -13,7 +13,23 @@
  */
 
 class PhotoSphereViewerRenderer {
-    render(configObject) {
+    render(configObject, hideDownload) {
+        const navbarButtons = [
+            'autorotate',
+            'zoom',
+            'move',
+            'download',
+            'description',
+            'caption',
+            'fullscreen',
+            'stereo',
+            'gyroscope'
+        ];
+
+        if (hideDownload) {
+            navbarButtons.splice(navbarButtons.indexOf('download'), 1)
+        }
+
         const defaults = {
             container: document.querySelector('#viewer'),
             useXmpData: false,
@@ -26,7 +42,8 @@ class PhotoSphereViewerRenderer {
                     autostartOnIdle: false,
                     autostartDelay: null,
                 }],
-            ]
+            ],
+            navbar: navbarButtons
         };
 
         // Merge with defaults
