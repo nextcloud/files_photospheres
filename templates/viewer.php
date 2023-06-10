@@ -18,7 +18,8 @@
 		<script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/photo-sphere-viewer/core/index.min.js')) ?>?v=<?php p($version) ?>"></script>
 		<script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/photo-sphere-viewer/gyroscope-plugin/index.min.js')) ?>?v=<?php p($version) ?>"></script>
 		<script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/photo-sphere-viewer/stereo-plugin/index.min.js')) ?>?v=<?php p($version) ?>"></script>
-		<script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/init.js')) ?>?v=<?php p($version) ?>"></script>
+        <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/photo-sphere-viewer/autorotate-plugin/index.min.js')) ?>?v=<?php p($version) ?>"></script>
+        <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/init.js')) ?>?v=<?php p($version) ?>"></script>
         <script nonce="<?php p($nounceManager->getNonce()) ?>" src="<?php p($urlGenerator->linkTo(AppInfo\Application::APP_NAME, 'js/functions.js')) ?>?v=<?php p($version) ?>"></script>
 	</head>
     <body id="body-public">
