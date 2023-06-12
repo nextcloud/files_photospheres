@@ -219,6 +219,8 @@
             this._frameContainer = $(`<iframe id="${this._frameId}" src="${appUrl}" allowfullscreen="true"/>`);
             $('body').after(this._frameContainer);
 
+            var hideDownload = $('#hideDownload').val() === 'true';
+
             this._frameContainer.on('load', function () {
                 // Viewer is rendered via helper-class in the
                 // iframe. After the frame has loaded, provide
@@ -227,7 +229,7 @@
 
                 switch(frameType){
                     case 'image':
-                        frameWindow.photoSphereViewerRenderer.render(configObject);
+                        frameWindow.photoSphereViewerRenderer.render(configObject, hideDownload);
                         break;
                     case 'video':
                         frameWindow.photoSphereVideoRenderer.render(configObject);
