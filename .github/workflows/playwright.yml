@@ -1,0 +1,103 @@
+name: Playwright Tests
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - stable*
+
+env:
+  APP_NAME: files_photospheres
+  NC_REF: stable27
+  NC_BIND: 'localhost:8080'
+  NODE_VER: 16
+  DB_USER: root
+  DB_PASSWORD: rootpassword
+  DB_PORT: 4444
+  # These env vars are used in vars.sh for setting up the tests
+  E2E_USER: admin
+  E2E_PASSWORD: admin
+  E2E_BASE_URL: 'http://localhost:8080'
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mariadb:10.5
+        ports:
+          - 4444:3306/tcp
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ env.DB_PASSWORD }}
+        options: --health-cmd="mysqladmin ping" --health-interval 5s --health-timeout 2s --health-retries 5
+    steps:
+    - name: Checkout Nextcloud server
+      uses: actions/checkout@v3
+      with:
+        repository: nextcloud/server
+        ref: ${{ env.NC_REF }}
+    
+    - name: Checkout server submodules
+      shell: bash
+      run: |
+        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
+    
+    - name: Checkout app
+      uses: actions/checkout@v3
+      with:
+        path: apps/${{ env.APP_NAME }}
+      
+    - name: Set up and run Nextcloud server
+      run: |
+        mkdir data
+        ./occ maintenance:install \
+          --verbose \
+          --database=mysql \
+          --database-name=nextcloud \
+          --database-host=127.0.0.1 \
+          --database-port=${{ env.DB_PORT }} \
+          --database-user=${{ env.DB_USER }} \
+          --database-pass=${{ env.DB_PASSWORD }} \
+          --admin-user ${{ env.E2E_USER }} \
+          --admin-pass ${{ env.E2E_PASSWORD }}
+        ./occ app:enable ${{ env.APP_NAME }}
+        php -S ${{ env.NC_BIND }} &
+
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VER }}
+
+    - name: Install dependencies
+      run: npm ci
+      working-directory: apps/${{ env.APP_NAME }}/tests/E2E
+
+    - name: Install Playwright Browsers
+      run: npx playwright install chromium --with-deps
+      working-directory: apps/${{ env.APP_NAME }}/tests/E2E
+
+    - name: Test setup
+      run: ./test-setup.sh
+      working-directory: apps/${{ env.APP_NAME }}/tests/E2E/scripts
+
+    - name: Run Playwright tests
+      run: npx playwright test
+      working-directory: apps/${{ env.APP_NAME }}/tests/E2E
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: apps/${{ env.APP_NAME }}/tests/E2E/playwright-report/
+        retention-days: 30
+
+    - name: Upload server logs
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: nextcloud-logs
+        path: data/nextcloud.log
