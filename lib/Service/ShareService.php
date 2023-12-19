@@ -14,12 +14,12 @@
 
 namespace OCA\Files_PhotoSpheres\Service;
 
-use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
-use OCP\Share\IManager;
-use OCP\Share\Exceptions\ShareNotFound;
-use OCP\Files\NotFoundException;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
+use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
+use OCP\Files\NotFoundException;
 use OCP\Share\Exceptions\GenericShareException;
+use OCP\Share\Exceptions\ShareNotFound;
+use OCP\Share\IManager;
 
 /**
  * class ShareService

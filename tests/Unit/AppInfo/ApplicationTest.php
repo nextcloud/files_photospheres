@@ -23,10 +23,10 @@ declare(strict_types=1);
 
 namespace OCA\Files_PhotoSpheres\Tests\Unit\AppInfo;
 
-use PHPUnit\Framework\TestCase;
+use oca\Files_PhotoSpheres\AppInfo\Application;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use PHPUnit\Framework\MockObject\MockObject;
-use oca\Files_PhotoSpheres\AppInfo\Application;
+use PHPUnit\Framework\TestCase;
 
 class ApplicationTest extends TestCase {
 	public function testBootDoesNothing_OnBootContext() {

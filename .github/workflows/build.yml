@@ -8,8 +8,25 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
+      
+      - name: Read package.json node and npm engines version
+        uses: skjnldsv/read-package-engines-version-actions@v2
+        id: versions
+        continue-on-error: false
+        with:
+          path: ${{ env.APP_NAME }}
+
+      - name: Set up node ${{ steps.versions.outputs.nodeVersion }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ steps.versions.outputs.nodeVersion }}
+
+      - name: Set up npm ${{ steps.versions.outputs.npmVersion }}
+        run: npm i -g npm@"${{ steps.versions.outputs.npmVersion }}"
+      
       - name: Run Makefile
         run: make appstore
+      
       - name: Upload artifacts
         uses: actions/upload-artifact@v1
         with:

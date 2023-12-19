@@ -18,8 +18,8 @@ use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use OCA\Files_PhotoSpheres\Service\StorageService;
 use OCP\Files\File;
 use OCP\Files\Folder;
-use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 class StorageServiceTest extends TestCase {
 

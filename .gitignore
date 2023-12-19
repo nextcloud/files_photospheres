@@ -7,3 +7,4 @@ coverage*.xml
 *.cov
 *.result.cache
 coverage_html
+node_modules

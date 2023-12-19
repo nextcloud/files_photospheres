@@ -65,35 +65,19 @@ ifneq (,$(wildcard $(CURDIR)/js/package.json))
 	make npm
 endif
 
-# Installs and updates the composer dependencies. If composer is not installed
-# a copy is fetched from the web
-.PHONY: composer
-composer:
-ifeq (, $(composer))
-	@echo "No composer command available, downloading a copy from the web"
-	mkdir -p $(build_tools_directory)
-	curl -sS https://getcomposer.org/installer | php
-	mv composer.phar $(build_tools_directory)
-	php $(build_tools_directory)/composer.phar install --prefer-dist
-	php $(build_tools_directory)/composer.phar update --prefer-dist
-else
-	composer install --prefer-dist
-	composer update --prefer-dist
-endif
-
 # Installs composer dependencies for building the app and
 # wipes out unused composer files.
-.PHONY: composer-build
-composer-build:
+.PHONY: composer
+composer:
 	composer install --no-dev --prefer-dist
 
 # Installs npm dependencies
 .PHONY: npm
 npm:
 ifeq (,$(wildcard $(CURDIR)/package.json))
-	cd js && $(npm) run build
+	cd js && $(npm) ci && $(npm) run build
 else
-	npm run build
+	npm ci && npm run build
 endif
 
 # Removes the appstore build
@@ -133,7 +117,7 @@ source:
 .PHONY: appstore
 appstore:
 	make distclean
-	make composer-build
+	make build
 	rm -rf $(appstore_build_directory)
 	mkdir -p $(appstore_build_directory)
 	tar cvzf $(appstore_package_name).tar.gz \
@@ -158,6 +142,8 @@ appstore:
 	--exclude="../$(app_name)/protractor\.*" \
 	--exclude="../$(app_name)/.*" \
 	--exclude="../$(app_name)/js/.*" \
+	--exclude="../$(app_name)/src" \
+	--exclude="../$(app_name)/node_modules" \
 	../$(app_name) \
 
 .PHONY: test
