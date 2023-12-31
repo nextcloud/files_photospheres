@@ -8,7 +8,7 @@ on:
 
 env:
   APP_NAME: files_photospheres
-  NC_REF: stable27
+  NC_REF: stable28
   NC_BIND: 'localhost:8080'
   NODE_VER: 16
   DB_USER: root
@@ -49,6 +49,26 @@ jobs:
       uses: actions/checkout@v3
       with:
         path: apps/${{ env.APP_NAME }}
+
+    - name: Checkout viewer app
+      uses: actions/checkout@v3
+      with:
+        repository: nextcloud/viewer
+        ref: ${{ env.NC_REF }}
+        path: apps/viewer
+
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VER }}
+
+    - name: Build app
+      run: npm ci && npm run build
+      working-directory: apps/${{ env.APP_NAME }}
+
+    - name: Build viewer app
+      run: npm ci && npm run build
+      working-directory: apps/viewer
       
     - name: Set up and run Nextcloud server
       run: |
@@ -64,19 +84,15 @@ jobs:
           --admin-user ${{ env.E2E_USER }} \
           --admin-pass ${{ env.E2E_PASSWORD }}
         ./occ app:enable ${{ env.APP_NAME }}
+        ./occ app:enable viewer
         php -S ${{ env.NC_BIND }} &
 
-    - name: Setup node
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ env.NODE_VER }}
-
-    - name: Install dependencies
+    - name: Install test dependencies
       run: npm ci
       working-directory: apps/${{ env.APP_NAME }}/tests/E2E
 
     - name: Install Playwright Browsers
-      run: npx playwright install chromium --with-deps
+      run: npx playwright install chrome --with-deps
       working-directory: apps/${{ env.APP_NAME }}/tests/E2E
 
     - name: Test setup

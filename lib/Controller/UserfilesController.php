@@ -16,8 +16,8 @@ namespace OCA\Files_PhotoSpheres\Controller;
 
 use OCA\Files_PhotoSpheres\Service\IStorageService;
 use OCP\AppFramework\Controller;
-use OCP\IRequest;
 use OCP\AppFramework\Http\JSONResponse;
+use OCP\IRequest;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -51,17 +51,17 @@ class UserfilesController extends Controller {
 			$this->logger->info("Reading XMP data for file id $fileId");
 			$xmpData = $this->storageService->getXmpData($fileId);
 			return new JSONResponse(
-					[
-						'data' => $xmpData,
-						'success' => true
-					]);
+				[
+					'data' => $xmpData,
+					'success' => true
+				]);
 		} catch (\Exception $e) {
 			$this->logger->error($e->getMessage(), ['exception' => $e]);
 			return new JSONResponse(
-					[
-						'message' => $e->getMessage(),
-						'success' => false
-					]);
+				[
+					'message' => $e->getMessage(),
+					'success' => false
+				]);
 		}
 	}
 }

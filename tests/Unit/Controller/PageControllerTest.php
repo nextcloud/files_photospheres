@@ -15,13 +15,13 @@ namespace OCA\Files_PhotoSpheres\Tests\Unit\Controller;
 
 use OC\Security\CSP\ContentSecurityPolicyNonceManager;
 use OCA\Files_PhotoSpheres\AppInfo;
-use PHPUnit\Framework\TestCase;
-use OCP\AppFramework\Http\TemplateResponse;
 use OCA\Files_PhotoSpheres\Controller\PageController;
 use OCP\App\IAppManager;
+use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 use OCP\IURLGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
 class PageControllerTest extends TestCase {

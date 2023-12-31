@@ -15,11 +15,11 @@ namespace OCA\Files_PhotoSpheres\Controller;
 
 use OCA\Files_PhotoSpheres\AppInfo;
 use OCP\App\IAppManager;
-use OCP\IURLGenerator;
-use OCP\IRequest;
-use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\ContentSecurityPolicy;
+use OCP\AppFramework\Http\TemplateResponse;
+use OCP\IRequest;
+use OCP\IURLGenerator;
 
 /**
  * class PageController
@@ -62,15 +62,15 @@ class PageController extends Controller {
 			'nounceManager' => \OC::$server->getContentSecurityPolicyNonceManager()
 		];
 		switch ($type) {
-						case "image":
-								$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer', $params, 'blank');  // templates/viewer.php
-								$this->setContentSecurityPolicy($response);
-								break;
-						case "video":
-								$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer_video', $params, 'blank');  // templates/viewer_video.php
-								break;
-						default: return null;
-				}
+			case "image":
+				$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer', $params, 'blank');  // templates/viewer.php
+				$this->setContentSecurityPolicy($response);
+				break;
+			case "video":
+				$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer_video', $params, 'blank');  // templates/viewer_video.php
+				break;
+			default: return null;
+		}
 		
 		return $response;
 	}

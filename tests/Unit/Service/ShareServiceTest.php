@@ -14,9 +14,6 @@
 namespace OCA\Files_PhotoSpheres\Tests\Unit\Service;
 
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
-use PHPUnit\Framework\TestCase;
-use OCP\Share\IManager;
-use PHPUnit\Framework\MockObject\MockObject;
 use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use OCA\Files_PhotoSpheres\Service\ShareService;
 use OCP\Files\File;
@@ -24,7 +21,10 @@ use OCP\Files\Folder;
 use OCP\Files\NotFoundException;
 use OCP\Share\Exceptions\GenericShareException;
 use OCP\Share\Exceptions\ShareNotFound;
+use OCP\Share\IManager;
 use OCP\Share\IShare;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 class ShareServiceTest extends TestCase {
 

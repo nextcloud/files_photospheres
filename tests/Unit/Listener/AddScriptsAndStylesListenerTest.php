@@ -31,8 +31,8 @@ use OCA\Files\Event\LoadSidebar;
 use OCA\Files_PhotoSpheres\Listener\AddScriptsAndStylesListener;
 use OCA\Files_Sharing\Event\BeforeTemplateRenderedEvent;
 use OCP\EventDispatcher\Event;
-use OCP\Util;
 use OCP\Share\IShare;
+use OCP\Util;
 use Test\TestCase;
 
 class AddScriptsAndStylesListenerTest extends TestCase {

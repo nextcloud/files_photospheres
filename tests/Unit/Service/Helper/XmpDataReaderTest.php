@@ -16,12 +16,12 @@ namespace OCA\Files_PhotoSpheres\Tests\Unit\Service\Helper;
 use Exception;
 use JsonMapper;
 use OCA\Files_PhotoSpheres\Model\CroppingConfigModel;
-use PHPUnit\Framework\TestCase;
-use OCA\Files_PhotoSpheres\Service\Helper\XmpDataReader;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 use OCA\Files_PhotoSpheres\Service\Helper\IRegexMatcher;
 use OCA\Files_PhotoSpheres\Service\Helper\RegexMatcher;
+use OCA\Files_PhotoSpheres\Service\Helper\XmpDataReader;
 use OCP\Files\File;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 class XmpDataReaderTest extends TestCase {
@@ -257,5 +257,11 @@ class TestFile implements File {
 	}
 	public function getUploadTime() : int {
 		return 0;
+	}
+	public function getParentId() : int {
+		return 0;
+	}
+	public function getMetadata(): array {
+		return [];
 	}
 }

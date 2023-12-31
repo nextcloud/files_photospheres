@@ -4,14 +4,14 @@
 [![codecov](https://codecov.io/gh/nextcloud/files_photospheres/branch/master/graph/badge.svg)](https://codecov.io/gh/nextcloud/files_photospheres)
 ![Lint](https://github.com/nextcloud/files_photospheres/workflows/Lint/badge.svg)
 [![Generic badge](https://img.shields.io/github/v/release/nextcloud/files_photospheres)](https://github.com/nextcloud/files_photospheres/releases)
-[![Generic badge](https://img.shields.io/badge/Nextcloud-27-orange)](https://github.com/nextcloud/server)
+[![Generic badge](https://img.shields.io/badge/Nextcloud-28-orange)](https://github.com/nextcloud/server)
 
 
 Nextcloud app for viewing Google PhotoSphere 360° images (panorama-images). This app is based on 
 the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library. For 
 360° videos the library [marzipano](https://www.marzipano.net/) is used.
 
-**This version is tested for Nextcloud 27.**
+**This version is tested for Nextcloud 28.**
 
 ## Table of contents
 
@@ -22,6 +22,7 @@ the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library. For
     - [Install through the app store](#install-through-the-app-store)
     - [Install manually](#install-manually)
     - [Usage](#usage)
+    - [Caching](#caching)
   - [Caveats](#caveats)
   - [Report an issue](#report-an-issue)
 
@@ -47,6 +48,9 @@ You can manually install this app, by cloning the repository into your nextcloud
 
 ### Usage
 After installing the app you can view your PhotoSphere 360° images by clicking on the file in the Nextcloud file browser. Note that opening PhotoSpheres from the gallery is currently not supported.
+
+### Caching
+This app uses the caching mechanism of Nextcloud to cache the XMP Metadata of the images. The cache is filled on demand when opening a directory for the first time and it will be valid for 24 hours. To get the full performance it's highly recommended to install a local caching backend like **APCu** or **Redis** like described [here](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/caching_configuration.html).
 
 ## Caveats
 * It is not possible to open the photosphere viewer from the Gallery. You must use the file browser.

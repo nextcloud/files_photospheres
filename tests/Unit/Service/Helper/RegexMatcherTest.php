@@ -13,8 +13,8 @@
 
 namespace OCA\Files_PhotoSpheres\Tests\Unit\Service\Helper;
 
-use PHPUnit\Framework\TestCase;
 use OCA\Files_PhotoSpheres\Service\Helper\RegexMatcher;
+use PHPUnit\Framework\TestCase;
 
 class RegexMatcherTest extends TestCase {
 	/** @var RegexMatcher */

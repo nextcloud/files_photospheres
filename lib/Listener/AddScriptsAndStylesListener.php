@@ -39,8 +39,12 @@ class AddScriptsAndStylesListener implements IEventListener {
 			return;
 		}
 
-		Util::addScript(Application::APP_NAME, 'functions');
-		Util::addScript(Application::APP_NAME, 'fileAction');
+		Util::addInitScript(Application::APP_NAME, 'init');
+
+		// Add our JS after the viewer JS to make sure we register
+		// our file click handlers later than the viewer app
+		Util::addScript(Application::APP_NAME, 'functions', 'viewer');
+		Util::addScript(Application::APP_NAME, 'fileAction', 'viewer');
 		Util::addStyle(Application::APP_NAME, 'style');
 	}
 }

@@ -14,9 +14,9 @@
 
 namespace OCA\Files_PhotoSpheres\Service;
 
-use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use \OCP\Files\Folder;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
+use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 
 /**
  * class StorageService
