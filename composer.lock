@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4510da7441f980ddd494ec70d42bcc38",
+    "content-hash": "045c49dcab5c8ba40f1eaea29106d6c5",
     "packages": [],
     "packages-dev": [
         {
@@ -444,16 +444,16 @@
         },
         {
             "name": "php-cs-fixer/shim",
-            "version": "v3.42.0",
+            "version": "v3.45.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/shim.git",
-                "reference": "c503b36b4ae065ac9dbfbda584e0827b32afa1c4"
+                "reference": "6612ded23a774a376efe7332b4fc8333cdd324af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/c503b36b4ae065ac9dbfbda584e0827b32afa1c4",
-                "reference": "c503b36b4ae065ac9dbfbda584e0827b32afa1c4",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/shim/zipball/6612ded23a774a376efe7332b4fc8333cdd324af",
+                "reference": "6612ded23a774a376efe7332b4fc8333cdd324af",
                 "shasum": ""
             },
             "require": {
@@ -490,9 +490,9 @@
             "description": "A tool to automatically fix PHP code style",
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/shim/issues",
-                "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.42.0"
+                "source": "https://github.com/PHP-CS-Fixer/shim/tree/v3.45.0"
             },
-            "time": "2023-12-24T14:39:15+00:00"
+            "time": "2023-12-30T02:07:42+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -2340,7 +2340,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.0 <=8.2"
+        "php": ">=8.1 <=8.3"
     },
     "platform-dev": [],
     "platform-overrides": {
