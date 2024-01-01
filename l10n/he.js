@@ -1,6 +1,7 @@
 OC.L10N.register(
     "files_photospheres",
     {
+    "hidden" : "נסתר",
     "Photo Sphere Viewer" : "הצגת תמונות כדוריות",
     "Enables viewing of google photosphere images" : "הפעלת צפייה בתמונות כדוריות (פוטוספרות) של גוגל"
 },
