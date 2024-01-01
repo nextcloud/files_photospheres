@@ -1,4 +1,5 @@
 { "translations": {
+    "hidden" : "piilotettu",
     "Photo Sphere Viewer" : "Photo Sphere ‑kuvien esikatselu",
     "Enables viewing of google photosphere images" : "Mahdollistaa Google Photo Sphere ‑kuvien katselemisen"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
