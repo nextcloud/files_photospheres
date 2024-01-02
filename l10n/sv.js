@@ -1,6 +1,7 @@
 OC.L10N.register(
     "files_photospheres",
     {
+    "___proto___::_set_" : ["__proto__","Sätt"],
     "hidden" : "gömd",
     "Photo Sphere Viewer" : "Photosphere-visare",
     "Enables viewing of google photosphere images" : "Aktiverar visning av Google Photosphere-bilder",

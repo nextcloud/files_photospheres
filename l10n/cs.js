@@ -1,6 +1,7 @@
 OC.L10N.register(
     "files_photospheres",
     {
+    "hidden" : "skryté",
     "Photo Sphere Viewer" : "Prohlížeč Photo Sphere",
     "Enables viewing of google photosphere images" : "Umožňuje zobrazování obrázků google photosphere",
     "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Umožňuje zobrazování google photosphere obrázků \n        pomocí začlenění součásti photo-sphere-viewer.js\n        do vaší instance Nextcloud."
