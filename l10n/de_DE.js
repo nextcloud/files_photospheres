@@ -1,6 +1,7 @@
 OC.L10N.register(
     "files_photospheres",
     {
+    "___proto___::_set_" : ["__proto__","Setzen"],
     "hidden" : "Versteckt",
     "Photo Sphere Viewer" : "Photo Sphere-Betrachter",
     "Enables viewing of google photosphere images" : "Aktiviert das Betrachten von Google Photo Sphere-Bilder",
