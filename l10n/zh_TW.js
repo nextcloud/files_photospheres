@@ -1,6 +1,7 @@
 OC.L10N.register(
     "files_photospheres",
     {
+    "___proto___::_set_" : ["設定"],
     "hidden" : "隱藏",
     "Photo Sphere Viewer" : "球狀圖檢視器",
     "Enables viewing of google photosphere images" : "開啟檢視 Google 球狀圖圖片",
