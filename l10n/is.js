@@ -1,7 +1,6 @@
 OC.L10N.register(
     "files_photospheres",
     {
-    "hidden" : "falið",
     "Photo Sphere Viewer" : "Skoðari fyrir myndhnött (photo sphere)",
     "Enables viewing of google photosphere images" : "Gerir kleift að skoða myndir á Google myndhnetti (photosphere)"
 },
