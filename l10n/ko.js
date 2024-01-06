@@ -1,7 +1,6 @@
 OC.L10N.register(
     "files_photospheres",
     {
-    "hidden" : "숨김",
     "Photo Sphere Viewer" : "Photo Sphere 뷰어",
     "Enables viewing of google photosphere images" : "Google Photo Sphere 그림 보기"
 },

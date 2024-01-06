@@ -1,8 +1,6 @@
 OC.L10N.register(
     "files_photospheres",
     {
-    "___proto___::_set_" : ["設置"],
-    "hidden" : "隱藏",
     "Photo Sphere Viewer" : "球狀圖檢視器",
     "Enables viewing of google photosphere images" : "開啟檢視Google球狀圖圖片",
     "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "允許通過以下方式查看 Google Photosphere 圖像：\n        整合 photo-sphere-viewer.js 組件\n        進入您的 Nextcloud。"
