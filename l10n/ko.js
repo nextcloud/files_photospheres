@@ -2,6 +2,7 @@ OC.L10N.register(
     "files_photospheres",
     {
     "Photo Sphere Viewer" : "Photo Sphere 뷰어",
-    "Enables viewing of google photosphere images" : "Google Photo Sphere 그림 보기"
+    "Enables viewing of google photosphere images" : "Google Photo Sphere 그림 보기",
+    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "photo-sphere-viewer.js 구성요소를 \n        당신의 Nextcloud 인스턴스와 통합하여 \n        Google Photosphere 이미지를 볼 수 있도록 합니다"
 },
 "nplurals=1; plural=0;");
