@@ -61,4 +61,18 @@ class CroppingConfigModel {
 
 	/** @var float|null */
 	public $poseRoll;
+
+	public static function fromArray(array $data) {
+		$croppingConfig = new CroppingConfigModel();
+		$croppingConfig->fullWidth = $data['fullWidth'];
+		$croppingConfig->fullHeight = $data['fullHeight'];
+		$croppingConfig->croppedWidth = $data['croppedWidth'];
+		$croppingConfig->croppedHeight = $data['croppedHeight'];
+		$croppingConfig->croppedX = $data['croppedX'];
+		$croppingConfig->croppedY = $data['croppedY'];
+		$croppingConfig->poseHeading = $data['poseHeading'];
+		$croppingConfig->posePitch = $data['posePitch'];
+		$croppingConfig->poseRoll = $data['poseRoll'];
+		return $croppingConfig;
+	}
 }

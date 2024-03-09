@@ -31,6 +31,14 @@ class XmpResultModel implements XmlSerializable {
 		$this->croppingConfig = new CroppingConfigModel();
 	}
 
+	public static function fromArray(array $data) {
+		$xmpResult = new XmpResultModel();
+		$xmpResult->usePanoramaViewer = $data['usePanoramaViewer'];
+		$xmpResult->containsCroppingConfig = $data['containsCroppingConfig'];
+		$xmpResult->croppingConfig = CroppingConfigModel::fromArray($data['croppingConfig']);
+		return $xmpResult;
+	}
+
 	public function xmlSerialize(Writer $writer) {
 		$writer->write([
 			'usePanoramaViewer' => $this->usePanoramaViewer,

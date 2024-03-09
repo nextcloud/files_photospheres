@@ -144,7 +144,7 @@ class PhotosphereViewerPlugin extends ServerPlugin {
 
 		if ($cachedXmpMeta !== null) {
 			$this->logger->debug('Cache hit for file {file}', ['file' => $file->getName()]);
-			return $cachedXmpMeta;
+			return $cachedXmpMeta instanceof XmpResultModel ? $cachedXmpMeta : XmpResultModel::fromArray($cachedXmpMeta);
 		}
 
 		$this->logger->debug('Cache miss for file {file}', ['file' => $file->getName()]);
