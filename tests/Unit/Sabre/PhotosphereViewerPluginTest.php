@@ -27,6 +27,7 @@ namespace OCA\Files_PhotoSpheres\Tests\Unit\Sabre;
 use OC\Files\View;
 use OCA\DAV\Connector\Sabre\Directory;
 use OCA\DAV\Connector\Sabre\File;
+use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 use OCA\Files_PhotoSpheres\Sabre\PhotosphereViewerPlugin;
 use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use OCP\Files\FileInfo;
@@ -387,14 +388,86 @@ class PhotosphereViewerPluginTest extends TestCase {
 		$dir1 = $this->createMock(Directory::class);
 
 		$node = $this->createMock(ICollection::class);
-		$node->expects($this->once())
+		$node->expects($this->atLeastOnce())
 			->method('getChildren')
 			->willReturn([$file1, $file2, $dir1]);
 
-		$xmpReader->expects($this->exactly(2))
+		$xmpReader->expects($this->exactly(2)) // 2 reads, one per file. Should be cached
 			->method('readXmpDataFromFileObject');
 
 		$plugin->handleGetProperties($propFind, $node);
+		$plugin->handleGetProperties($propFind, $node);
+	}
+
+	public function testReturnsXmpResultModel_IfRedisCacheReturnsArray() { // #137
+		$this->cacheArray = [
+				'42' => [
+					'usePanoramaViewer' => false,
+					'containsCroppingConfig' => true,
+					'croppingConfig' => [
+						'fullWidth' => 1,
+						'fullHeight' => 2,
+						'croppedWidth' => 3,
+						'croppedHeight' => 4,
+						'croppedX' => 5,
+						'croppedY' => 6,
+						'poseHeading' => 7,
+						'posePitch' => 8,
+						'poseRoll' => 9,
+					]
+				]
+			];
+		$logger = $this->createMock(LoggerInterface::class);
+		$xmpReader = $this->createMock(IXmpDataReader::class);
+
+		$plugin = new PhotosphereViewerPlugin(
+			$xmpReader,
+			$this->cacheFactory,
+			$logger
+		);
+		$propFind = $this->createMock(PropFind::class);
+		$propFind->expects($this->once())
+			->method('getStatus')
+			->with(
+				$this->equalTo(self::META_PROP)
+			)
+			->willReturn(200);
+		$propFind->expects($this->never())
+			->method('getDepth')
+			->willReturn(1);
+		$propFindHandleFunction = null;
+		$propFind->expects($this->once())
+			->method('handle')
+			->with(
+				$this->equalTo(self::META_PROP),
+				$this->callback(function ($propFindHandleFunctionCall) use (&$propFindHandleFunction) {
+					$propFindHandleFunction = $propFindHandleFunctionCall;
+					return true;
+				})
+			);
+
+		$view = $this->createMock(View::class);
+		$ocFile = $this->createMock(\OC\Files\Node\File::class);
+		$ocFile
+			->method('getId')
+			->willReturn('42');
+		$ocFile
+			->method('getMimetype')
+			->willReturn('image/jpeg');
+		$manager = $this->createMock(IManager::class);
+		$request = $this->createMock(IRequest::class);
+		$l10n = $this->createMock(IL10N::class);
+
+		$node = new File($view, $ocFile, $manager, $request, $l10n);
+
+		$plugin->handleGetProperties($propFind, $node);
+
+		$this->assertNotNull($propFindHandleFunction);
+		$this->assertIsCallable($propFindHandleFunction);
+
+		$result = $propFindHandleFunction($node);
+
+		$this->assertInstanceOf(XmpResultModel::class, $result);
 	}
 }
 
