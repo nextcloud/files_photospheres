@@ -94,4 +94,36 @@ class XmpResultModelTest extends TestCase {
 
 		$this->assertEquals($xmpModel, $deserialized);
 	}
+
+	public function testFromArray() {
+		$data = [
+			'usePanoramaViewer' => false,
+			'containsCroppingConfig' => true,
+			'croppingConfig' => [
+				'fullWidth' => 1,
+				'fullHeight' => 2,
+				'croppedWidth' => 3,
+				'croppedHeight' => 4,
+				'croppedX' => 5,
+				'croppedY' => 6,
+				'poseHeading' => 7,
+				'posePitch' => 8,
+				'poseRoll' => 9,
+			]
+		];
+
+		$xmpModel = XmpResultModel::fromArray($data);
+
+		$this->assertEquals($data['usePanoramaViewer'], $xmpModel->usePanoramaViewer);
+		$this->assertEquals($data['containsCroppingConfig'], $xmpModel->containsCroppingConfig);
+		$this->assertEquals($data['croppingConfig']['fullWidth'], $xmpModel->croppingConfig->fullWidth);
+		$this->assertEquals($data['croppingConfig']['fullHeight'], $xmpModel->croppingConfig->fullHeight);
+		$this->assertEquals($data['croppingConfig']['croppedWidth'], $xmpModel->croppingConfig->croppedWidth);
+		$this->assertEquals($data['croppingConfig']['croppedHeight'], $xmpModel->croppingConfig->croppedHeight);
+		$this->assertEquals($data['croppingConfig']['croppedX'], $xmpModel->croppingConfig->croppedX);
+		$this->assertEquals($data['croppingConfig']['croppedY'], $xmpModel->croppingConfig->croppedY);
+		$this->assertEquals($data['croppingConfig']['poseHeading'], $xmpModel->croppingConfig->poseHeading);
+		$this->assertEquals($data['croppingConfig']['posePitch'], $xmpModel->croppingConfig->posePitch);
+		$this->assertEquals($data['croppingConfig']['poseRoll'], $xmpModel->croppingConfig->poseRoll);
+	}
 }
