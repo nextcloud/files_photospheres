@@ -8,7 +8,7 @@ on:
 
 env:
   APP_NAME: files_photospheres
-  NC_REF: master
+  NC_REF: stable29
   NC_BIND: 'localhost:8080'
   NODE_VER: 16
   DB_USER: root
@@ -37,14 +37,14 @@ jobs:
       with:
         repository: nextcloud/server
         ref: ${{ env.NC_REF }}
-    
+
     - name: Checkout server submodules
       shell: bash
       run: |
         auth_header="$(git config --local --get http.https://github.com/.extraheader)"
         git submodule sync --recursive
         git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
-    
+
     - name: Checkout app
       uses: actions/checkout@v3
       with:
@@ -69,7 +69,7 @@ jobs:
     - name: Build viewer app
       run: npm ci && npm run build
       working-directory: apps/viewer
-      
+
     - name: Set up and run Nextcloud server
       run: |
         mkdir data
