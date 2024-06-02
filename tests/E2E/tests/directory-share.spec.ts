@@ -28,8 +28,8 @@ async function removeDirectoryShare(page) {
 
 async function unshare(page) {
   await page.goto(baseUrl);
-  await page.getByRole('link', { name: 'Files' }).click();
-  await page.getByRole('link', { name: 'ppv-testfiles' }).click();
+  await page.getByLabel('Files', { exact: true }).click();
+  await page.getByRole('button', { name: 'ppv-testfiles' }).click();
   await page.locator('.files-list__header-share-button').click();
   await page.getByLabel('Actions for "Share link"').click();
   await page.getByRole('menuitem', { name: 'Unshare' }).click();
