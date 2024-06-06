@@ -31,8 +31,8 @@ async function removeExistingSingleFileShare(page) {
 
 async function unshare(page) {
   await page.goto(baseUrl);
-  await page.getByRole('link', { name: 'Files' }).click();
-  await page.getByRole('link', { name: 'ppv-testfiles' }).click();
+  await page.getByLabel('Files', { exact: true }).click();
+  await page.getByRole('button', { name: 'ppv-testfiles' }).click();
   await page.locator("[data-cy-files-list-row-name='" + fileName + "'] .files-list__row-mtime").click();
   await page.getByRole('tab', { name: 'Sharing' }).click();
   await page.getByRole('button', { name: 'Actions for "Share link"' }).click();
