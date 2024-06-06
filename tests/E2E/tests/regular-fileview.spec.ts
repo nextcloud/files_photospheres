@@ -68,7 +68,7 @@ test('PPV should not show', async ({ page }) => {
 
 test('360 video should show on context menu click', async ({ page }) => {
   // Note :: this test needs to run on Chrome because Chromium lacks support for 360 video codecs
-  await page.getByRole('row', { name: 'Select the row for 360-video' }).getByLabel('Actions').click();
+  await page.getByRole('row', { name: 'Toggle selection for file "360-video.mp4" 360-video .mp4 Show sharing options' }).getByLabel('Actions').click();
   await page.getByRole('menuitem', { name: 'View in 360° viewer' }).click();
 
   await expect(page.frameLocator('#photo-sphere-viewer-frame').locator('#pano div').nth(1)).toBeVisible({ timeout: 1000 });

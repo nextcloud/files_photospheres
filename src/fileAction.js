@@ -42,6 +42,12 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
 
         _onClose: null,
 
+        // FIXME :: showImage is called multiple times because of the
+        // route-call in the actionhandler. This is a workaround to prevent
+        // the close handler from being registered multiple times.
+        // #143
+        _showImageCalled: false,
+
         /**
          * Actionhandler for image-click
          * @param {Node} node The file to open
@@ -169,6 +175,12 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
          * to the photosphere app
          */
         _showImage: function (node, view, dir, fileName, xmpResultModel) {
+            if (this._showImageCalled) {
+                return;
+            }
+
+            this._showImageCalled = true;
+
             var imageUrl = node.source;
             var urlParams = {
                 url: imageUrl,
@@ -324,6 +336,7 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
                 }
             }
             this._frameShowing = false;
+            this._showImageCalled = false;
         },
 
         _getFileObject: function (filename, context) {
