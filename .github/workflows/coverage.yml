@@ -18,7 +18,7 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ['8.1']
+        php-versions: ['8.3']
         databases: ['sqlite']
         server-versions: ['master']
 
@@ -68,7 +68,7 @@ jobs:
         run: make coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./apps/${{ env.APP_NAME }}/coverage.xml
