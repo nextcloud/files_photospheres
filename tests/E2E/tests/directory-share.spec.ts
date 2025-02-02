@@ -44,7 +44,8 @@ async function shareDirectory(page) {
 
 test('PPV should show on click on directory shared pano.jpg', async ({ page }) => {
   // Open pano
-  await page.getByRole('link', { name: 'pano .jpg Actions', exact: true }).click();
+  await page.getByRole('row', { name: /.*"pano.jpg".*/ }).click();
+
   await page.locator(frameId).waitFor({ state: 'visible', timeout: 5000 });
   const ppvLocator = page.frameLocator(frameId);
 
@@ -55,7 +56,7 @@ test('PPV should show on click on directory shared pano.jpg', async ({ page }) =
 
 test('PPV should not show on click on directory shared non-pano.jpg', async ({ page }) => {
   // Open image
-  await page.getByRole('link', { name: 'non-pano .jpg Actions', exact: true }).click();
+  await page.getByRole('row', { name: /.*"non-pano.jpg".*/ }).click();
 
   // Assert PPV did not open
   let visible = true;
@@ -68,4 +69,7 @@ test('PPV should not show on click on directory shared non-pano.jpg', async ({ p
   }
 
   expect(visible).toBe(false);
+  
+  // Assert regular viewer opened
+  await page.getByRole('img', { name: 'non-pano.jpg' }).waitFor({ state: 'visible', timeout: 1000 });
 });
