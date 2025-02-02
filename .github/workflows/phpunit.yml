@@ -12,7 +12,7 @@ env:
 
 jobs:
   php:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     strategy:
       # do not stop on another job's failure
@@ -67,7 +67,7 @@ jobs:
         run: make test
 
   mysql:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     strategy:
       # do not stop on another job's failure
@@ -131,7 +131,7 @@ jobs:
         run: make test
 
   pgsql:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     strategy:
       # do not stop on another job's failure
