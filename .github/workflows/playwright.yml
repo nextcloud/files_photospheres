@@ -9,9 +9,9 @@ on:
 
 env:
   APP_NAME: files_photospheres
-  NC_REF: master
+  NC_REF: stable31
   NC_BIND: 'localhost:8080'
-  NODE_VER: 16
+  NODE_VER: 20
   DB_USER: root
   DB_PASSWORD: rootpassword
   DB_PORT: 4444
@@ -105,7 +105,7 @@ jobs:
       working-directory: apps/${{ env.APP_NAME }}/tests/E2E
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report
@@ -113,7 +113,7 @@ jobs:
         retention-days: 30
 
     - name: Upload server logs
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: nextcloud-logs
