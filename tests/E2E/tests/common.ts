@@ -7,7 +7,7 @@ export async function loginAndSwitchToPPVTestFiles(page) {
     await page.locator('#password').fill(process.env.E2E_PASSWORD ?? 'admin');
     await page.locator('#password').press('Enter');
     await page.getByLabel('Files', { exact: true }).click();
-    await page.getByRole('button', { name: 'ppv-testfiles' }).click();
+    await page.getByRole('button', { name: /.*\sppv-testfiles.*/ }).click();
 };
 
 export const frameId = '#photo-sphere-viewer-frame';

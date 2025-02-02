@@ -9,14 +9,13 @@ test.beforeEach(async ({ page }) => {
 
 test('PPV should show', async ({ page }) => {
   const ppvTestDirUrl = page.url();
-  const panoLink = page.getByRole('link', { name: 'pano .jpg', exact: true });
-  const panoRow = page.locator('tr', { has: panoLink });
+  const panoRow = await page.getByRole('row', { name: /.*"pano.jpg".*/ });
   const panoFileId = await panoRow.getAttribute('data-cy-files-list-row-fileid');
 
   expect(ppvTestDirUrl).not.toContain('/' + panoFileId + '?');
 
   // Open 1st time
-  await panoLink.click();
+  await panoRow.click();
   await page.locator(frameId).waitFor({ state: 'visible' });
 
   expect(page.url()).toContain('/' + panoFileId + '?');
@@ -30,7 +29,7 @@ test('PPV should show', async ({ page }) => {
   expect(page.url()).toBe(ppvTestDirUrl);
 
   // Open 2nd time
-  await panoLink.click();
+  await panoRow.click();
   await page.locator(frameId).waitFor({ state: 'visible' });
 
   // Move the image
@@ -51,8 +50,8 @@ test('PPV should show', async ({ page }) => {
 });
 
 test('PPV should not show', async ({ page }) => {
-  await page.getByRole('link', { name: 'non-pano .jpg', exact: true }).click();
-  
+  await page.getByRole('row', { name: /.*"non-pano.jpg".*/ }).click();
+
   // Assert PPV did not open
   let visible = true;
   try {
@@ -64,11 +63,14 @@ test('PPV should not show', async ({ page }) => {
   }
 
   expect(visible).toBe(false);
+
+  // Assert regular viewer opened
+  await page.getByRole('img', { name: 'non-pano.jpg' }).waitFor({ state: 'visible', timeout: 1000 });
 });
 
 test('360 video should show on context menu click', async ({ page }) => {
   // Note :: this test needs to run on Chrome because Chromium lacks support for 360 video codecs
-  await page.getByRole('row', { name: 'Toggle selection for file "360-video.mp4" 360-video .mp4 Show sharing options' }).getByLabel('Actions').click();
+  await page.getByRole('row', { name: /.*"360-video.mp4".*/ }).getByLabel('Actions').click();
   await page.getByRole('menuitem', { name: 'View in 360° viewer' }).click();
 
   await expect(page.frameLocator('#photo-sphere-viewer-frame').locator('#pano div').nth(1)).toBeVisible({ timeout: 1000 });
