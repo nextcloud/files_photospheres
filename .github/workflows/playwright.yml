@@ -11,7 +11,7 @@ env:
   APP_NAME: files_photospheres
   NC_REF: stable31
   NC_BIND: 'localhost:8080'
-  NODE_VER: 16
+  NODE_VER: 20
   DB_USER: root
   DB_PASSWORD: rootpassword
   DB_PORT: 4444
