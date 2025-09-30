@@ -14,7 +14,7 @@
 
 namespace OCA\Files_PhotoSpheres\Controller;
 
-use \OCA\Files_PhotoSpheres\Service\IShareService;
+use OCA\Files_PhotoSpheres\Service\IShareService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;

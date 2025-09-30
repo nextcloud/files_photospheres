@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - Files_PhotoSpheres
  *
@@ -66,7 +67,7 @@ class UserfilesControllerTest extends TestCase {
 		/** @var JSONResponse */
 		$controllerResult = $this->controller->getXmpData($fileId);
 		$data = $controllerResult->getData();
-		
+
 		$this->assertEquals($result, $data['data']);
 		$this->assertTrue($data['success']);
 	}
@@ -76,7 +77,7 @@ class UserfilesControllerTest extends TestCase {
 		$this->storageService->expects($this->once())
 			->method('getXmpData')
 			->willThrowException($ex);
-		
+
 		/** @var JSONResponse */
 		$controllerResult = $this->controller->getXmpData(1234);
 		$data = $controllerResult->getData();

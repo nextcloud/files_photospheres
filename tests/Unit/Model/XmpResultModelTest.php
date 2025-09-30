@@ -33,7 +33,7 @@ class XmpResultModelTest extends TestCase {
 	public function testXmlSerialize() {
 		$writerMock = $this->createMock(Writer::class);
 		$xmpModel = new XmpResultModel();
-		
+
 		$xmpModel->usePanoramaViewer = false;
 		$xmpModel->containsCroppingConfig = true;
 		$croppingConfig = new CroppingConfigModel();
@@ -73,7 +73,7 @@ class XmpResultModelTest extends TestCase {
 
 	public function testCanBeSerializedAndDeserialized() {
 		$xmpModel = new XmpResultModel();
-		
+
 		$xmpModel->usePanoramaViewer = false;
 		$xmpModel->containsCroppingConfig = true;
 		$croppingConfig = new CroppingConfigModel();

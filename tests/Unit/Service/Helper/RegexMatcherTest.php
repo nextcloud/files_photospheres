@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - Files_PhotoSpheres
  *
@@ -24,7 +25,7 @@ class RegexMatcherTest extends TestCase {
 		parent::setUp();
 		$this->regexMatcher = new RegexMatcher();
 	}
-	
+
 	public function testMatch() {
 		$this->regexMatcher->preg_match('/(a)(b)*(c)/', 'ac', $matches);
 		$this->assertTrue(count($matches) == 4);
