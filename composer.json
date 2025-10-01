@@ -12,19 +12,24 @@
         "php": ">=8.1 <=8.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5",
-        "phpunit/php-code-coverage": "9.2.5",
-        "phpunit/phpcov": "^8.2",
-        "nextcloud/coding-standard": "^1.0",
+        "phpunit/phpunit": "^11.0",
+        "phpunit/php-code-coverage": "^11.0",
+        "phpunit/phpcov": "^10.0",
+        "nextcloud/coding-standard": "^1.1",
         "netresearch/jsonmapper": "^4.0"
     },
     "config": {
         "optimize-autoloader": true,
-        "classmap-authoritative": true,
         "platform": {
-			"php": "8.1"
-		}
+			"php": "8.2"
+		},
+        "autoloader-suffix": "Files_PhotoSpheres"
     },
+    "autoload": {
+		"psr-4": {
+			"OCA\\Files_PhotoSpheres\\": "lib/"
+		}
+	},
     "scripts": {
         "lint": "find . -name \\*.php -not -path './vendor/*' -exec php -l \"{}\" \\;",
         "cs:check": "php-cs-fixer fix --dry-run --diff",
