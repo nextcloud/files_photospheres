@@ -22,6 +22,8 @@ use OCA\Files_PhotoSpheres\Service\Helper\IRegexMatcher;
 use OCA\Files_PhotoSpheres\Service\Helper\RegexMatcher;
 use OCA\Files_PhotoSpheres\Service\Helper\XmpDataReader;
 use OCP\Files\File;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -38,9 +40,7 @@ class XmpDataReaderTest extends TestCase {
 		$this->xmpDataReader = new XmpDataReader($this->logger, new RegexMatcher());
 	}
 
-	/**
-	 * @dataProvider dataProvider_Positive
-	 */
+	#[DataProvider('dataProvider_Positive')]
 	public function testUsePanoramaViewer_Positive($path) {
 		$testFile = new TestFile($path);
 		/** @var XmpResultModel */
@@ -57,9 +57,7 @@ class XmpDataReaderTest extends TestCase {
 		}
 	}
 
-	/**
-	 * @dataProvider dataProvider_Negative
-	 */
+	#[DataProvider('dataProvider_Negative')]
 	public function testUsePanoramaViewer_Negative($path) {
 		$testFile = new TestFile($path);
 		/** @var XmpResultModel */
@@ -152,15 +150,15 @@ class XmpDataReaderTest extends TestCase {
 		$reader->readXmpDataFromFileObject($testFile);
 	}
 
-	public function dataProvider_Positive() {
-		return $this->readTestFiles('pos*.jpg');
+	public static function dataProvider_Positive() {
+		return self::readTestFiles('pos*.jpg');
 	}
 
-	public function dataProvider_Negative() {
-		return $this->readTestFiles('neg*.jpg');
+	public static function dataProvider_Negative() {
+		return self::readTestFiles('neg*.jpg');
 	}
 
-	private function readTestFiles(string $globPattern) {
+	private static function readTestFiles(string $globPattern) {
 		$ret = [];
 		foreach (glob(realpath('./tests/Testdata') . "/$globPattern") as $path) {
 			$ret[] = [ $path ];

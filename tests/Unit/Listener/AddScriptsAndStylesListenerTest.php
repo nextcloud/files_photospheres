@@ -33,6 +33,7 @@ use OCA\Files_Sharing\Event\BeforeTemplateRenderedEvent;
 use OCP\EventDispatcher\Event;
 use OCP\Share\IShare;
 use OCP\Util;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Test\TestCase;
 
 class AddScriptsAndStylesListenerTest extends TestCase {
@@ -41,9 +42,7 @@ class AddScriptsAndStylesListenerTest extends TestCase {
 		$this->resetStylesAndScripts();
 	}
 
-	/**
-	 * @dataProvider dataProvider_InvalidEvents
-	 */
+	#[DataProvider('dataProvider_InvalidEvents')]
 	public function testHandleDoesNothing_OnInvalidEvent(Event $event) {
 		$scriptCountBefore = count(Util::getScripts());
 		$styleCountBefore = count(\OC_Util::$styles);
@@ -58,12 +57,10 @@ class AddScriptsAndStylesListenerTest extends TestCase {
 		$this->assertEquals($styleCountBefore, $styleCountAfter);
 	}
 
-	/**
-	 * @dataProvider dataProvider_ValidEvents
-	 */
-	public function testAddsScriptAndStyles_OnValidEvent(Event $event) {
+	#[DataProvider('dataProvider_ValidEvents')]
+	public function testAddsScriptAndStyles_OnValidEvent(callable $eventFactory) {
 		$listener = new AddScriptsAndStylesListener();
-		$listener->handle($event);
+		$listener->handle($eventFactory($this));
 
 		$functionJsCnt = 0;
 		$fileActionJsCnt = 0;
@@ -90,19 +87,17 @@ class AddScriptsAndStylesListenerTest extends TestCase {
 		$this->assertEquals(1, $styleCssCnt);
 	}
 
-	public function dataProvider_InvalidEvents() {
+	public static function dataProvider_InvalidEvents() {
 		return  [
 			[ new LoadSidebar() ],
 			[ new Event() ]
 		];
 	}
 
-	public function dataProvider_ValidEvents() {
-		/** @var IShare */
-		$shareMock = $this->createMock(IShare::class);
+	public static function dataProvider_ValidEvents() {
 		return  [
-			[ new LoadAdditionalScriptsEvent() ],
-			[ new BeforeTemplateRenderedEvent($shareMock) ]
+			[fn (self $testClass) => new LoadAdditionalScriptsEvent()],
+			[fn (self $testClass) => new BeforeTemplateRenderedEvent($testClass->createMock(IShare::class)) ]
 		];
 	}
 

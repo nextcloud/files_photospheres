@@ -24,6 +24,7 @@ use OCP\Share\Exceptions\GenericShareException;
 use OCP\Share\Exceptions\ShareNotFound;
 use OCP\Share\IManager;
 use OCP\Share\IShare;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -47,7 +48,7 @@ class ShareServiceTest extends TestCase {
 	public function testSingleFileShare() {
 		$sharingToken = 'myFileSharingToken';
 		$xmpResult = new XmpResultModel();
-		$xmpResult->croppingConfig->full_width = 100;
+		$xmpResult->croppingConfig->fullWidth = 100;
 
 		$fileMock = $this->createMock(File::class);
 		$fileMock->method('isReadable')
@@ -75,16 +76,14 @@ class ShareServiceTest extends TestCase {
 		$returnedXmpResult = $this->shareService->getXmpData($sharingToken);
 
 		$this->assertEquals($xmpResult, $returnedXmpResult);
-		$this->assertEquals(100, $returnedXmpResult->croppingConfig->full_width);
+		$this->assertEquals(100, $returnedXmpResult->croppingConfig->fullWidth);
 	}
 
-	/**
-	 * @dataProvider dataProvider_DirectoryTests
-	 */
+	#[DataProvider('dataProvider_DirectoryTests')]
 	public function testDirectoryShare($filename, $path) {
 		$sharingToken = 'myDirectoryToken';
 		$xmpResult = new XmpResultModel();
-		$xmpResult->croppingConfig->full_width = 100;
+		$xmpResult->croppingConfig->fullWidth = 100;
 
 		$dirMock = $this->createMock(Folder::class);
 		$dirMock->method('isReadable')
@@ -122,7 +121,7 @@ class ShareServiceTest extends TestCase {
 		$returnedXmpResult = $this->shareService->getXmpData($sharingToken, $filename, $path);
 
 		$this->assertEquals($xmpResult, $returnedXmpResult);
-		$this->assertEquals(100, $returnedXmpResult->croppingConfig->full_width);
+		$this->assertEquals(100, $returnedXmpResult->croppingConfig->fullWidth);
 	}
 
 	public function testThrowsOnShareNotFound() {
@@ -156,9 +155,7 @@ class ShareServiceTest extends TestCase {
 		$this->assertTrue(strpos($exception->getMessage(), 'cannot be read') !== false);
 	}
 
-	/**
-	 * @dataProvider dataProvider_ReadableShareableTests
-	 */
+	#[DataProvider('dataProvider_ReadableShareableTests')]
 	public function testThrowsOnShare_NodeReadableOrShareable_ReturnsFalse($isReadable, $isShareable) {
 		$nodeMock = $this->createMock(File::class);
 		$nodeMock->expects($this->atMost(1))
@@ -191,9 +188,7 @@ class ShareServiceTest extends TestCase {
 		$this->assertTrue(strpos($exception->getMessage(), 'permissions') !== false);
 	}
 
-	/**
-	 * @dataProvider dataProvider_MissingPathOrFilename_DirectoryTests
-	 */
+	#[DataProvider('dataProvider_MissingPathOrFilename_DirectoryTests')]
 	public function testThrowsOnDirectoryShare_WithoutPathInfo($filename, $path) {
 		$sharingToken = 'myDirectoryToken';
 
@@ -283,7 +278,7 @@ class ShareServiceTest extends TestCase {
 		$this->assertTrue($thrown);
 	}
 
-	public function dataProvider_DirectoryTests() {
+	public static function dataProvider_DirectoryTests() {
 		/* $filename, $path */
 		$arr = [
 			['myFileInRoot.jpg', '/'],
@@ -292,7 +287,7 @@ class ShareServiceTest extends TestCase {
 		return $arr;
 	}
 
-	public function dataProvider_ReadableShareableTests() {
+	public static function dataProvider_ReadableShareableTests() {
 		/* $isReadable, $isShareable*/
 		$arr = [
 			[false, true],
@@ -302,7 +297,7 @@ class ShareServiceTest extends TestCase {
 		return $arr;
 	}
 
-	public function dataProvider_MissingPathOrFilename_DirectoryTests() {
+	public static function dataProvider_MissingPathOrFilename_DirectoryTests() {
 		/* $filename, $path*/
 		$arr = [
 			['', '/somepath/somesubpath'],
