@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - Files_PhotoSpheres
  *
@@ -27,7 +28,7 @@ use OCP\IURLGenerator;
  * @package OCA\Files_PhotoSpheres\Controller
  */
 class PageController extends Controller {
-	
+
 	/** @var IURLGenerator */
 	private $urlGenerator;
 	/** @var IAppManager */
@@ -44,7 +45,7 @@ class PageController extends Controller {
 	 * @PublicPage
 	 */
 	public function image() {
-		return $this->showPage("image");
+		return $this->showPage('image');
 	}
 
 	/**
@@ -52,7 +53,7 @@ class PageController extends Controller {
 	 * @PublicPage
 	 */
 	public function video() {
-		return $this->showPage("video");
+		return $this->showPage('video');
 	}
 
 	private function showPage(string $type) {
@@ -62,19 +63,19 @@ class PageController extends Controller {
 			'nounceManager' => \OC::$server->getContentSecurityPolicyNonceManager()
 		];
 		switch ($type) {
-			case "image":
+			case 'image':
 				$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer', $params, 'blank');  // templates/viewer.php
 				$this->setContentSecurityPolicy($response);
 				break;
-			case "video":
+			case 'video':
 				$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer_video', $params, 'blank');  // templates/viewer_video.php
 				break;
 			default: return null;
 		}
-		
+
 		return $response;
 	}
-		
+
 	/**
 	 *
 	 * @param TemplateResponse $response

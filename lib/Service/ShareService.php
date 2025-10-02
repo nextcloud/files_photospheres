@@ -90,7 +90,7 @@ class ShareService implements IShareService {
 				// Directory containing the file -> read the file by name
 				$shareNode = $shareNode->get($filename);
 			}
-			
+
 			return $this->xmpDataReader->readXmpDataFromFileObject($shareNode);
 		}
 	}

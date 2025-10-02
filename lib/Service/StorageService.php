@@ -14,9 +14,9 @@
 
 namespace OCA\Files_PhotoSpheres\Service;
 
-use \OCP\Files\Folder;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
+use OCP\Files\Folder;
 
 /**
  * class StorageService
@@ -30,7 +30,7 @@ class StorageService implements IStorageService {
 	 * @var Folder
 	 */
 	private $userFolder;
-	
+
 	/**
 	 *
 	 * @var IXmpDataReader

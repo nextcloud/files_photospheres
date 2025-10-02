@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - Files_PhotoSpheres
  *
@@ -23,6 +24,7 @@ use OCP\App\IAppManager;
 use OCP\AppFramework\App;
 use OCP\AppFramework\IAppContainer;
 use OCP\Files\Folder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Test\TestCase;
 
 /**
@@ -45,16 +47,14 @@ class AppTest extends TestCase {
 		$this->assertTrue($this->appManager->isInstalled(Application::APP_NAME));
 	}
 
-	/**
-	 * @dataProvider dataProvider_InterfaceToClassMappings
-	 */
+	#[DataProvider('dataProvider_InterfaceToClassMappings')]
 	public function testCanResolveClasses_AfterRegistration(string $interfaceName, string $className, bool $lazyInit) {
 		$this->runBootstrapRegistrations($lazyInit);
 		$object = $this->container->get($interfaceName);
 		$this->assertInstanceOf($className, $object);
 	}
 
-	public function dataProvider_InterfaceToClassMappings() {
+	public static function dataProvider_InterfaceToClassMappings() {
 		$arr = [
 			[ IStorageService::class, StorageService::class, true ],
 			[ IShareService::class, ShareService::class, true ],
