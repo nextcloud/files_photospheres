@@ -105,7 +105,7 @@ jobs:
       working-directory: tmp/${{ env.APP_NAME }}/tests/E2E/scripts
 
     - name: Run Playwright tests
-      run: npx playwright test
+      run: npx playwright test -x
       working-directory: tmp/${{ env.APP_NAME }}/tests/E2E
 
     - name: Upload artifacts
