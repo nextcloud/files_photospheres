@@ -81,7 +81,7 @@ class AddScriptsAndStylesListenerTest extends TestCase {
 				$styleCssCnt++;
 			}
 		}
-		
+
 		$this->assertEquals(1, $functionJsCnt);
 		$this->assertEquals(1, $fileActionJsCnt);
 		$this->assertEquals(1, $styleCssCnt);

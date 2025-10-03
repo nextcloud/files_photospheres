@@ -34,7 +34,7 @@ class ApplicationTest extends TestCase {
 		$bootContext = $this->createMock(IBootContext::class);
 		$bootContext->expects($this->never())
 			->method($this->anything());
-		
+
 		$app = new Application();
 
 		$app->boot($bootContext);

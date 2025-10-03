@@ -24,7 +24,6 @@ declare(strict_types=1);
 
 namespace OCA\Files_PhotoSpheres\Sabre;
 
-use \Sabre\DAV\INode;
 use OCA\DAV\Connector\Sabre\File;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
@@ -33,6 +32,7 @@ use OCP\ICacheFactory;
 use Psr\Log\LoggerInterface;
 use Sabre\DAV\ICollection;
 use Sabre\DAV\IFile;
+use Sabre\DAV\INode;
 use Sabre\DAV\PropFind;
 use Sabre\DAV\Server;
 use Sabre\DAV\ServerPlugin;
@@ -51,7 +51,7 @@ class PhotosphereViewerPlugin extends ServerPlugin {
 	private ICache $cache;
 	private LoggerInterface $logger;
 	//private array $xmpMetadataCache = []; // fileId => xmpMetadata
-	
+
 	public function __construct(IXmpDataReader $xmpDataReader, ICacheFactory $cacheFactory, LoggerInterface $logger) {
 		$this->xmpDataReader = $xmpDataReader;
 		$this->logger = $logger;
@@ -84,10 +84,10 @@ class PhotosphereViewerPlugin extends ServerPlugin {
 	 */
 	public function handleGetProperties(
 		PropFind $propFind,
-		INode $node
+		INode $node,
 	) {
-		if ((!($node instanceof IFile) && !($node instanceof ICollection)) ||
-			is_null($propFind->getStatus(self::PROPERTY_XMP_METADATA))) {
+		if ((!($node instanceof IFile) && !($node instanceof ICollection))
+			|| is_null($propFind->getStatus(self::PROPERTY_XMP_METADATA))) {
 			$this->logger->debug('{node}: Not a file or directory or no XMP Metadata requested', ['node' => $node->getName()]);
 			return;
 		}
@@ -112,7 +112,7 @@ class PhotosphereViewerPlugin extends ServerPlugin {
 	private function cacheDirectory(ICollection $directory): void {
 		$this->logger->debug('Start caching directory {dir}', ['dir' => $directory->getName()]);
 		$start = hrtime(true);
-		
+
 		$children = $directory->getChildren();
 
 		foreach ($children as $child) {
@@ -120,7 +120,7 @@ class PhotosphereViewerPlugin extends ServerPlugin {
 				$this->getXmpMetadataCached($child);
 			}
 		}
-		
+
 		$end = hrtime(true);
 		$eta = $end - $start;
 		$elapsedMs = $eta / 1e+6;
@@ -129,7 +129,7 @@ class PhotosphereViewerPlugin extends ServerPlugin {
 
 	private function getXmpMetadataCached(File $file) : ?XmpResultModel {
 		$id = $file?->getId();
-		
+
 		if ($id === null) {
 			$this->logger->warning('File {file} has no id', ['file' => $file->getName()]);
 			return null;

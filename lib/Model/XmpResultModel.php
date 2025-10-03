@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - Files_PhotoSpheres
  *
@@ -17,7 +18,7 @@ use Sabre\Xml\Writer;
 use Sabre\Xml\XmlSerializable;
 
 class XmpResultModel implements XmlSerializable {
-	
+
 	/** @var bool */
 	public $usePanoramaViewer = false;
 

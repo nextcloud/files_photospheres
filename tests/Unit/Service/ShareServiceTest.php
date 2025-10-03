@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - Files_PhotoSpheres
  *
@@ -101,7 +102,7 @@ class ShareServiceTest extends TestCase {
 		$dirMock->method('get')
 			->with($path)
 			->willReturn($innerDirMock);
-		
+
 		$innerFileMock = $this->createMock(File::class);
 		$innerDirMock->method('get')
 			->willReturn($filename)
@@ -113,9 +114,9 @@ class ShareServiceTest extends TestCase {
 			->willReturn($shareMock);
 
 		$this->xmpDataReader->expects($this->once())
-			 ->method('readXmpDataFromFileObject')
-			 ->with($innerFileMock)
-			 ->willReturn($xmpResult);
+			->method('readXmpDataFromFileObject')
+			->with($innerFileMock)
+			->willReturn($xmpResult);
 
 		$returnedXmpResult = $this->shareService->getXmpData($sharingToken, $filename, $path);
 
@@ -142,7 +143,7 @@ class ShareServiceTest extends TestCase {
 			->method('getShareByToken')
 			->withAnyParameters()
 			->willReturn($shareMock);
-		
+
 		$exception = null;
 		try {
 			$this->shareService->getXmpData('someToken');
@@ -170,7 +171,7 @@ class ShareServiceTest extends TestCase {
 			->willReturn(\OCP\Constants::PERMISSION_READ);
 		$shareMock->method('getNode')
 			->willReturn($nodeMock);
-		
+
 		$this->shareManager->expects($this->once())
 			->method('getShareByToken')
 			->withAnyParameters()
@@ -209,7 +210,7 @@ class ShareServiceTest extends TestCase {
 			->method('get')
 			->with($path)
 			->willReturn($innerDirMock);
-		
+
 		$innerFileMock = $this->createMock(File::class);
 		$innerDirMock->expects($this->never())
 			->method('get')
@@ -222,7 +223,7 @@ class ShareServiceTest extends TestCase {
 			->willReturn($shareMock);
 
 		$this->xmpDataReader->expects($this->never())
-			 ->method('readXmpDataFromFileObject');
+			->method('readXmpDataFromFileObject');
 
 		$thrown = false;
 		try {
@@ -257,14 +258,14 @@ class ShareServiceTest extends TestCase {
 			->method('get')
 			->with($path)
 			->willThrowException(new NotFoundException());
-		
+
 		$this->shareManager->expects($this->once())
 			->method('getShareByToken')
 			->with($sharingToken)
 			->willReturn($shareMock);
 
 		$this->xmpDataReader->expects($this->never())
-			 ->method('readXmpDataFromFileObject');
+			->method('readXmpDataFromFileObject');
 
 		$thrown = false;
 		try {

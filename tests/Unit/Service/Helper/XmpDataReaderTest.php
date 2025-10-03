@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - Files_PhotoSpheres
  *
@@ -47,7 +48,7 @@ class XmpDataReaderTest extends TestCase {
 		$this->assertTrue($xmpResultModel->usePanoramaViewer);
 
 		$testFileInfo = pathinfo($path);
-		$jsonFile = $testFileInfo['dirname'].'/'.$testFileInfo['filename'].'.json';
+		$jsonFile = $testFileInfo['dirname'] . '/' . $testFileInfo['filename'] . '.json';
 		if (file_exists($jsonFile)) {
 			// If we have the data payload as JSON we can check that, too
 			$jsonMapper = new JsonMapper();
@@ -72,14 +73,14 @@ class XmpDataReaderTest extends TestCase {
 			->withAnyParameters();
 
 		$exceptionThrown = false;
-		
+
 		try {
 			$this->xmpDataReader->readXmpDataFromFileObject($mockFile);
 		} catch (Exception $e) {
 			$exceptionThrown = true;
 			$this->assertTrue(strpos($e->getMessage(), 'not open file') > 0);
 		}
-		
+
 		$this->assertTrue($exceptionThrown);
 	}
 
@@ -114,7 +115,7 @@ class XmpDataReaderTest extends TestCase {
 		$regexMatcherMock = $this->createMock(IRegexMatcher::class);
 		$regexMatcherMock
 			->method('preg_match')
-			->willReturnCallback(function (string $pattern, string $subject, array &$matches = null, int $flags = 0, int $offset = 0) use ($gPanoMatchCnt, $realMatcher) {
+			->willReturnCallback(function (string $pattern, string $subject, ?array &$matches = null, int $flags = 0, int $offset = 0) use ($gPanoMatchCnt, $realMatcher) {
 				// Fake gpano match does not succeed
 				if ($pattern === '/GPano:/') {
 					return false;
@@ -159,7 +160,7 @@ class XmpDataReaderTest extends TestCase {
 
 	private static function readTestFiles(string $globPattern) {
 		$ret = [];
-		foreach (glob(realpath("./tests/Testdata") . "/$globPattern") as $path) {
+		foreach (glob(realpath('./tests/Testdata') . "/$globPattern") as $path) {
 			$ret[] = [ $path ];
 		}
 		return $ret;
@@ -168,7 +169,7 @@ class XmpDataReaderTest extends TestCase {
 
 class TestFile implements File {
 	private $filePath;
-	
+
 	public function __construct($filePath) {
 		$this->filePath = $filePath;
 	}
@@ -178,7 +179,7 @@ class TestFile implements File {
 	public function putContent($data) {
 	}
 	public function getMimeType() {
-		return "";
+		return '';
 	}
 	public function fopen($mode) {
 		return fopen($this->filePath, $mode);
@@ -228,7 +229,7 @@ class TestFile implements File {
 	public function isUpdateable() {
 	}
 	public function getExtension(): string {
-		return "";
+		return '';
 	}
 	public function getCreationTime(): int {
 		return 0;
