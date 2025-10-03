@@ -91,7 +91,7 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
          */
         _actionHandlerVideo: function(node, view, dir){
             const fileName = node.path.replace(/^.*[\\/]/, '');
-            const fileUrl = node.source;
+            const fileUrl = node.encodedSource;
             this.showFrame(fileUrl, fileName, null, 'video');
         },
 
@@ -181,7 +181,7 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
 
             this._showImageCalled = true;
 
-            var imageUrl = node.source;
+            var imageUrl = node.encodedSource;
             var urlParams = {
                 url: imageUrl,
                 filename: fileName
