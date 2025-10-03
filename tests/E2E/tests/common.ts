@@ -6,9 +6,15 @@ export async function loginAndSwitchToPPVTestFiles(page) {
     await page.locator('#user').press('Tab');
     await page.locator('#password').fill(process.env.E2E_PASSWORD ?? 'admin');
     await page.locator('#password').press('Enter');
-    await page.getByLabel('Files', { exact: true }).click();
+    await page.waitForLoadState('networkidle');
+    await goToFilesApp(page);
     await page.getByRole('button', { name: /.*\sppv-testfiles.*/ }).click();
 };
+
+export async function goToFilesApp(page) {
+    await page.goto(baseUrl + "/index.php/apps/files/files");
+    await page.waitForLoadState('networkidle');
+}
 
 export const frameId = '#photo-sphere-viewer-frame';
 

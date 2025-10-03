@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { loginAndSwitchToPPVTestFiles, frameId, baseUrl } from './common';
+import { loginAndSwitchToPPVTestFiles, frameId, baseUrl, goToFilesApp } from './common';
 
 const playwright = require('playwright');
 
@@ -31,7 +31,7 @@ async function removeExistingSingleFileShare(page) {
 
 async function unshare(page) {
   await page.goto(baseUrl);
-  await page.getByLabel('Files', { exact: true }).click();
+  await goToFilesApp(page);
   await page.getByRole('button', { name: 'ppv-testfiles' }).click();
   await page.locator("[data-cy-files-list-row-name='" + fileName + "'] .files-list__row-mtime").click();
   await page.getByRole('tab', { name: 'Sharing' }).click();

@@ -52,7 +52,7 @@ class PhotosphereViewerPluginTest extends TestCase {
 
 	protected function setUp(): void {
 		$this->cacheArray = [];
-		
+
 		$cacheFake = $this->createMock(ICache::class);
 		$cacheFake->expects($this->any())
 			->method('get')
@@ -344,7 +344,7 @@ class PhotosphereViewerPluginTest extends TestCase {
 				$this->equalTo('File {file} has no id'),
 				['file' => 'myTestfile42']
 			);
-		
+
 		$propFindHandleFunction($node);
 	}
 
@@ -477,7 +477,7 @@ class NonFileNonDirectory implements INode {
 	}
 
 	public function getName() {
-		return "non-file-non-directory";
+		return 'non-file-non-directory';
 	}
 
 	public function setName($name) {

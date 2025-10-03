@@ -32,6 +32,9 @@ test('PPV should show', async ({ page }) => {
   await panoRow.click();
   await page.locator(frameId).waitFor({ state: 'visible' });
 
+  // Wait for loading spinner to disappear
+  await page.frameLocator('#photo-sphere-viewer-frame').locator('.psv-loader').waitFor({ state: 'hidden' });
+
   // Move the image
   const ppvCanvasBoundingBox = await page.frameLocator('#photo-sphere-viewer-frame').locator('canvas').boundingBox() ?? { x: 0, y: 0, width: 0, height: 0 };
   const centerX = ppvCanvasBoundingBox.x + ppvCanvasBoundingBox.width / 2;

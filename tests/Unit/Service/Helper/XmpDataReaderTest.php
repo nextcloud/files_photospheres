@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - Files_PhotoSpheres
  *
@@ -21,6 +22,8 @@ use OCA\Files_PhotoSpheres\Service\Helper\IRegexMatcher;
 use OCA\Files_PhotoSpheres\Service\Helper\RegexMatcher;
 use OCA\Files_PhotoSpheres\Service\Helper\XmpDataReader;
 use OCP\Files\File;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -36,10 +39,8 @@ class XmpDataReaderTest extends TestCase {
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->xmpDataReader = new XmpDataReader($this->logger, new RegexMatcher());
 	}
-	
-	/**
-	 * @dataProvider dataProvider_Positive
-	 */
+
+	#[DataProvider('dataProvider_Positive')]
 	public function testUsePanoramaViewer_Positive($path) {
 		$testFile = new TestFile($path);
 		/** @var XmpResultModel */
@@ -47,7 +48,7 @@ class XmpDataReaderTest extends TestCase {
 		$this->assertTrue($xmpResultModel->usePanoramaViewer);
 
 		$testFileInfo = pathinfo($path);
-		$jsonFile = $testFileInfo['dirname'].'/'.$testFileInfo['filename'].'.json';
+		$jsonFile = $testFileInfo['dirname'] . '/' . $testFileInfo['filename'] . '.json';
 		if (file_exists($jsonFile)) {
 			// If we have the data payload as JSON we can check that, too
 			$jsonMapper = new JsonMapper();
@@ -56,9 +57,7 @@ class XmpDataReaderTest extends TestCase {
 		}
 	}
 
-	/**
-	 * @dataProvider dataProvider_Negative
-	 */
+	#[DataProvider('dataProvider_Negative')]
 	public function testUsePanoramaViewer_Negative($path) {
 		$testFile = new TestFile($path);
 		/** @var XmpResultModel */
@@ -74,14 +73,14 @@ class XmpDataReaderTest extends TestCase {
 			->withAnyParameters();
 
 		$exceptionThrown = false;
-		
+
 		try {
 			$this->xmpDataReader->readXmpDataFromFileObject($mockFile);
 		} catch (Exception $e) {
 			$exceptionThrown = true;
 			$this->assertTrue(strpos($e->getMessage(), 'not open file') > 0);
 		}
-		
+
 		$this->assertTrue($exceptionThrown);
 	}
 
@@ -116,7 +115,7 @@ class XmpDataReaderTest extends TestCase {
 		$regexMatcherMock = $this->createMock(IRegexMatcher::class);
 		$regexMatcherMock
 			->method('preg_match')
-			->willReturnCallback(function (string $pattern, string $subject, array &$matches = null, int $flags = 0, int $offset = 0) use ($gPanoMatchCnt, $realMatcher) {
+			->willReturnCallback(function (string $pattern, string $subject, ?array &$matches = null, int $flags = 0, int $offset = 0) use ($gPanoMatchCnt, $realMatcher) {
 				// Fake gpano match does not succeed
 				if ($pattern === '/GPano:/') {
 					return false;
@@ -151,17 +150,17 @@ class XmpDataReaderTest extends TestCase {
 		$reader->readXmpDataFromFileObject($testFile);
 	}
 
-	public function dataProvider_Positive() {
-		return $this->readTestFiles("pos*.jpg");
+	public static function dataProvider_Positive() {
+		return self::readTestFiles('pos*.jpg');
 	}
 
-	public function dataProvider_Negative() {
-		return $this->readTestFiles("neg*.jpg");
+	public static function dataProvider_Negative() {
+		return self::readTestFiles('neg*.jpg');
 	}
 
-	private function readTestFiles(string $globPattern) {
+	private static function readTestFiles(string $globPattern) {
 		$ret = [];
-		foreach (glob(realpath("./tests/Testdata") . "/$globPattern") as $path) {
+		foreach (glob(realpath('./tests/Testdata') . "/$globPattern") as $path) {
 			$ret[] = [ $path ];
 		}
 		return $ret;
@@ -170,7 +169,7 @@ class XmpDataReaderTest extends TestCase {
 
 class TestFile implements File {
 	private $filePath;
-	
+
 	public function __construct($filePath) {
 		$this->filePath = $filePath;
 	}
@@ -180,7 +179,7 @@ class TestFile implements File {
 	public function putContent($data) {
 	}
 	public function getMimeType() {
-		return "";
+		return '';
 	}
 	public function fopen($mode) {
 		return fopen($this->filePath, $mode);
@@ -230,7 +229,7 @@ class TestFile implements File {
 	public function isUpdateable() {
 	}
 	public function getExtension(): string {
-		return "";
+		return '';
 	}
 	public function getCreationTime(): int {
 		return 0;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - Files_PhotoSpheres
  *
@@ -64,7 +65,7 @@ class PageControllerTest extends TestCase {
 		$this->assertTrue($result instanceof TemplateResponse);
 		$this->assertEquals('viewer', $result->getTemplateName());
 		$this->assertEquals('blank', $result->getRenderAs());
-		
+
 		$csp = $result->getContentSecurityPolicy();
 		$cspString = $csp->buildPolicy();
 		$this->assertStringContainsString('unsafe-eval', $cspString);
@@ -87,7 +88,7 @@ class PageControllerTest extends TestCase {
 		$this->assertTrue($result instanceof TemplateResponse);
 		$this->assertEquals('viewer_video', $result->getTemplateName());
 		$this->assertEquals('blank', $result->getRenderAs());
-		
+
 		$csp = $result->getContentSecurityPolicy();
 		$cspString = $csp->buildPolicy();
 		$this->assertStringNotContainsString('unsafe-eval', $cspString);

@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
  *  See https://developers.google.com/streetview/spherical-metadata
  */
 class XmpDataReader implements IXmpDataReader {
-	
+
 	/**
 	 * Read files in 8kb blocks
 	 */
@@ -53,7 +53,7 @@ class XmpDataReader implements IXmpDataReader {
 		$this->logger = $logger;
 		$this->regexMatcher = $regexMatcher;
 	}
-	
+
 	public function readXmpDataFromFileObject(\OCP\Files\File $file) : XmpResultModel {
 		$firstFileBytesString = $this->readFirstFileBlocks($file);
 		return $this->readXmpDataFromFileSting($firstFileBytesString);
@@ -67,7 +67,7 @@ class XmpDataReader implements IXmpDataReader {
 
 		$data = '';
 		$blocksRead = 0;
-		
+
 		while (!feof($fileHandle) && strpos($data, self::$XMP_END_TAG) === false && $blocksRead < self::$MAX_BLOCK_COUNT) {
 			$chunk = fread($fileHandle, self::$CHUNK_SIZE);
 			if ($chunk !== false) {
@@ -106,13 +106,13 @@ class XmpDataReader implements IXmpDataReader {
 		// GPano:UsePanoramaViewer tag (optional)
 		$usePanoViewerStr = $this->getXmpStringValue($xmlString, 'UsePanoramaViewer');
 		if ($usePanoViewerStr !== null) {
-			return strtolower($usePanoViewerStr) === "true";
+			return strtolower($usePanoViewerStr) === 'true';
 		}
 
 		// Since GPano:UsePanoramaViewer is optional, take a look at GPano:ProjectionType
 		$projectionTypeStr = $this->getXmpStringValue($xmlString, 'ProjectionType');
 		if ($projectionTypeStr !== null) {
-			return strtolower($projectionTypeStr) === "equirectangular";
+			return strtolower($projectionTypeStr) === 'equirectangular';
 		}
 
 		/*
@@ -124,7 +124,7 @@ class XmpDataReader implements IXmpDataReader {
 		*/
 		$gImageMimeStr = $this->getXmpStringValue($xmlString, 'Mime', 'GImage');
 		if ($gImageMimeStr !== null) {
-			return strtolower($gImageMimeStr) === "image/jpeg";
+			return strtolower($gImageMimeStr) === 'image/jpeg';
 		}
 
 		return false;

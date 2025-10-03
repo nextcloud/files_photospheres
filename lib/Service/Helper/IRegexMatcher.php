@@ -19,5 +19,5 @@ interface IRegexMatcher {
 	 * Regex match function
 	 * @return int|bool
 	 */
-	public function preg_match(string $pattern, string $subject, array &$matches = null, int $flags = 0, int $offset = 0);
+	public function preg_match(string $pattern, string $subject, ?array &$matches = null, int $flags = 0, int $offset = 0);
 }

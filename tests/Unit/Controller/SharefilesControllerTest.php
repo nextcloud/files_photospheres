@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Nextcloud - Files_PhotoSpheres
  *
@@ -67,7 +68,7 @@ class SharefilesControllerTest extends TestCase {
 		/** @var JSONResponse */
 		$controllerResult = $this->controller->getXmpData($shareToken, $filename, $path);
 		$data = $controllerResult->getData();
-		
+
 		$this->assertEquals($result, $data['data']);
 		$this->assertTrue($data['success']);
 	}
@@ -77,7 +78,7 @@ class SharefilesControllerTest extends TestCase {
 		$this->shareService->expects($this->once())
 			->method('getXmpData')
 			->willThrowException($ex);
-		
+
 		/** @var JSONResponse */
 		$controllerResult = $this->controller->getXmpData('token');
 		$data = $controllerResult->getData();
