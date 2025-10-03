@@ -15,8 +15,6 @@ export default defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Fail immediately after first test failure in CI */
-  maxFailures: process.env.CI ? 1 : undefined,
   /* Default timeout 30s */
   timeout: 30000,
   /* Retry on CI only */
