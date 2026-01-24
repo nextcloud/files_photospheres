@@ -178,7 +178,7 @@ class TestFile implements File {
 	}
 	public function putContent($data) {
 	}
-	public function getMimeType() {
+	public function getMimeType(): string {
 		return '';
 	}
 	public function fopen($mode) {
