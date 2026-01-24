@@ -86,7 +86,7 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
         },
 
         /**
-         * Actionhandler for image-click
+         * Actionhandler for video-click
          * @param {Node} node The file to open
          * @param {any} view any The files view
          * @param {string} dir the directory path
