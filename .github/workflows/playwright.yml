@@ -9,7 +9,7 @@ on:
 
 env:
   APP_NAME: files_photospheres
-  NC_REF: master
+  NC_REF: stable33
   NC_BIND: 'localhost:8080'
   NODE_VER: 20
   DB_USER: root
