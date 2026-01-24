@@ -53,12 +53,14 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
          * @param {Node} node The file to open
          * @param {any} view any The files view
          * @param {string} dir the directory path
+         * @returns {Promise<boolean | null>} Promise resolving to true if action was executed successfully
          */
-        _actionHandler: function(node, view, dir) {
+        _actionHandler: async function(node, view, dir) {
             const fileName = node.path.replace(/^.*[\\/]/, '');
             const xmpResultModel = this._getDavXmpMeta(node);
 
             this._showImage(node, view, dir, fileName, xmpResultModel);
+            return true;
         },
 
         _legacyActionHandlerImage: function (fileName, context) {
@@ -88,11 +90,13 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
          * @param {Node} node The file to open
          * @param {any} view any The files view
          * @param {string} dir the directory path
+         * @returns {Promise<boolean | null>} Promise resolving to true if action was executed successfully
          */
-        _actionHandlerVideo: function(node, view, dir){
+        _actionHandlerVideo: async function(node, view, dir){
             const fileName = node.path.replace(/^.*[\\/]/, '');
             const fileUrl = node.encodedSource;
             this.showFrame(fileUrl, fileName, null, 'video');
+            return true;
         },
 
         /*
