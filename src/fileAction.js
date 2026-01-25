@@ -50,17 +50,20 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
 
         /**
          * Actionhandler for image-click
-         * @param {Node} node The file to open
-         * @param {any} view any The files view
-         * @param {string} dir the directory path
-         * @returns {Promise<boolean | null>} Promise resolving to true if action was executed successfully
+         * @param {Object} context - The action context
+         * @param {Node[]} context.nodes - The nodes (files) to act upon
+         * @param {View} context.view - The files view
+         * @param {Folder} context.folder - The current folder
+         * @returns {Promise<boolean | null>} Promise resolving to null if action was executed successfully
          */
-        _actionHandler: async function(node, view, dir) {
+        _actionHandler: async function({ nodes, view, folder }) {
+            const node = nodes[0];
+            const dir = folder.path;
             const fileName = node.path.replace(/^.*[\\/]/, '');
             const xmpResultModel = this._getDavXmpMeta(node);
 
             this._showImage(node, view, dir, fileName, xmpResultModel);
-            return true;
+            return null;
         },
 
         _legacyActionHandlerImage: function (fileName, context) {
@@ -87,16 +90,18 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
 
         /**
          * Actionhandler for video-click
-         * @param {Node} node The file to open
-         * @param {any} view any The files view
-         * @param {string} dir the directory path
-         * @returns {Promise<boolean | null>} Promise resolving to true if action was executed successfully
+         * @param {Object} context - The action context
+         * @param {Node[]} context.nodes - The nodes (files) to act upon
+         * @param {View} context.view - The files view
+         * @param {Folder} context.folder - The current folder
+         * @returns {Promise<boolean | null>} Promise resolving to null if action was executed successfully
          */
-        _actionHandlerVideo: async function(node, view, dir){
+        _actionHandlerVideo: async function({ nodes, view, folder }){
+            const node = nodes[0];
             const fileName = node.path.replace(/^.*[\\/]/, '');
             const fileUrl = node.encodedSource;
             this.showFrame(fileUrl, fileName, null, 'video');
-            return true;
+            return null;
         },
 
         /*
@@ -106,11 +111,11 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
             return {
                 id: "photosphereviewer-image",
                 exec: this._actionHandler.bind(this),
-                displayName: () => "View in PhotoSphereViewer",
-                iconSvgInline: () => "",
+                displayName: (context) => "View in PhotoSphereViewer",
+                iconSvgInline: (context) => "",
                 order: -1,  // Make sure we get a higher priority than the viewer app
                 default: DefaultType.DEFAULT,
-                enabled: (nodes) => {
+                enabled: ({ nodes }) => {
                     const enabled = nodes.every(node => {
                         const meta = this._getDavXmpMeta(node);
                         return (node.permissions & Permission.READ) !== 0
@@ -134,10 +139,10 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
             return {
                 id: "photosphereviewer-video",
                 exec: this._actionHandlerVideo.bind(this),
-                displayName: () => "View in 360° viewer",
-                iconSvgInline: () => "",
+                displayName: (context) => "View in 360° viewer",
+                iconSvgInline: (context) => "",
                 order: 1000,
-                enabled: (nodes) => nodes.every(node => (
+                enabled: ({ nodes }) => nodes.every(node => (
                     node.permissions & Permission.READ) !== 0 && 
                     node.mime === 'video/mp4')
             };

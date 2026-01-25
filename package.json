@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/nextcloud/files_photospheres/blob/master/README.md",
   "dependencies": {
-    "@nextcloud/files": "^3.12.2"
+    "@nextcloud/files": "^4.0.0-beta.9"
   },
   "devDependencies": {
     "node-polyfill-webpack-plugin": "3.0.0",
