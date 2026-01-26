@@ -12,7 +12,7 @@
  * Injected via the OCA\Files::loadAdditionalScripts-callback.
  * Used to hook into the actionhandler for images.
  */
-import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcloud/files'
+import { registerFileAction, FileAction, FileActionData, DefaultType, Permission, ActionContextSingle } from '@nextcloud/files'
 
 (function ($, OC, OCA) {
 
@@ -50,11 +50,13 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
 
         /**
          * Actionhandler for image-click
-         * @param {Node} node The file to open
-         * @param {any} view any The files view
-         * @param {string} dir the directory path
+         * @param {ActionContextSingle} actionContextSingle The action context
          */
-        _actionHandler: function(node, view, dir) {
+        _actionHandler: function(actionContextSingle) {
+            const node = actionContextSingle.nodes[0];
+            const view = actionContextSingle.view;
+            const dir = actionContextSingle.folder.path;
+
             const fileName = node.path.replace(/^.*[\\/]/, '');
             const xmpResultModel = this._getDavXmpMeta(node);
 
@@ -85,18 +87,18 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
 
         /**
          * Actionhandler for image-click
-         * @param {Node} node The file to open
-         * @param {any} view any The files view
-         * @param {string} dir the directory path
+          * @param {ActionContextSingle} actionContextSingle The action context
          */
-        _actionHandlerVideo: function(node, view, dir){
+        _actionHandlerVideo: function(actionContextSingle){
+            const node = actionContextSingle.nodes[0];
             const fileName = node.path.replace(/^.*[\\/]/, '');
             const fileUrl = node.encodedSource;
             this.showFrame(fileUrl, fileName, null, 'video');
         },
 
-        /*
+        /**
          * Photosphere Viewer action for jpeg-images
+         * @returns {FileActionData} The action data
          */
         _getAction: function () {
             return {
@@ -106,8 +108,10 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
                 iconSvgInline: () => "",
                 order: -1,  // Make sure we get a higher priority than the viewer app
                 default: DefaultType.DEFAULT,
-                enabled: (nodes) => {
-                    const enabled = nodes.every(node => {
+                enabled: (actionContext) => {
+                    /** @var INode[] */
+                    const nodeArray = actionContext?.nodes || [];
+                    const enabled = nodeArray.every(node => {
                         const meta = this._getDavXmpMeta(node);
                         return (node.permissions & Permission.READ) !== 0
                             && node.mime === this._photoShpereMimeType
@@ -133,9 +137,13 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
                 displayName: () => "View in 360° viewer",
                 iconSvgInline: () => "",
                 order: 1000,
-                enabled: (nodes) => nodes.every(node => (
-                    node.permissions & Permission.READ) !== 0 && 
-                    node.mime === 'video/mp4')
+                enabled: (context) => {
+                    // In Nextcloud 33+, context is {nodes: [...], view: ..., folder: ...}
+                    const nodeArray = context?.nodes || (Array.isArray(context) ? context : [context]);
+                    return nodeArray.every(node => (
+                        node.permissions & Permission.READ) !== 0 && 
+                        node.mime === 'video/mp4');
+                }
             };
         },
 
@@ -167,7 +175,9 @@ import { registerFileAction, FileAction, DefaultType, Permission } from '@nextcl
          * Returns the xmp-metadata from the node (delivered by backend)
          */
         _getDavXmpMeta: function (node) {
-            return node.attributes['files-photospheres-xmp-metadata'];
+            const actualNode = node?.nodes?.[0] || node;
+            // The DAV property is: {http://nextcloud.org/ns}files-photospheres-xmp-metadata
+            return actualNode?.attributes?.['files-photospheres-xmp-metadata'];
         },
 
         /*
@@ -534,7 +544,6 @@ jQuery(function () {
     // Regular user view or shared view?
     var sharingToken = $('#sharingToken').val();
     if (!sharingToken) {
-        console.log("Init regular user view");
         window.photoSphereViewerFileAction.init(false, null, false);
         return;
     }
@@ -554,7 +563,6 @@ jQuery(function () {
              *  Unfortunately this events aren't merged into the new
              *  object.
              */
-        console.log("Init directory share view");
         window.photoSphereViewerFileAction.init(isDirectoryShare, sharingToken, false);
     } else {
         // single file-share
@@ -563,7 +571,6 @@ jQuery(function () {
 
         if (mimeType === window.photoSphereViewerFileAction._photoShpereMimeType) {
             PhotosphereViewerFunctions.showLoader(true);
-            console.log("Init single file share view");
             window.photoSphereViewerFileAction.init(false, null, true);
             $('#files-public-content').hide();
             window.photoSphereViewerFileAction.canShowSingleFileShare(sharingToken, function (canShowImage, xmpResultModel) {
