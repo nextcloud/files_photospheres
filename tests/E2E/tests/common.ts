@@ -1,4 +1,6 @@
-export async function loginAndSwitchToPPVTestFiles(page) {
+import { Page } from "playwright/test";
+
+export async function loginAndSwitchToPPVTestFiles(page: Page) {
     // Do the login and navigate to the folder where the test files have been uploaded
     await page.goto(baseUrl + '/index.php/login');
     await page.locator('#user').click();
@@ -8,12 +10,16 @@ export async function loginAndSwitchToPPVTestFiles(page) {
     await page.locator('#password').press('Enter');
     await page.waitForLoadState('networkidle');
     await goToFilesApp(page);
-    await page.getByRole('button', { name: /.*\sppv-testfiles.*/ }).click();
+    await goToPPVTestFiles(page);
 };
 
-export async function goToFilesApp(page) {
+export async function goToFilesApp(page: Page) {
     await page.goto(baseUrl + "/index.php/apps/files/files");
     await page.waitForLoadState('networkidle');
+}
+
+export async function goToPPVTestFiles(page: Page) {
+    await page.getByRole('button', { name: /.*\sppv-testfiles.*/ }).click();
 }
 
 export const frameId = '#photo-sphere-viewer-frame';
