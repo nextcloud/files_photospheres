@@ -1,45 +1,98 @@
-import { test, expect } from '@playwright/test';
-import { loginAndSwitchToPPVTestFiles, frameId, baseUrl, goToFilesApp } from './common';
+import { test, expect, Page } from '@playwright/test';
+import { loginAndSwitchToPPVTestFiles, frameId, baseUrl, goToFilesApp, goToPPVTestFiles } from './common';
 
 const playwright = require('playwright');
 
+let shareLink: string;
+let shareId: number;
+let consoleErrors: string[] = [];
+
 test.beforeEach(async ({ page }) => {
+  captureConsoleErrors(page);
   await loginAndSwitchToPPVTestFiles(page);
-  await removeDirectoryShare(page);
-  const shareLink = await shareDirectory(page);
+  const { link, id } = await shareDirectory(page);
+  shareLink = link;
+  shareId = id;
   await page.goto(shareLink);
 });
 
 test.afterEach(async ({ page }) => {
-  await unshare(page);
+  try {
+    await unshare(page, shareId);
+  }
+  finally {
+    if (consoleErrors.length > 0) {
+      console.error('Console errors during the test:\n' + consoleErrors.join('\n'));
+    }
+    consoleErrors = [];
+  }
 });
 
-async function removeDirectoryShare(page) {
-  try {
-    await page.getByLabel('Shared by link').click({ timeout: 2000 });
-    await page.getByLabel('Actions for "Share link"').click();
-    await page.getByRole('menuitem', { name: 'Unshare' }).click();
-  }
-  catch (e) {
-    if (!(e instanceof playwright.errors.TimeoutError))
-      throw e;
-  }
+function captureConsoleErrors(page: Page) {
+  page.on('console', msg => {
+    if (msg.type() === 'error') {
+      consoleErrors.push(msg.text());
+    }
+  });
 }
 
-async function unshare(page) {
+async function getRequestToken(page: Page): Promise<string> {
+  return await page.evaluate(() => {
+    return document.head.dataset.requesttoken;
+  }) as string;
+}
+
+async function unshare(page: Page, shareId: number) {
   await page.goto(baseUrl);
   await goToFilesApp(page);
-  await page.getByRole('button', { name: 'ppv-testfiles' }).click();
-  await page.locator('.files-list__header-share-button').click();
-  await page.getByLabel('Actions for "Share link"').click();
-  await page.getByRole('menuitem', { name: 'Unshare' }).click();
+  const requesttoken = await getRequestToken(page);
+
+  await page.evaluate(async ({baseUrl, requesttoken, shareId}) => {
+    const response = await fetch(baseUrl + '/ocs/v2.php/apps/files_sharing/api/v1/shares/' + shareId, {
+      method: 'DELETE',
+      headers: {
+        'requesttoken': requesttoken,
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+    }
+  }, {baseUrl, requesttoken, shareId});
 }
 
-async function shareDirectory(page) {
-  await page.locator('.files-list__header-share-button').click();
-  await page.getByLabel('Create a new share link').click();
-  await page.waitForTimeout(1000);
-  return await page.evaluate(async () => await navigator.clipboard.readText());
+async function shareDirectory(page: Page): Promise<{link: string, id: number}> {
+  const requesttoken = await getRequestToken(page);
+
+  const result = await page.evaluate(async ({baseUrl, requesttoken}) => {
+    const response = await fetch(baseUrl + '/ocs/v2.php/apps/files_sharing/api/v1/shares', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+        'requesttoken': requesttoken,
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: JSON.stringify({
+        path: '/ppv-testfiles',
+        shareType: 3,
+        expireDate: '',
+        attributes: "[]"
+      })
+    });
+
+    if (!response.ok) {
+      const err = `shareDirectory error - HTTP ${response.status}: ${await response.text()}`;
+      console.error(err);
+      throw new Error(err);
+    }
+
+    return await response.json();
+  }, {baseUrl, requesttoken});
+
+  const url = result.ocs.data.url;
+  const id = result.ocs.data.id;
+  return { link: url, id };
 }
 
 test('PPV should show on click on directory shared pano.jpg', async ({ page }) => {

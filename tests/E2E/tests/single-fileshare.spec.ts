@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 import { loginAndSwitchToPPVTestFiles, frameId, baseUrl, goToFilesApp } from './common';
 
 const playwright = require('playwright');
@@ -13,12 +13,12 @@ test.afterEach(async ({ page }) => {
   await unshare(page);
 });
 
-async function openSharingPage(page) { 
+async function openSharingPage(page: Page) { 
   await page.locator("[data-cy-files-list-row-name='" + fileName + "'] .files-list__row-mtime").click();
   await page.getByRole('tab', { name: 'Sharing' }).click();
 }
 
-async function removeExistingSingleFileShare(page) {
+async function removeExistingSingleFileShare(page: Page) {
   try{
     await page.getByRole('button', { name: 'Actions for "Share link"' }).click({ timeout: 2000});
     await page.getByRole('menuitem', { name: 'Unshare' }).click();
@@ -29,7 +29,7 @@ async function removeExistingSingleFileShare(page) {
   }
 }
 
-async function unshare(page) {
+async function unshare(page: Page) {
   await page.goto(baseUrl);
   await goToFilesApp(page);
   await page.getByRole('button', { name: 'ppv-testfiles' }).click();
@@ -39,7 +39,7 @@ async function unshare(page) {
   await page.getByRole('menuitem', { name: 'Unshare' }).click();
 }
 
-async function navigateToSingleFileShare(page) {
+async function navigateToSingleFileShare(page: Page) {
   await openSharingPage(page);
   await removeExistingSingleFileShare(page);
   await page.getByRole('button', { name: 'Create a new share link' }).click();
