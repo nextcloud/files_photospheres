@@ -34,7 +34,7 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval 5s --health-timeout 2s --health-retries 5
     steps:
     - name: Checkout Nextcloud server
-      uses: actions/checkout@v3
+      uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       with:
         repository: nextcloud/server
         ref: ${{ env.NC_REF }}
@@ -47,19 +47,19 @@ jobs:
         git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
     
     - name: Checkout app
-      uses: actions/checkout@v3
+      uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       with:
         path: tmp/${{ env.APP_NAME }}
 
     - name: Checkout viewer app
-      uses: actions/checkout@v3
+      uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
       with:
         repository: nextcloud/viewer
         ref: ${{ env.NC_REF }}
         path: apps/viewer
 
     - name: Setup node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
       with:
         node-version: ${{ env.NODE_VER }}
 
@@ -109,7 +109,7 @@ jobs:
       working-directory: tmp/${{ env.APP_NAME }}/tests/E2E
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       if: always()
       with:
         name: playwright-report
@@ -117,7 +117,7 @@ jobs:
         retention-days: 30
 
     - name: Upload server logs
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       if: failure()
       with:
         name: nextcloud-logs
