@@ -32,6 +32,8 @@ export default defineConfig({
     trace: 'on-first-retry',
     /* To be able to create and read share links */
     permissions: ["clipboard-read", "clipboard-write"],
+    /* Global action timeout for clicks and other actions */
+    actionTimeout: 2000,
   },
 
   /* Configure projects for major browsers */

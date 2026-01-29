@@ -12,6 +12,7 @@ module.exports = {
     entry: {
         fileAction: path.resolve(path.join('src', 'fileAction.js')),
         init: path.resolve(path.join('src', 'init.js')),
+        initIframe: path.resolve(path.join('src', 'initIframe.js')),
     },
     output: {
       path: __dirname + "/js",

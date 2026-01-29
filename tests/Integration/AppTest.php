@@ -44,7 +44,7 @@ class AppTest extends TestCase {
 	}
 
 	public function testAppInstalled() {
-		$this->assertTrue($this->appManager->isInstalled(Application::APP_NAME));
+		$this->assertTrue($this->appManager->isEnabledForAnyone(Application::APP_NAME));
 	}
 
 	#[DataProvider('dataProvider_InterfaceToClassMappings')]
