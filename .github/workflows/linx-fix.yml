@@ -14,12 +14,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       with:
         ref: ${{ github.head_ref }}
 
     - name: Set up php
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
       with:
         php-version: ${{ matrix.php-versions }}
         coverage: none
@@ -30,6 +30,6 @@ jobs:
     - name: Run coding standard formatter
       run: composer run cs:fix
 
-    - uses: stefanzweifel/git-auto-commit-action@v4
+    - uses: stefanzweifel/git-auto-commit-action@3ea6ae190baf489ba007f7c92608f33ce20ef04a # v4
       with:
         commit_message: Apply php-cs-fixer changes
