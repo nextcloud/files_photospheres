@@ -11,6 +11,6 @@
  *
  * Init script for the app
  */
-import { registerDavProperty } from '@nextcloud/files'
+import { registerDavProperty } from '@nextcloud/files/dav'
 
 registerDavProperty('nc:files-photospheres-xmp-metadata');
