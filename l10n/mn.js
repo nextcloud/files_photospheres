@@ -2,6 +2,7 @@ OC.L10N.register(
     "files_photospheres",
     {
     "Photo Sphere Viewer" : "Фото бөмбөрцөг үзэгч",
-    "Enables viewing of google photosphere images" : "Google фото бөмбөрцөг зургуудыг үзэх боломжийг олгоно"
+    "Enables viewing of google photosphere images" : "Google фото бөмбөрцөг зургуудыг үзэх боломжийг олгоно",
+    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "photo-sphere-viewer.js компонентийг таны nextcloud-д нэгтгэж\n        Google photosphere зургуудыг үзэх боломжийг идэвхжүүлнэ."
 },
 "nplurals=2; plural=(n != 1);");
