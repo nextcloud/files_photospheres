@@ -14,7 +14,7 @@
  */
 import { registerFileAction, FileAction, FileActionData, DefaultType, Permission, ActionContextSingle } from '@nextcloud/files'
 
-(function ($, OC, OCA) {
+(function (OC, OCA) {
 
     "use strict";
     var photoSphereViewerFileAction = {
@@ -209,7 +209,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
 
             // Add xmpData to url-params, if we have some
             if (xmpResultModel) {
-                urlParams = $.extend(urlParams, xmpResultModel);
+                urlParams = Object.assign(urlParams, xmpResultModel);
             }
 
             this.showFrame(imageUrl, fileName, xmpResultModel, 'image');
@@ -240,7 +240,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
 
             // Add xmpData to url-params, if we have some
             if (xmpResultModel) {
-                urlParams = $.extend(urlParams, xmpResultModel);
+                urlParams = Object.assign(urlParams, xmpResultModel);
             }
 
             this.showFrame(imageUrl, fileName, xmpResultModel, 'image');
@@ -307,16 +307,19 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
                 var extendObject = {
                     panoData: xmpResultModel.croppingConfig
                 };
-                configObject = $.extend(configObject, extendObject);
+                configObject = Object.assign(configObject, extendObject);
             }
 
-            this._frameContainer = $(`<iframe id="${this._frameId}" src="${appUrl}" allowfullscreen="true"/>`);
-            $('body').after(this._frameContainer);
+            this._frameContainer = document.createElement('iframe');
+            this._frameContainer.id = this._frameId;
+            this._frameContainer.src = appUrl;
+            this._frameContainer.allowFullscreen = true;
+            document.body.after(this._frameContainer);
 
-            const hideDownload = $('#hideDownload').val() === 'true';
+            const hideDownload = (document.getElementById('hideDownload')?.value ?? '') === 'true';
             const hideCloseButton = self._isSharedSingleFileViewer;
 
-            this._frameContainer.on('load', function () {
+            this._frameContainer.addEventListener('load', function () {
                 // Viewer is rendered via helper-class in the
                 // iframe. After the frame has loaded, provide
                 // appropriate config object for rendering the component.
@@ -334,7 +337,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
                 // Register ESC listener on iframe
                 frameWindow.addEventListener("keyup", self._onKeyUp.bind(self));
 
-                $('body').addClass('showing-photo-sphere-viewer-frame');
+                document.body.classList.add('showing-photo-sphere-viewer-frame');
                 PhotosphereViewerFunctions.showLoader(false);
 
                 self._frameShowing = true;
@@ -345,11 +348,11 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
          *  Removes the injected iframe that contains the viewer.
          */
         hideFrame: function () {
-            if (this._frameContainer != null && document.contains(this._frameContainer[0])) {
-                this._frameContainer.detach();
+            if (this._frameContainer != null && document.contains(this._frameContainer)) {
+                this._frameContainer.remove();
                 this._frameContainer = null;
-                $('body').removeClass('showing-photo-sphere-viewer-frame');
-                $("#close-photosphere-viewer").remove();
+                document.body.classList.remove('showing-photo-sphere-viewer-frame');
+                document.getElementById('close-photosphere-viewer')?.remove();
                 if (typeof (this._onClose) === 'function') {
                     this._onClose();
                     this._onClose = null;
@@ -372,7 +375,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
         },
 
         _xmpDataBackendRequest: function (url, callback) {
-            $.get(url, function (serverResponse) {
+            fetch(url).then(r => r.json()).then(function (serverResponse) {
                 if (!serverResponse.success) {
                     if (serverResponse.message) {
                         PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', serverResponse.message]);
@@ -471,7 +474,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
 
             // Register the "close" function for non-single-file shares only
             if (this._isSharedSingleFileViewer) {
-                $('footer').addClass('hidden');
+                document.querySelector('footer')?.classList.add('hidden');
             } else {
                 var self = this;
 
@@ -544,22 +547,22 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
 
     window.photoSphereViewerFileAction = photoSphereViewerFileAction;
 
-})(jQuery, OC, OCA);
+})(OC, OCA);
 
 // document ready
-jQuery(function () {
+document.addEventListener('DOMContentLoaded', function () {
 
     "use strict";
     
     // Regular user view or shared view?
-    var sharingToken = $('#sharingToken').val();
+    var sharingToken = document.getElementById('sharingToken')?.value;
     if (!sharingToken) {
         window.photoSphereViewerFileAction.init(false, null, false);
         return;
     }
 
     // Are we dealing with a shared directory or a single file?
-    var isDirectoryShare = $.find('.files-filestable').length > 0 ? true : false;;
+    var isDirectoryShare = document.querySelectorAll('.files-filestable').length > 0;
     if (isDirectoryShare) {
          /*
              *  FIXME ::
@@ -576,20 +579,20 @@ jQuery(function () {
         window.photoSphereViewerFileAction.init(isDirectoryShare, sharingToken, false);
     } else {
         // single file-share
-        var mimeType = $('#mimetype').val();
-        var fileName = $('#filename').val();
+        var mimeType = document.getElementById('mimetype')?.value;
+        var fileName = document.getElementById('filename')?.value;
 
         if (mimeType === window.photoSphereViewerFileAction._photoShpereMimeType) {
             PhotosphereViewerFunctions.showLoader(true);
             window.photoSphereViewerFileAction.init(false, null, true);
-            $('#files-public-content').hide();
+            document.getElementById('files-public-content').style.display = 'none';
             window.photoSphereViewerFileAction.canShowSingleFileShare(sharingToken, function (canShowImage, xmpResultModel) {
                 if (canShowImage) {
                     var imageUrl = OC.generateUrl('/s/{token}/download', { token: sharingToken });
                     window.photoSphereViewerFileAction.showFrame(imageUrl, fileName, xmpResultModel, 'image');
                 }
                 else {
-                    $('#files-public-content').show();
+                    document.getElementById('files-public-content').style.display = '';
                     PhotosphereViewerFunctions.showLoader(false);
                 }
             });
