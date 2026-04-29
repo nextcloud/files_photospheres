@@ -22,6 +22,14 @@ module.exports = {
 	    chunkFilename: `[name].js?v=[contenthash]`,
     },
     devtool: isDev ? 'cheap-source-map' : 'source-map',
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader'],
+            },
+        ],
+    },
     plugins: [
         new webpack.ProvidePlugin({
           process: 'process/browser.js',

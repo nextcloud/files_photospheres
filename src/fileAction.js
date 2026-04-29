@@ -12,7 +12,8 @@
  * Injected via the OCA\Files::loadAdditionalScripts-callback.
  * Used to hook into the actionhandler for images.
  */
-import { registerFileAction, FileAction, FileActionData, DefaultType, Permission, ActionContextSingle } from '@nextcloud/files'
+import { registerFileAction, DefaultType, Permission, ActionContextSingle } from '@nextcloud/files'
+import { showError } from '@nextcloud/dialogs'
 
 (function (OC, OCA) {
 
@@ -98,7 +99,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
 
         /**
          * Photosphere Viewer action for jpeg-images
-         * @returns {FileActionData} The action data
+         * @returns {Object} The action data
          */
         _getAction: function () {
             return {
@@ -121,7 +122,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
 
                     // Notify user if we would show a Photosphere but WebGL/WebGL2 is not supported
                     if (enabled && !PhotosphereViewerFunctions.isWebGl2Supported()) {
-                        PhotosphereViewerFunctions.notify("Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings.", "error");
+                        showError(t('files_photospheres', "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings."));
                         return false;
                     }
 
@@ -378,10 +379,10 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
             fetch(url).then(r => r.json()).then(function (serverResponse) {
                 if (!serverResponse.success) {
                     if (serverResponse.message) {
-                        PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', serverResponse.message]);
+                        showError(t('files_photospheres', 'An error occured while trying to read xmp-data: ') + serverResponse.message);
                     }
                     else{
-                        PhotosphereViewerFunctions.notify('An unknown error occured while trying to read xmp-data.');
+                        showError(t('files_photospheres', 'An unknown error occured while trying to read xmp-data.'));
                     }
                     PhotosphereViewerFunctions.showLoader(false);
                     callback(false, null);
@@ -394,7 +395,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
                     // check WebGL2 support in browser, otherwise
                     // the viewer can't be rendered
                     if (!PhotosphereViewerFunctions.isWebGl2Supported()) {
-                        PhotosphereViewerFunctions.notify("Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings.", "error");
+                        showError(t('files_photospheres', "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings."));
                         PhotosphereViewerFunctions.showLoader(false);
                         return;
                     }
@@ -404,7 +405,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
                 callback(false, null);
             })
                 .fail(function (jqXHR, textStatus, errorThrown) {
-                    PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', errorThrown]);
+                    showError(t('files_photospheres', 'An error occured while trying to read xmp-data: ') + errorThrown);
                     PhotosphereViewerFunctions.showLoader(false);
                 });
         },
@@ -468,8 +469,8 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
             this._sharingToken = sharingToken;
             this._isSharedSingleFileViewer = isSharedSingleFileViewer;
 
-            registerFileAction(new FileAction(this._getAction()));      // PhotoSphere image click (default for image/jpeg with appropriate xmp-data)
-            registerFileAction(new FileAction(this._getVideoAction())); // Open 360 video via contextmenu
+            registerFileAction(this._getAction());      // PhotoSphere image click (default for image/jpeg with appropriate xmp-data)
+            registerFileAction(this._getVideoAction()); // Open 360 video via contextmenu
             this._registerLegacyActions();                              // Register legacy actions (e.g. for directory share)
 
             // Register the "close" function for non-single-file shares only
