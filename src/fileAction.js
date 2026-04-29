@@ -116,7 +116,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
                         return (node.permissions & Permission.READ) !== 0
                             && node.mime === this._photoShpereMimeType
                             && meta
-                            && meta.usePanoramaViewer === 1;
+                            && (meta.usePanoramaViewer === true || meta.usePanoramaViewer === 1);
                     });
 
                     // Notify user if we would show a Photosphere but WebGL/WebGL2 is not supported
@@ -172,12 +172,22 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
         },
 
         /*
-         * Returns the xmp-metadata from the node (delivered by backend)
+         * Returns the xmp-metadata from the node (delivered by backend).
+         * In NC33+, WebDAV property values are returned as text content (JSON string).
          */
         _getDavXmpMeta: function (node) {
             const actualNode = node?.nodes?.[0] || node;
             // The DAV property is: {http://nextcloud.org/ns}files-photospheres-xmp-metadata
-            return actualNode?.attributes?.['files-photospheres-xmp-metadata'];
+            const rawValue = actualNode?.attributes?.['files-photospheres-xmp-metadata'];
+            if (typeof rawValue === 'string') {
+                try {
+                    return JSON.parse(rawValue);
+                } catch (e) {
+                    console.warn('files_photospheres: failed to parse XMP metadata JSON', e, rawValue);
+                    return null;
+                }
+            }
+            return rawValue;
         },
 
         /*
