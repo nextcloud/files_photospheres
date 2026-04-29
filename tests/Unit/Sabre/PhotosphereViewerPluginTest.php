@@ -24,7 +24,6 @@ declare(strict_types=1);
 
 namespace OCA\Files_PhotoSpheres\Tests\Unit\Sabre;
 
-use OC\Files\View;
 use OCA\DAV\Connector\Sabre\Directory;
 use OCA\DAV\Connector\Sabre\File;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
@@ -33,9 +32,6 @@ use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use OCP\Files\FileInfo;
 use OCP\ICache;
 use OCP\ICacheFactory;
-use OCP\IL10N;
-use OCP\IRequest;
-use OCP\Share\IManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -145,12 +141,10 @@ class PhotosphereViewerPluginTest extends TestCase {
 				$this->equalTo('{node}: Not a file or directory or no XMP Metadata requested'),
 				['node' => 'testDirectory']
 			);
-		$view = $this->createMock(View::class);
-		$info = $this->createMock(FileInfo::class);
-		$info->expects($this->once())
+		$node = $this->createMock(Directory::class);
+		$node->expects($this->once())
 			->method('getName')
 			->willReturn('testDirectory');
-		$node = new Directory($view, $info);
 
 		$plugin->handleGetProperties($propFind, $node);
 	}
@@ -184,19 +178,21 @@ class PhotosphereViewerPluginTest extends TestCase {
 				})
 			);
 
-		$view = $this->createMock(View::class);
 		$ocFile = $this->createMock(\OC\Files\Node\File::class);
-		$ocFile->expects($this->exactly(2))
-			->method('getId')
-			->willReturn('42');
-		$ocFile->expects($this->exactly(2))
+		$fileInfo = $this->createMock(FileInfo::class);
+		$fileInfo->expects($this->exactly(2))
 			->method('getMimetype')
 			->willReturn('image/jpeg');
-		$manager = $this->createMock(IManager::class);
-		$request = $this->createMock(IRequest::class);
-		$l10n = $this->createMock(IL10N::class);
-
-		$node = new File($view, $ocFile, $manager, $request, $l10n);
+		$node = $this->createMock(File::class);
+		$node->expects($this->exactly(2))
+			->method('getId')
+			->willReturn(42);
+		$node->expects($this->exactly(2))
+			->method('getFileInfo')
+			->willReturn($fileInfo);
+		$node->expects($this->once())
+			->method('getNode')
+			->willReturn($ocFile);
 
 		$plugin->handleGetProperties($propFind, $node);
 
@@ -247,22 +243,20 @@ class PhotosphereViewerPluginTest extends TestCase {
 				})
 			);
 
-		$view = $this->createMock(View::class);
-		$ocFile = $this->createMock(\OC\Files\Node\File::class);
-		$ocFile->expects($this->once())
-			->method('getId')
-			->willReturn('42');
-		$ocFile->expects($this->once())
-			->method('getName')
-			->willReturn('myTestfile42');
-		$ocFile->expects($this->once())
+		$fileInfo = $this->createMock(FileInfo::class);
+		$fileInfo->expects($this->once())
 			->method('getMimetype')
 			->willReturn('application/xml'); // This should be skipped, XMP reader should not be called
-		$manager = $this->createMock(IManager::class);
-		$request = $this->createMock(IRequest::class);
-		$l10n = $this->createMock(IL10N::class);
-
-		$node = new File($view, $ocFile, $manager, $request, $l10n);
+		$node = $this->createMock(File::class);
+		$node->expects($this->once())
+			->method('getId')
+			->willReturn(42);
+		$node->expects($this->once())
+			->method('getFileInfo')
+			->willReturn($fileInfo);
+		$node->expects($this->once())
+			->method('getName')
+			->willReturn('myTestfile42');
 
 		$plugin->handleGetProperties($propFind, $node);
 
@@ -270,10 +264,7 @@ class PhotosphereViewerPluginTest extends TestCase {
 		$this->assertIsCallable($propFindHandleFunction);
 
 		$xmpReader->expects($this->never())
-			->method('readXmpDataFromFileObject')
-			->with(
-				$this->equalTo($ocFile)
-			);
+			->method('readXmpDataFromFileObject');
 		$logger->expects($this->once())
 			->method('debug')
 			->with(
@@ -313,20 +304,13 @@ class PhotosphereViewerPluginTest extends TestCase {
 				})
 			);
 
-		$view = $this->createMock(View::class);
-		$ocFile = $this->createMock(\OC\Files\Node\File::class);
-		$ocFile->expects($this->once())
+		$node = $this->createMock(File::class);
+		$node->expects($this->once())
 			->method('getId')
 			->willReturn(null);
-		$ocFile->expects($this->once())
+		$node->expects($this->once())
 			->method('getName')
 			->willReturn('myTestfile42');
-
-		$manager = $this->createMock(IManager::class);
-		$request = $this->createMock(IRequest::class);
-		$l10n = $this->createMock(IL10N::class);
-
-		$node = new File($view, $ocFile, $manager, $request, $l10n);
 
 		$plugin->handleGetProperties($propFind, $node);
 
@@ -334,10 +318,7 @@ class PhotosphereViewerPluginTest extends TestCase {
 		$this->assertIsCallable($propFindHandleFunction);
 
 		$xmpReader->expects($this->never())
-			->method('readXmpDataFromFileObject')
-			->with(
-				$this->equalTo($ocFile)
-			);
+			->method('readXmpDataFromFileObject');
 		$logger->expects($this->once())
 			->method('warning')
 			->with(
@@ -374,14 +355,14 @@ class PhotosphereViewerPluginTest extends TestCase {
 		$file1 = $this->createMock(File::class);
 		$file1->expects($this->atLeastOnce())
 			->method('getId')
-			->willReturn('42');
+			->willReturn(42);
 		$file1->expects($this->atLeastOnce())
 			->method('getFileInfo')
 			->willReturn($jpgInfo);
 		$file2 = $this->createMock(File::class);
 		$file2->expects($this->atLeastOnce())
 			->method('getId')
-			->willReturn('43');
+			->willReturn(43);
 		$file2->expects($this->atLeastOnce())
 			->method('getFileInfo')
 			->willReturn($jpgInfo);
@@ -446,19 +427,17 @@ class PhotosphereViewerPluginTest extends TestCase {
 				})
 			);
 
-		$view = $this->createMock(View::class);
-		$ocFile = $this->createMock(\OC\Files\Node\File::class);
-		$ocFile
-			->method('getId')
-			->willReturn('42');
-		$ocFile
+		$fileInfo = $this->createMock(FileInfo::class);
+		$fileInfo
 			->method('getMimetype')
 			->willReturn('image/jpeg');
-		$manager = $this->createMock(IManager::class);
-		$request = $this->createMock(IRequest::class);
-		$l10n = $this->createMock(IL10N::class);
-
-		$node = new File($view, $ocFile, $manager, $request, $l10n);
+		$node = $this->createMock(File::class);
+		$node
+			->method('getId')
+			->willReturn(42);
+		$node
+			->method('getFileInfo')
+			->willReturn($fileInfo);
 
 		$plugin->handleGetProperties($propFind, $node);
 
