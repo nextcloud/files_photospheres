@@ -15,7 +15,6 @@
 namespace OCA\Files_PhotoSpheres\Tests\Unit\Controller;
 
 use OC\Security\CSP\ContentSecurityPolicyNonceManager;
-use OCA\Files_PhotoSpheres\AppInfo;
 use OCA\Files_PhotoSpheres\Controller\PageController;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http\TemplateResponse;
