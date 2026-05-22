@@ -6,6 +6,7 @@
 [![Generic badge](https://img.shields.io/github/v/release/nextcloud/files_photospheres)](https://github.com/nextcloud/files_photospheres/releases)
 [![Generic badge](https://img.shields.io/badge/Nextcloud-34-orange)](https://github.com/nextcloud/server)
 
+**This version is tested for Nextcloud 34.**
 
 Nextcloud app for viewing Google PhotoSphere 360° images (panorama-images). This app is based on 
 the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library. For 
