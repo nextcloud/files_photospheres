@@ -14,32 +14,6 @@
 
 var PhotosphereViewerFunctions = {
 
-    /**
-     * Shows a (translated) notify message and hides it after 7s
-     * @param {string|array} message(s) (could have a translation each)
-     * @param {string} type of the notification (e.g. 'error'). If none provided it will be the default.
-     * @returns {void}
-     */
-    notify: function (message, type) {
-        var tmpMessage = '';
-        if (typeof message === "string") {
-            tmpMessage = t('files_photospheres', message);
-        } else if (typeof message === "object" && message.length) {
-            for (var i = 0; i < message.length; i++) {
-                tmpMessage += t('files_photospheres', message[i]);
-            }
-        } else {
-            throw "Function 'notify' needs a message argument";
-        }
-
-        if (!type){
-            OC.Notification.showTemporary(tmpMessage);
-        }
-        else{
-            OC.Notification.showTemporary(tmpMessage, {type: type})
-        }
-    },
-
     /*
      * Parses the xmp-data from the url-string-object
      * into an valid JSON-object
@@ -91,12 +65,14 @@ var PhotosphereViewerFunctions = {
     },
 
     showLoader: function(show) {
-        var $loadingPanel = $('#photo-sphere-viewer-loader');
-        if (!$loadingPanel.length){
-            $loadingPanel = $('<div id="photo-sphere-viewer-loader"></div>').addClass('icon-loading');
-            $('#app-content').after($loadingPanel);
+        var loadingPanel = document.getElementById('photo-sphere-viewer-loader');
+        if (!loadingPanel){
+            loadingPanel = document.createElement('div');
+            loadingPanel.id = 'photo-sphere-viewer-loader';
+            loadingPanel.classList.add('icon-loading');
+            document.getElementById('app-content')?.after(loadingPanel);
         }
-        $loadingPanel.toggleClass('hidden', !show);
+        loadingPanel.classList.toggle('hidden', !show);
     },
 
     isWebGl2Supported: function() {

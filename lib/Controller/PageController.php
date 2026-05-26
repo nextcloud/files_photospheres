@@ -14,12 +14,11 @@
 
 namespace OCA\Files_PhotoSpheres\Controller;
 
+use OC\Security\CSP\ContentSecurityPolicyNonceManager;
 use OCA\Files_PhotoSpheres\AppInfo;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http\ContentSecurityPolicy;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\IRequest;
 use OCP\IURLGenerator;
 
 /**
@@ -29,15 +28,11 @@ use OCP\IURLGenerator;
  */
 class PageController extends Controller {
 
-	/** @var IURLGenerator */
-	private $urlGenerator;
-	/** @var IAppManager */
-	private $appManager;
-
-	public function __construct($AppName, IRequest $request, IURLGenerator $urlGenerator, IAppManager $appManager) {
-		parent::__construct($AppName, $request);
-		$this->urlGenerator = $urlGenerator;
-		$this->appManager = $appManager;
+	public function __construct(
+		private IURLGenerator $urlGenerator,
+		private IAppManager $appManager,
+		private ContentSecurityPolicyNonceManager $nonceManager,
+	) {
 	}
 
 	/**
@@ -60,12 +55,11 @@ class PageController extends Controller {
 		$params = [
 			'urlGenerator' => $this->urlGenerator,
 			'appVersion' => $this->appManager->getAppVersion(AppInfo\Application::APP_NAME),
-			'nounceManager' => \OC::$server->getContentSecurityPolicyNonceManager()
+			'nounceManager' => $this->nonceManager
 		];
 		switch ($type) {
 			case 'image':
 				$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer', $params, 'blank');  // templates/viewer.php
-				$this->setContentSecurityPolicy($response);
 				break;
 			case 'video':
 				$response = new TemplateResponse(AppInfo\Application::APP_NAME, 'viewer_video', $params, 'blank');  // templates/viewer_video.php
@@ -74,20 +68,5 @@ class PageController extends Controller {
 		}
 
 		return $response;
-	}
-
-	/**
-	 *
-	 * @param TemplateResponse $response
-	 */
-	private function setContentSecurityPolicy($response) {
-		/*
-		 * Fix: Nextcloud >= 15 does not allow
-		 * the Javascript 'eval'-function, which
-		 * is internally needed in 'doT.min.js'
-		 */
-		$csp = new ContentSecurityPolicy();
-		$csp->allowEvalScript();
-		$response->setContentSecurityPolicy($csp);
 	}
 }
