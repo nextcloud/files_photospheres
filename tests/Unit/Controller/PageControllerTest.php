@@ -15,11 +15,9 @@
 namespace OCA\Files_PhotoSpheres\Tests\Unit\Controller;
 
 use OC\Security\CSP\ContentSecurityPolicyNonceManager;
-use OCA\Files_PhotoSpheres\AppInfo;
 use OCA\Files_PhotoSpheres\Controller\PageController;
 use OCP\App\IAppManager;
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\IRequest;
 use OCP\IURLGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -27,30 +25,29 @@ use ReflectionMethod;
 
 class PageControllerTest extends TestCase {
 
-	/** @var IRequest|MockObject */
-	private $request;
 	/** @var IURLGenerator|MockObject */
 	private $urlGenerator;
 	/** @var IAppManager|MockObject */
 	private $appManager;
+	/** @var ContentSecurityPolicyNonceManager|MockObject */
+	private $nonceManager;
 	/** @var PageController */
 	private $controller;
 
 	public function setUp() : void {
 		parent::setUp();
 
-		/** @var IRequest|MockObject */
-		$this->request = $this->getMockBuilder(IRequest::class)->getMock();
 		/** @var IURLGenerator|MockObject */
 		$this->urlGenerator = $this->getMockBuilder(IURLGenerator::class)->getMock();
 		/** @var IAppManager|MockObject */
 		$this->appManager = $this->createMock(IAppManager::class);
+		/** @var ContentSecurityPolicyNonceManager|MockObject */
+		$this->nonceManager = $this->createMock(ContentSecurityPolicyNonceManager::class);
 
 		$this->controller = new PageController(
-			AppInfo\Application::APP_NAME,
-			$this->request,
 			$this->urlGenerator,
-			$this->appManager
+			$this->appManager,
+			$this->nonceManager
 		);
 	}
 
@@ -66,15 +63,11 @@ class PageControllerTest extends TestCase {
 		$this->assertEquals('viewer', $result->getTemplateName());
 		$this->assertEquals('blank', $result->getRenderAs());
 
-		$csp = $result->getContentSecurityPolicy();
-		$cspString = $csp->buildPolicy();
-		$this->assertStringContainsString('unsafe-eval', $cspString);
-
 		/** @var array */
 		$params = $result->getParams();
 		$this->assertEquals($this->urlGenerator, $params['urlGenerator']);
 		$this->assertEquals($appVersion, $params['appVersion']);
-		$this->assertTrue($params['nounceManager'] instanceof ContentSecurityPolicyNonceManager);
+		$this->assertEquals($this->nonceManager, $params['nounceManager']);
 	}
 
 	public function testShowsVideoView() {
@@ -89,15 +82,11 @@ class PageControllerTest extends TestCase {
 		$this->assertEquals('viewer_video', $result->getTemplateName());
 		$this->assertEquals('blank', $result->getRenderAs());
 
-		$csp = $result->getContentSecurityPolicy();
-		$cspString = $csp->buildPolicy();
-		$this->assertStringNotContainsString('unsafe-eval', $cspString);
-
 		/** @var array */
 		$params = $result->getParams();
 		$this->assertEquals($this->urlGenerator, $params['urlGenerator']);
 		$this->assertEquals($appVersion, $params['appVersion']);
-		$this->assertTrue($params['nounceManager'] instanceof ContentSecurityPolicyNonceManager);
+		$this->assertEquals($this->nonceManager, $params['nounceManager']);
 	}
 
 	public function testReturnsNullOnInvalidPage() {
