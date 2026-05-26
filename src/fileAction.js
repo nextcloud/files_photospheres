@@ -12,9 +12,10 @@
  * Injected via the OCA\Files::loadAdditionalScripts-callback.
  * Used to hook into the actionhandler for images.
  */
-import { registerFileAction, FileAction, FileActionData, DefaultType, Permission, ActionContextSingle } from '@nextcloud/files'
+import { registerFileAction, DefaultType, Permission, ActionContextSingle } from '@nextcloud/files'
+import { showError } from '@nextcloud/dialogs'
 
-(function ($, OC, OCA) {
+(function (OC, OCA) {
 
     "use strict";
     var photoSphereViewerFileAction = {
@@ -98,7 +99,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
 
         /**
          * Photosphere Viewer action for jpeg-images
-         * @returns {FileActionData} The action data
+         * @returns {Object} The action data
          */
         _getAction: function () {
             return {
@@ -116,12 +117,12 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
                         return (node.permissions & Permission.READ) !== 0
                             && node.mime === this._photoShpereMimeType
                             && meta
-                            && meta.usePanoramaViewer === 1;
+                            && (meta.usePanoramaViewer === true || meta.usePanoramaViewer === 1);
                     });
 
                     // Notify user if we would show a Photosphere but WebGL/WebGL2 is not supported
                     if (enabled && !PhotosphereViewerFunctions.isWebGl2Supported()) {
-                        PhotosphereViewerFunctions.notify("Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings.", "error");
+                        showError(t('files_photospheres', "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings."));
                         return false;
                     }
 
@@ -172,12 +173,22 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
         },
 
         /*
-         * Returns the xmp-metadata from the node (delivered by backend)
+         * Returns the xmp-metadata from the node (delivered by backend).
+         * In NC33+, WebDAV property values are returned as text content (JSON string).
          */
         _getDavXmpMeta: function (node) {
             const actualNode = node?.nodes?.[0] || node;
             // The DAV property is: {http://nextcloud.org/ns}files-photospheres-xmp-metadata
-            return actualNode?.attributes?.['files-photospheres-xmp-metadata'];
+            const rawValue = actualNode?.attributes?.['files-photospheres-xmp-metadata'];
+            if (typeof rawValue === 'string') {
+                try {
+                    return JSON.parse(rawValue);
+                } catch (e) {
+                    console.warn('files_photospheres: failed to parse XMP metadata JSON', e, rawValue);
+                    return null;
+                }
+            }
+            return rawValue;
         },
 
         /*
@@ -199,7 +210,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
 
             // Add xmpData to url-params, if we have some
             if (xmpResultModel) {
-                urlParams = $.extend(urlParams, xmpResultModel);
+                urlParams = Object.assign(urlParams, xmpResultModel);
             }
 
             this.showFrame(imageUrl, fileName, xmpResultModel, 'image');
@@ -230,7 +241,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
 
             // Add xmpData to url-params, if we have some
             if (xmpResultModel) {
-                urlParams = $.extend(urlParams, xmpResultModel);
+                urlParams = Object.assign(urlParams, xmpResultModel);
             }
 
             this.showFrame(imageUrl, fileName, xmpResultModel, 'image');
@@ -297,16 +308,19 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
                 var extendObject = {
                     panoData: xmpResultModel.croppingConfig
                 };
-                configObject = $.extend(configObject, extendObject);
+                configObject = Object.assign(configObject, extendObject);
             }
 
-            this._frameContainer = $(`<iframe id="${this._frameId}" src="${appUrl}" allowfullscreen="true"/>`);
-            $('body').after(this._frameContainer);
+            this._frameContainer = document.createElement('iframe');
+            this._frameContainer.id = this._frameId;
+            this._frameContainer.src = appUrl;
+            this._frameContainer.allowFullscreen = true;
+            document.body.after(this._frameContainer);
 
-            const hideDownload = $('#hideDownload').val() === 'true';
+            const hideDownload = (document.getElementById('hideDownload')?.value ?? '') === 'true';
             const hideCloseButton = self._isSharedSingleFileViewer;
 
-            this._frameContainer.on('load', function () {
+            this._frameContainer.addEventListener('load', function () {
                 // Viewer is rendered via helper-class in the
                 // iframe. After the frame has loaded, provide
                 // appropriate config object for rendering the component.
@@ -324,7 +338,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
                 // Register ESC listener on iframe
                 frameWindow.addEventListener("keyup", self._onKeyUp.bind(self));
 
-                $('body').addClass('showing-photo-sphere-viewer-frame');
+                document.body.classList.add('showing-photo-sphere-viewer-frame');
                 PhotosphereViewerFunctions.showLoader(false);
 
                 self._frameShowing = true;
@@ -335,11 +349,11 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
          *  Removes the injected iframe that contains the viewer.
          */
         hideFrame: function () {
-            if (this._frameContainer != null && document.contains(this._frameContainer[0])) {
-                this._frameContainer.detach();
+            if (this._frameContainer != null && document.contains(this._frameContainer)) {
+                this._frameContainer.remove();
                 this._frameContainer = null;
-                $('body').removeClass('showing-photo-sphere-viewer-frame');
-                $("#close-photosphere-viewer").remove();
+                document.body.classList.remove('showing-photo-sphere-viewer-frame');
+                document.getElementById('close-photosphere-viewer')?.remove();
                 if (typeof (this._onClose) === 'function') {
                     this._onClose();
                     this._onClose = null;
@@ -362,13 +376,13 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
         },
 
         _xmpDataBackendRequest: function (url, callback) {
-            $.get(url, function (serverResponse) {
+            fetch(url).then(r => r.json()).then(function (serverResponse) {
                 if (!serverResponse.success) {
                     if (serverResponse.message) {
-                        PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', serverResponse.message]);
+                        showError(t('files_photospheres', 'An error occured while trying to read xmp-data: ') + serverResponse.message);
                     }
                     else{
-                        PhotosphereViewerFunctions.notify('An unknown error occured while trying to read xmp-data.');
+                        showError(t('files_photospheres', 'An unknown error occured while trying to read xmp-data.'));
                     }
                     PhotosphereViewerFunctions.showLoader(false);
                     callback(false, null);
@@ -381,7 +395,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
                     // check WebGL2 support in browser, otherwise
                     // the viewer can't be rendered
                     if (!PhotosphereViewerFunctions.isWebGl2Supported()) {
-                        PhotosphereViewerFunctions.notify("Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings.", "error");
+                        showError(t('files_photospheres', "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings."));
                         PhotosphereViewerFunctions.showLoader(false);
                         return;
                     }
@@ -391,7 +405,7 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
                 callback(false, null);
             })
                 .fail(function (jqXHR, textStatus, errorThrown) {
-                    PhotosphereViewerFunctions.notify(['An error occured while trying to read xmp-data: ', errorThrown]);
+                    showError(t('files_photospheres', 'An error occured while trying to read xmp-data: ') + errorThrown);
                     PhotosphereViewerFunctions.showLoader(false);
                 });
         },
@@ -455,13 +469,13 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
             this._sharingToken = sharingToken;
             this._isSharedSingleFileViewer = isSharedSingleFileViewer;
 
-            registerFileAction(new FileAction(this._getAction()));      // PhotoSphere image click (default for image/jpeg with appropriate xmp-data)
-            registerFileAction(new FileAction(this._getVideoAction())); // Open 360 video via contextmenu
+            registerFileAction(this._getAction());      // PhotoSphere image click (default for image/jpeg with appropriate xmp-data)
+            registerFileAction(this._getVideoAction()); // Open 360 video via contextmenu
             this._registerLegacyActions();                              // Register legacy actions (e.g. for directory share)
 
             // Register the "close" function for non-single-file shares only
             if (this._isSharedSingleFileViewer) {
-                $('footer').addClass('hidden');
+                document.querySelector('footer')?.classList.add('hidden');
             } else {
                 var self = this;
 
@@ -534,22 +548,22 @@ import { registerFileAction, FileAction, FileActionData, DefaultType, Permission
 
     window.photoSphereViewerFileAction = photoSphereViewerFileAction;
 
-})(jQuery, OC, OCA);
+})(OC, OCA);
 
 // document ready
-jQuery(function () {
+document.addEventListener('DOMContentLoaded', function () {
 
     "use strict";
     
     // Regular user view or shared view?
-    var sharingToken = $('#sharingToken').val();
+    var sharingToken = document.getElementById('sharingToken')?.value;
     if (!sharingToken) {
         window.photoSphereViewerFileAction.init(false, null, false);
         return;
     }
 
     // Are we dealing with a shared directory or a single file?
-    var isDirectoryShare = $.find('.files-filestable').length > 0 ? true : false;;
+    var isDirectoryShare = document.querySelectorAll('.files-filestable').length > 0;
     if (isDirectoryShare) {
          /*
              *  FIXME ::
@@ -566,20 +580,20 @@ jQuery(function () {
         window.photoSphereViewerFileAction.init(isDirectoryShare, sharingToken, false);
     } else {
         // single file-share
-        var mimeType = $('#mimetype').val();
-        var fileName = $('#filename').val();
+        var mimeType = document.getElementById('mimetype')?.value;
+        var fileName = document.getElementById('filename')?.value;
 
         if (mimeType === window.photoSphereViewerFileAction._photoShpereMimeType) {
             PhotosphereViewerFunctions.showLoader(true);
             window.photoSphereViewerFileAction.init(false, null, true);
-            $('#files-public-content').hide();
+            document.getElementById('files-public-content').style.display = 'none';
             window.photoSphereViewerFileAction.canShowSingleFileShare(sharingToken, function (canShowImage, xmpResultModel) {
                 if (canShowImage) {
                     var imageUrl = OC.generateUrl('/s/{token}/download', { token: sharingToken });
                     window.photoSphereViewerFileAction.showFrame(imageUrl, fileName, xmpResultModel, 'image');
                 }
                 else {
-                    $('#files-public-content').show();
+                    document.getElementById('files-public-content').style.display = '';
                     PhotosphereViewerFunctions.showLoader(false);
                 }
             });

@@ -21,6 +21,7 @@ use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 use OCA\Files_PhotoSpheres\Service\Helper\IRegexMatcher;
 use OCA\Files_PhotoSpheres\Service\Helper\RegexMatcher;
 use OCA\Files_PhotoSpheres\Service\Helper\XmpDataReader;
+use OCP\Files\Cache\ICacheEntry;
 use OCP\Files\File;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -257,10 +258,16 @@ class TestFile implements File {
 	public function getUploadTime() : int {
 		return 0;
 	}
+	public function getLastActivity(): int {
+		return 0;
+	}
 	public function getParentId() : int {
 		return 0;
 	}
 	public function getMetadata(): array {
 		return [];
+	}
+	public function getData(): ICacheEntry {
+		throw new \BadMethodCallException('Not implemented in test double');
 	}
 }
