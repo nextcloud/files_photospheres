@@ -48,7 +48,7 @@ class XmpResultModelTest extends TestCase {
 		$croppingConfig->poseRoll = 9;
 		$xmpModel->croppingConfig = $croppingConfig;
 
-		$expectedArray = [
+		$expectedJson = json_encode([
 			'usePanoramaViewer' => false,
 			'containsCroppingConfig' => true,
 			'croppingConfig' => [
@@ -62,11 +62,11 @@ class XmpResultModelTest extends TestCase {
 				'posePitch' => 8,
 				'poseRoll' => 9,
 			]
-		];
+		]);
 
 		$writerMock->expects($this->once())
 			->method('write')
-			->with($this->equalTo($expectedArray));
+			->with($this->equalTo($expectedJson));
 
 		$xmpModel->xmlSerialize($writerMock);
 	}
