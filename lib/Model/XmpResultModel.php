@@ -41,7 +41,10 @@ class XmpResultModel implements XmlSerializable {
 	}
 
 	public function xmlSerialize(Writer $writer) {
-		$writer->write([
+		// Serialize as JSON text content instead of XML sub-elements.
+		// NC33+ WebDAV client reads element.textContent which would concatenate
+		// all child text nodes into garbage when using XML sub-elements.
+		$writer->write(json_encode([
 			'usePanoramaViewer' => $this->usePanoramaViewer,
 			'containsCroppingConfig' => $this->containsCroppingConfig,
 			'croppingConfig' => [
@@ -55,7 +58,6 @@ class XmpResultModel implements XmlSerializable {
 				'posePitch' => $this->croppingConfig->posePitch,
 				'poseRoll' => $this->croppingConfig->poseRoll
 			]
-		]);
-
+		]));
 	}
 }
