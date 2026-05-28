@@ -2,7 +2,10 @@ OC.L10N.register(
     "files_photospheres",
     {
     "Photo Sphere Viewer" : "Visualizador Photo Sphere",
-    "Enables viewing of google photosphere images" : "Permite visualizar imagens do google photosphere",
-    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Permite visualizar imagens do google photosphere\n        integrando o componente photo-sphere-viewer.js\n        em sua instância Nextcloud."
+    "Enables viewing of google photosphere images" : "Permite visualizar imagens do Google Photosphere",
+    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Permite visualizar imagens do Google Photosphere\n        integrando o componente photo-sphere-viewer.js\n        em sua instância Nextcloud.",
+    "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings." : "Seu navegador não é compatível com WebGL/WebGL2. Por favor, ative o suporte a WebGL/WebGL2 nas configurações do seu navegador.",
+    "An error occured while trying to read xmp-data: " : "Ocorreu um erro ao ler xmp-data:",
+    "An unknown error occured while trying to read xmp-data." : "Ocorreu um erro desconhecido ao ler xmp-data."
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
