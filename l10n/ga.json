@@ -1,6 +1,9 @@
 { "translations": {
     "Photo Sphere Viewer" : "Amharcóir Réimse Grianghraf",
     "Enables viewing of google photosphere images" : "Cumasaíonn sé íomhánna Google Photosphere a fheiceáil",
-    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Cumasaíonn sé íomhánna Google Photosphere a fheiceáil ag\nag comhtháthú na comhpháirte grianghraf-sféar-viewer.js\nisteach i do chás nextcloud."
+    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Cumasaíonn sé íomhánna Google Photosphere a fheiceáil ag\nag comhtháthú na comhpháirte grianghraf-sféar-viewer.js\nisteach i do chás nextcloud.",
+    "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings." : "Ní thacaíonn do bhrabhsálaí le WebGL/WebGL2. Cumasaigh tacaíocht WebGL/WebGL2 i socruithe an bhrabhsálaí le do thoil.",
+    "An error occured while trying to read xmp-data: " : "Tharla earráid agus iarracht á déanamh xmp-data a léamh:",
+    "An unknown error occured while trying to read xmp-data." : "Tharla earráid anaithnid agus iarracht á déanamh xmp-data a léamh."
 },"pluralForm" :"nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);"
 }
