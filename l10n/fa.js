@@ -3,6 +3,9 @@ OC.L10N.register(
     {
     "Photo Sphere Viewer" : "نمایشگر کره عکس",
     "Enables viewing of google photosphere images" : "مشاهده تصاویر Google Photosphere را فعال می کند",
-    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "مشاهده تصاویر Google Photosphere توسط ادغام مولفه photo-sphere-viewer.js\nبه نمونه نکست‌کلود شما."
+    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "مشاهده تصاویر Google Photosphere توسط ادغام مولفه photo-sphere-viewer.js\nبه نمونه نکست‌کلود شما.",
+    "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings." : "مرورگر شما از WebGL/WebGL2 پشتیبانی نمی‌کند. لطفاً پشتیبانی WebGL/WebGL2 را در تنظیمات مرورگر فعال کنید.",
+    "An error occured while trying to read xmp-data: " : "هنگام تلاش برای خواندن داده‌های xmp خطایی رخ داد: ",
+    "An unknown error occured while trying to read xmp-data." : "هنگام تلاش برای خواندن داده‌های xmp خطای ناشناخته‌ای رخ داد."
 },
 "nplurals=2; plural=(n > 1);");
