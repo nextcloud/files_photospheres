@@ -5,6 +5,7 @@ const buildMode = process.env.NODE_ENV
 const isDev = buildMode === 'development'
 
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
+const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
     target: 'web',
@@ -13,6 +14,7 @@ module.exports = {
         fileAction: path.resolve(path.join('src', 'fileAction.js')),
         init: path.resolve(path.join('src', 'init.js')),
         initIframe: path.resolve(path.join('src', 'initIframe.js')),
+        viewerHandler: path.resolve(path.join('src', 'viewerHandler.js')),
     },
     output: {
       path: __dirname + "/js",
@@ -25,12 +27,17 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.vue$/,
+                loader: 'vue-loader',
+            },
+            {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader'],
             },
         ],
     },
     plugins: [
+        new VueLoaderPlugin(),
         new webpack.ProvidePlugin({
           process: 'process/browser.js',
         }),
