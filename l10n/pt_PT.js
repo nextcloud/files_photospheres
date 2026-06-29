@@ -3,6 +3,7 @@ OC.L10N.register(
     {
     "Photo Sphere Viewer" : "Visualizador de Photo Sphere",
     "Enables viewing of google photosphere images" : "Ativa a vista de imagens google photosphere",
-    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Ativa a visualização de imagens google photosphere por integrar o componente photo-sphere-viewer.js na sua instancia de nextcloud."
+    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Ativa a visualização de imagens google photosphere por integrar o componente photo-sphere-viewer.js na sua instancia de nextcloud.",
+    "An error occured while trying to read xmp-data: " : "Ocorreu um erro ao ler xmp-data:"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");
