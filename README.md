@@ -6,6 +6,17 @@
 [![Generic badge](https://img.shields.io/github/v/release/nextcloud/files_photospheres)](https://github.com/nextcloud/files_photospheres/releases)
 [![Generic badge](https://img.shields.io/badge/Nextcloud-35-orange)](https://github.com/nextcloud/server)
 
+> [!IMPORTANT]
+> **Deprecation notice**: the photosphere functionality of this app is being moved
+> directly into the Nextcloud [Viewer app](https://github.com/nextcloud/viewer)
+> (see [#27](https://github.com/nextcloud/files_photospheres/issues/27)).
+> Once a Viewer release with built-in photosphere support ships, this app will be
+> deprecated: 360° images are then recognized and displayed by the Viewer out of
+> the box (optional, configurable by an administrator via the
+> `viewer` app config value `photospheres_enabled`), and 360° videos can be opened
+> through the "View in 360°" entry of the file context menu.
+> This app will keep working in the meantime, but new features will land in the
+> Viewer app instead.
 
 Nextcloud app for viewing Google PhotoSphere 360° images (panorama-images). This app is based on 
 the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library. For 
