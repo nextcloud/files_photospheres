@@ -1,6 +1,6 @@
 { "translations": {
-    "Photo Sphere Viewer" : "Photosphere-visare",
-    "Enables viewing of google photosphere images" : "Aktiverar visning av Google Photosphere-bilder",
-    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Aktiverar visning av Google Photosphere-bilder genom\n        att integrera photo-sphere-viewer.js komponenten\n        i din Nextcloud-instans."
+    "Photo Sphere Viewer" : "Fotosfärvisare",
+    "Enables viewing of google photosphere images" : "Gör det möjligt att visa Google Photo Sphere-bilder",
+    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Gör det möjligt att visa Google Photo Sphere-bilder genom\n        att integrera komponenten photo-sphere-viewer.js\n        med din Nextcloud-instans."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
