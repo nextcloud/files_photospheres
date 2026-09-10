@@ -64,6 +64,7 @@ class AddScriptsAndStylesListenerTest extends TestCase {
 
 		$functionJsCnt = 0;
 		$fileActionJsCnt = 0;
+		$viewerHandlerJsCnt = 0;
 		$styleCssCnt = 0;
 
 		$scripts = Util::getScripts();
@@ -73,6 +74,9 @@ class AddScriptsAndStylesListenerTest extends TestCase {
 			}
 			if (strpos($script, 'js/fileAction') !== false) {
 				$fileActionJsCnt++;
+			}
+			if (strpos($script, 'js/viewerHandler') !== false) {
+				$viewerHandlerJsCnt++;
 			}
 		}
 
@@ -84,6 +88,7 @@ class AddScriptsAndStylesListenerTest extends TestCase {
 
 		$this->assertEquals(1, $functionJsCnt);
 		$this->assertEquals(1, $fileActionJsCnt);
+		$this->assertEquals(1, $viewerHandlerJsCnt);
 		$this->assertEquals(1, $styleCssCnt);
 	}
 
