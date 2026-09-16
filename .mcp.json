@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--headless",
+        "--browser", "chromium",
+        "--console-level", "warning",
+        "--grant-permissions", "clipboard-read", "clipboard-write"
+      ],
+      "env": {}
+    }
+  }
+}
