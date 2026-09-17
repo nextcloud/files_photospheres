@@ -34,30 +34,31 @@ class XmpResultModel implements XmlSerializable {
 
 	public static function fromArray(array $data) {
 		$xmpResult = new XmpResultModel();
-		$xmpResult->usePanoramaViewer = $data['usePanoramaViewer'];
-		$xmpResult->containsCroppingConfig = $data['containsCroppingConfig'];
-		$xmpResult->croppingConfig = CroppingConfigModel::fromArray($data['croppingConfig']);
+		$xmpResult->usePanoramaViewer = (bool)($data['usePanoramaViewer'] ?? false);
+		$xmpResult->containsCroppingConfig = (bool)($data['containsCroppingConfig'] ?? false);
+		$croppingConfig = $data['croppingConfig'] ?? [];
+		$xmpResult->croppingConfig = CroppingConfigModel::fromArray(is_array($croppingConfig) ? $croppingConfig : []);
 		return $xmpResult;
+	}
+
+	/**
+	 * Representation used both for the DAV property value and for the
+	 * value stored through the files metadata API
+	 * (see \OCA\Files_PhotoSpheres\Listener\XmpMetadataListener).
+	 */
+	public function toArray(): array {
+		return [
+			'usePanoramaViewer' => $this->usePanoramaViewer,
+			'containsCroppingConfig' => $this->containsCroppingConfig,
+			'croppingConfig' => $this->croppingConfig->toArray()
+		];
 	}
 
 	public function xmlSerialize(Writer $writer) {
 		// Serialize as JSON text content instead of XML sub-elements.
 		// NC33+ WebDAV client reads element.textContent which would concatenate
 		// all child text nodes into garbage when using XML sub-elements.
-		$writer->write(json_encode([
-			'usePanoramaViewer' => $this->usePanoramaViewer,
-			'containsCroppingConfig' => $this->containsCroppingConfig,
-			'croppingConfig' => [
-				'fullWidth' => $this->croppingConfig->fullWidth,
-				'fullHeight' => $this->croppingConfig->fullHeight,
-				'croppedWidth' => $this->croppingConfig->croppedWidth,
-				'croppedHeight' => $this->croppingConfig->croppedHeight,
-				'croppedX' => $this->croppingConfig->croppedX,
-				'croppedY' => $this->croppingConfig->croppedY,
-				'poseHeading' => $this->croppingConfig->poseHeading,
-				'posePitch' => $this->croppingConfig->posePitch,
-				'poseRoll' => $this->croppingConfig->poseRoll
-			]
-		]));
+		$json = json_encode($this->toArray());
+		$writer->write($json !== false ? $json : '{}');
 	}
 }

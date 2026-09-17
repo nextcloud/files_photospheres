@@ -20,7 +20,7 @@ the [photo-sphere-viewer.js](https://photo-sphere-viewer.js.org/) library. For
     - [Install through the app store](#install-through-the-app-store)
     - [Install manually](#install-manually)
     - [Usage](#usage)
-    - [Caching](#caching)
+    - [Metadata generation](#metadata-generation)
   - [Caveats](#caveats)
   - [Report an issue](#report-an-issue)
 
@@ -47,8 +47,23 @@ You can manually install this app, by cloning the repository into your nextcloud
 ### Usage
 After installing the app you can view your PhotoSphere 360° images by clicking on the file in the Nextcloud file browser. Note that opening PhotoSpheres from the gallery is currently not supported.
 
-### Caching
-This app uses the caching mechanism of Nextcloud to cache the XMP Metadata of the images. The cache is filled on demand when opening a directory for the first time and it will be valid for 24 hours. To get the full performance it's highly recommended to install a local caching backend like **APCu** or **Redis** like described [here](https://docs.nextcloud.com/server/latest/admin_manual/configuration_server/caching_configuration.html).
+### Metadata generation
+Whether an image is a photosphere is recognized by scanning the first bytes of a jpeg file for XMP metadata. This happens once, ahead of time, when the file is uploaded or edited - not while browsing a directory - and the result is stored using Nextcloud's [files metadata](https://docs.nextcloud.com/server/latest/developer_manual/digging_deeper/files_metadata.html) API, so opening a directory never reads its jpegs on the server, no matter how many of them it contains.
+
+This pre-generated metadata is an optional optimization, not a requirement: for a file whose metadata hasn't been generated yet - typically because it already existed before this version of the app was installed, and hasn't been edited since - the check is instead performed on demand the first time you click on it, showing a brief loading indicator while the server reads that one file. The result is then stored for next time, so this only ever happens once per file.
+
+To avoid that one-time delay for existing files altogether, an administrator can pre-generate metadata for some or all users in bulk ahead of time:
+
+    # A specific user
+    occ files_photospheres:generate-metadata alice
+
+    # Several users at once
+    occ files_photospheres:generate-metadata alice bob
+
+    # Every user who has logged in at least once
+    occ files_photospheres:generate-metadata --all
+
+This command is entirely optional and can be run at any time, e.g. once after installing or updating the app, or periodically via a cron job.
 
 ## Caveats
 * It is not possible to open the photosphere viewer from the Gallery. You must use the file browser.

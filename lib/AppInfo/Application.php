@@ -16,6 +16,7 @@ namespace OCA\Files_PhotoSpheres\AppInfo;
 
 use OCA\Files\Event\LoadAdditionalScriptsEvent;
 use OCA\Files_PhotoSpheres\Listener\AddScriptsAndStylesListener;
+use OCA\Files_PhotoSpheres\Listener\XmpMetadataListener;
 use OCA\Files_PhotoSpheres\Service\Helper\IRegexMatcher;
 use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use OCA\Files_PhotoSpheres\Service\Helper\RegexMatcher;
@@ -29,6 +30,7 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\FilesMetadata\Event\MetadataLiveEvent;
 
 /**
  * class Application
@@ -53,6 +55,13 @@ class Application extends App implements IBootstrap {
 
 		$context->registerEventListener(LoadAdditionalScriptsEvent::class, AddScriptsAndStylesListener::class);
 		$context->registerEventListener(BeforeTemplateRenderedEvent::class, AddScriptsAndStylesListener::class);
+
+		// Compute the XMP metadata ahead of time on upload/edit (see
+		// XmpMetadataListener). This is a best-effort optimization: files
+		// without pre-computed metadata are resolved on demand instead, see
+		// UserfilesController::getXmpData() and
+		// `occ files_photospheres:generate-metadata` for backfilling.
+		$context->registerEventListener(MetadataLiveEvent::class, XmpMetadataListener::class);
 	}
 
 	/**

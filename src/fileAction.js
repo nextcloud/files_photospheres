@@ -12,7 +12,7 @@
  * Injected via the OCA\Files::loadAdditionalScripts-callback.
  * Used to hook into the actionhandler for images.
  */
-import { registerFileAction, DefaultType, Permission, ActionContextSingle } from '@nextcloud/files'
+import { registerFileAction, getFileActions, DefaultType, Permission, ActionContextSingle } from '@nextcloud/files'
 import { showError } from '@nextcloud/dialogs'
 
 (function (OC, OCA) {
@@ -37,6 +37,12 @@ import { showError } from '@nextcloud/dialogs'
          */
         _photoShpereMimeType: 'image/jpeg',
 
+        /*
+         *  Id of the registered image-click action (see _getAction()).
+         *  Used to exclude ourselves when looking for a fallback action.
+         */
+        _imageActionId: 'photosphereviewer-image',
+
         _isDirectoryShare: false,
         _sharingToken: '',
         _isSharedSingleFileViewer: false,
@@ -50,18 +56,94 @@ import { showError } from '@nextcloud/dialogs'
         _showImageCalled: false,
 
         /**
-         * Actionhandler for image-click
+         * Actionhandler for image-click.
+         *
+         * Pre-generated metadata is optional: if the DAV property wasn't
+         * returned for this node (undetermined - the backend hasn't computed
+         * it yet, see XmpMetadataListener), we ask the server on demand,
+         * showing a loading spinner while we wait. Once we know either way,
+         * we either show the photosphere or fall back to whatever action
+         * would otherwise have handled this file (e.g. the regular image
+         * viewer).
          * @param {ActionContextSingle} actionContextSingle The action context
+         * @returns {Promise<boolean|null>}
          */
-        _actionHandler: function(actionContextSingle) {
+        _actionHandler: async function(actionContextSingle) {
             const node = actionContextSingle.nodes[0];
             const view = actionContextSingle.view;
             const dir = actionContextSingle.folder.path;
-
             const fileName = node.path.replace(/^.*[\\/]/, '');
-            const xmpResultModel = this._getDavXmpMeta(node);
+
+            let xmpResultModel = this._getDavXmpMeta(node);
+
+            if (xmpResultModel === null || xmpResultModel === undefined) {
+                PhotosphereViewerFunctions.showLoader(true);
+                xmpResultModel = await this._requestXmpDataForUserfile(node.fileid);
+                PhotosphereViewerFunctions.showLoader(false);
+            }
+
+            if (!xmpResultModel || !(xmpResultModel.usePanoramaViewer === true || xmpResultModel.usePanoramaViewer === 1)) {
+                // Not a photosphere (or we failed to determine it) - let
+                // whichever action would otherwise be responsible for this
+                // file handle the click instead.
+                return await this._execFallbackAction(actionContextSingle);
+            }
+
+            if (!PhotosphereViewerFunctions.isWebGl2Supported()) {
+                showError(t('files_photospheres', "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings."));
+                return false;
+            }
 
             this._showImage(node, view, dir, fileName, xmpResultModel);
+            return true;
+        },
+
+        /**
+         * Requests the xmp-metadata of a regular (non-shared) file from the
+         * backend. Used when the DAV property wasn't pre-generated for this
+         * file yet (see _actionHandler). The backend persists the result for
+         * next time as a side effect (see StorageService::getXmpData()).
+         * @param {number} fileId
+         * @returns {Promise<object|null>}
+         */
+        _requestXmpDataForUserfile: function (fileId) {
+            const url = OC.generateUrl('apps/files_photospheres') + '/userfiles/xmpdata/' + fileId;
+            return new Promise((resolve) => {
+                this._xmpDataBackendRequest(url, (canShowImage, xmpResultModel) => resolve(canShowImage ? xmpResultModel : null));
+            });
+        },
+
+        /**
+         * Finds the file action which would have been the default action for
+         * this context had our own action not claimed it, and executes it.
+         * Mirrors the selection @nextcloud/files' own file list uses
+         * (enabled, non-download, default action with the lowest order).
+         * @param {ActionContextSingle} actionContextSingle The action context
+         * @returns {Promise<boolean|null>}
+         */
+        _execFallbackAction: async function (actionContextSingle) {
+            const fallbackAction = getFileActions()
+                .filter(action => action.id !== this._imageActionId
+                    && action.id !== 'download'
+                    && !!action.default
+                    && (action.enabled === undefined || action.enabled(actionContextSingle)))
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))[0];
+
+            if (fallbackAction) {
+                return await fallbackAction.exec(actionContextSingle);
+            }
+
+            // No other action wants this file either. This mirrors what
+            // @nextcloud/files' own file list does when it finds no default
+            // action at all: open the details panel instead of doing
+            // nothing.
+            window.OCP.Files.Router.goToRoute(
+                null,
+                window.OCP.Files.Router.params,
+                { ...window.OCP.Files.Router.query, openfile: undefined, opendetails: '' },
+                true,
+            );
+            return null;
         },
 
         _legacyActionHandlerImage: function (fileName, context) {
@@ -103,7 +185,7 @@ import { showError } from '@nextcloud/dialogs'
          */
         _getAction: function () {
             return {
-                id: "photosphereviewer-image",
+                id: this._imageActionId,
                 exec: this._actionHandler.bind(this),
                 displayName: () => "View in PhotoSphereViewer",
                 iconSvgInline: () => "",
@@ -112,21 +194,24 @@ import { showError } from '@nextcloud/dialogs'
                 enabled: (actionContext) => {
                     /** @var INode[] */
                     const nodeArray = actionContext?.nodes || [];
-                    const enabled = nodeArray.every(node => {
+                    return nodeArray.every(node => {
+                        if ((node.permissions & Permission.READ) === 0 || node.mime !== this._photoShpereMimeType) {
+                            return false;
+                        }
+
                         const meta = this._getDavXmpMeta(node);
-                        return (node.permissions & Permission.READ) !== 0
-                            && node.mime === this._photoShpereMimeType
-                            && meta
-                            && (meta.usePanoramaViewer === true || meta.usePanoramaViewer === 1);
+
+                        // Pre-generated metadata is optional: a node whose
+                        // metadata was never computed ahead of time (no DAV
+                        // property value) is claimed here too, and resolved
+                        // on demand by _actionHandler. Only metadata which
+                        // explicitly says "not a photosphere" rules the
+                        // action out already, avoiding an unnecessary
+                        // roundtrip on click for files we already know
+                        // about.
+                        return meta === null || meta === undefined
+                            || meta.usePanoramaViewer === true || meta.usePanoramaViewer === 1;
                     });
-
-                    // Notify user if we would show a Photosphere but WebGL/WebGL2 is not supported
-                    if (enabled && !PhotosphereViewerFunctions.isWebGl2Supported()) {
-                        showError(t('files_photospheres', "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings."));
-                        return false;
-                    }
-
-                    return enabled;
                 },
             };
         },
@@ -376,37 +461,41 @@ import { showError } from '@nextcloud/dialogs'
         },
 
         _xmpDataBackendRequest: function (url, callback) {
-            fetch(url).then(r => r.json()).then(function (serverResponse) {
-                if (!serverResponse.success) {
-                    if (serverResponse.message) {
-                        showError(t('files_photospheres', 'An error occured while trying to read xmp-data: ') + serverResponse.message);
-                    }
-                    else{
-                        showError(t('files_photospheres', 'An unknown error occured while trying to read xmp-data.'));
-                    }
-                    PhotosphereViewerFunctions.showLoader(false);
-                    callback(false, null);
-                    return;
-                }
-                if (serverResponse.data &&
-                    typeof (serverResponse.data) === 'object' &&
-                    serverResponse.data.usePanoramaViewer) {
-                    // Its a photosphere but now
-                    // check WebGL2 support in browser, otherwise
-                    // the viewer can't be rendered
-                    if (!PhotosphereViewerFunctions.isWebGl2Supported()) {
-                        showError(t('files_photospheres', "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings."));
+            fetch(url)
+                .then(r => r.json())
+                .then(function (serverResponse) {
+                    if (!serverResponse.success) {
+                        if (serverResponse.message) {
+                            showError(t('files_photospheres', 'An error occured while trying to read xmp-data: ') + serverResponse.message);
+                        }
+                        else{
+                            showError(t('files_photospheres', 'An unknown error occured while trying to read xmp-data.'));
+                        }
                         PhotosphereViewerFunctions.showLoader(false);
+                        callback(false, null);
                         return;
                     }
-                    callback(true, serverResponse.data);
-                    return;
-                }
-                callback(false, null);
-            })
-                .fail(function (jqXHR, textStatus, errorThrown) {
-                    showError(t('files_photospheres', 'An error occured while trying to read xmp-data: ') + errorThrown);
+                    if (serverResponse.data &&
+                        typeof (serverResponse.data) === 'object' &&
+                        serverResponse.data.usePanoramaViewer) {
+                        // Its a photosphere but now
+                        // check WebGL2 support in browser, otherwise
+                        // the viewer can't be rendered
+                        if (!PhotosphereViewerFunctions.isWebGl2Supported()) {
+                            showError(t('files_photospheres', "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings."));
+                            PhotosphereViewerFunctions.showLoader(false);
+                            callback(false, null);
+                            return;
+                        }
+                        callback(true, serverResponse.data);
+                        return;
+                    }
+                    callback(false, null);
+                })
+                .catch(function (error) {
+                    showError(t('files_photospheres', 'An error occured while trying to read xmp-data: ') + error);
                     PhotosphereViewerFunctions.showLoader(false);
+                    callback(false, null);
                 });
         },
 

@@ -126,4 +126,35 @@ class XmpResultModelTest extends TestCase {
 		$this->assertEquals($data['croppingConfig']['posePitch'], $xmpModel->croppingConfig->posePitch);
 		$this->assertEquals($data['croppingConfig']['poseRoll'], $xmpModel->croppingConfig->poseRoll);
 	}
+
+	public function testFromArray_UsesDefaultsForMissingValues() {
+		$xmpModel = XmpResultModel::fromArray([]);
+
+		$this->assertFalse($xmpModel->usePanoramaViewer);
+		$this->assertFalse($xmpModel->containsCroppingConfig);
+		$this->assertInstanceOf(CroppingConfigModel::class, $xmpModel->croppingConfig);
+		$this->assertNull($xmpModel->croppingConfig->fullWidth);
+	}
+
+	public function testToArray_IsInverseOfFromArray() {
+		// This is the representation which is stored through the
+		// files metadata API, see XmpMetadataListener
+		$data = [
+			'usePanoramaViewer' => true,
+			'containsCroppingConfig' => true,
+			'croppingConfig' => [
+				'fullWidth' => 1,
+				'fullHeight' => 2,
+				'croppedWidth' => 3,
+				'croppedHeight' => 4,
+				'croppedX' => 5,
+				'croppedY' => 6,
+				'poseHeading' => 7.5,
+				'posePitch' => 8.5,
+				'poseRoll' => 9.5,
+			]
+		];
+
+		$this->assertEquals($data, XmpResultModel::fromArray($data)->toArray());
+	}
 }
