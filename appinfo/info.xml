@@ -24,6 +24,9 @@
     <types>
 		  <dav/>
 	  </types>
+    <commands>
+      <command>OCA\Files_PhotoSpheres\Command\GenerateMetadataCommand</command>
+    </commands>
     <sabre>
       <plugins>
         <plugin>OCA\Files_PhotoSpheres\Sabre\PhotosphereViewerPlugin</plugin>

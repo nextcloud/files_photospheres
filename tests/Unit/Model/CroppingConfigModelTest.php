@@ -51,4 +51,34 @@ class CroppingConfigModelTest extends TestCase {
 		$this->assertEquals(8, $croppingConfig->posePitch);
 		$this->assertEquals(9, $croppingConfig->poseRoll);
 	}
+
+	public function testFromArray_UsesNullForMissingValues() {
+		$croppingConfig = CroppingConfigModel::fromArray([]);
+
+		$this->assertNull($croppingConfig->fullWidth);
+		$this->assertNull($croppingConfig->fullHeight);
+		$this->assertNull($croppingConfig->croppedWidth);
+		$this->assertNull($croppingConfig->croppedHeight);
+		$this->assertNull($croppingConfig->croppedX);
+		$this->assertNull($croppingConfig->croppedY);
+		$this->assertNull($croppingConfig->poseHeading);
+		$this->assertNull($croppingConfig->posePitch);
+		$this->assertNull($croppingConfig->poseRoll);
+	}
+
+	public function testToArray_IsInverseOfFromArray() {
+		$data = [
+			'fullWidth' => 1,
+			'fullHeight' => 2,
+			'croppedWidth' => 3,
+			'croppedHeight' => 4,
+			'croppedX' => 5,
+			'croppedY' => 6,
+			'poseHeading' => 7.5,
+			'posePitch' => 8.5,
+			'poseRoll' => 9.5,
+		];
+
+		$this->assertEquals($data, CroppingConfigModel::fromArray($data)->toArray());
+	}
 }
