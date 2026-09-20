@@ -24,14 +24,14 @@ declare(strict_types=1);
 
 namespace OCA\Files_PhotoSpheres\Tests\Unit\Sabre;
 
-use OCA\DAV\Connector\Sabre\Directory;
 use OCA\DAV\Connector\Sabre\File;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
 use OCA\Files_PhotoSpheres\Sabre\PhotosphereViewerPlugin;
-use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
 use OCP\Files\FileInfo;
-use OCP\ICache;
-use OCP\ICacheFactory;
+use OCP\FilesMetadata\Exceptions\FilesMetadataNotFoundException;
+use OCP\FilesMetadata\Exceptions\FilesMetadataTypeException;
+use OCP\FilesMetadata\IFilesMetadataManager;
+use OCP\FilesMetadata\Model\IFilesMetadata;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -40,89 +40,72 @@ use Sabre\DAV\INode;
 use Sabre\DAV\PropFind;
 use Sabre\DAV\Server;
 
+/**
+ * Since the metadata is computed ahead of time by the XmpMetadataListener,
+ * there is no directory pre-scan and no ad-hoc caching left to test here:
+ * the plugin is a read-only lookup against IFilesMetadataManager.
+ * See XmpMetadataListenerTest for the code which computes and stores the
+ * metadata.
+ */
 class PhotosphereViewerPluginTest extends TestCase {
 	private const META_PROP = '{http://nextcloud.org/ns}files-photospheres-xmp-metadata';
 
-	private array $cacheArray;
-	private ICacheFactory|MockObject $cacheFactory;
+	private IFilesMetadataManager|MockObject $filesMetadataManager;
+	private LoggerInterface|MockObject $logger;
+	private PhotosphereViewerPlugin $plugin;
 
 	protected function setUp(): void {
-		$this->cacheArray = [];
-
-		$cacheFake = $this->createMock(ICache::class);
-		$cacheFake->expects($this->any())
-			->method('get')
-			->willReturnCallback(function ($key) {
-				return $this->cacheArray[$key] ?? null;
-			});
-		$cacheFake->expects($this->any())
-			->method('set')
-			->willReturnCallback(function ($key, $value) {
-				$this->cacheArray[$key] = $value;
-			});
-
-		$this->cacheFactory = $this->createMock(ICacheFactory::class);
-		$this->cacheFactory->expects($this->any())
-			->method('createLocal')
-			->with(
-				$this->equalTo(PhotosphereViewerPlugin::class)
-			)
-			->willReturn($cacheFake);
+		parent::setUp();
+		$this->filesMetadataManager = $this->createMock(IFilesMetadataManager::class);
+		$this->logger = $this->createMock(LoggerInterface::class);
+		$this->plugin = new PhotosphereViewerPlugin($this->filesMetadataManager, $this->logger);
 	}
 
 	public function testInit() {
-		$plugin = new PhotosphereViewerPlugin(
-			$this->createMock(IXmpDataReader::class),
-			$this->cacheFactory,
-			$this->createMock(LoggerInterface::class)
-		);
 		$server = $this->createMock(Server::class);
 		$server->expects($this->once())
 			->method('on')
 			->with(
 				$this->equalTo('propFind'),
-				$this->equalTo([$plugin, 'handleGetProperties'])
+				$this->equalTo([$this->plugin, 'handleGetProperties'])
 			);
-		$plugin->initialize($server);
+
+		$this->plugin->initialize($server);
 	}
 
-	public function testHandleGetProperties_DoesNothingOnNonFileAndNonDirectory() {
-		$logger = $this->createMock(LoggerInterface::class);
-		$plugin = new PhotosphereViewerPlugin(
-			$this->createMock(IXmpDataReader::class),
-			$this->cacheFactory,
-			$logger
-		);
+	public function testHandleGetProperties_DoesNothingOnNonFile() {
 		$propFind = $this->createMock(PropFind::class);
 		$propFind->expects($this->never())
-			->method('getStatus')
-			->with(
-				$this->equalTo(self::META_PROP)
-			)
-			->willReturn(200);
-		$propFind->expects($this->never())
-			->method('getDepth')
-			->willReturn(1);
+			->method('getStatus');
 		$propFind->expects($this->never())
 			->method('handle');
-		$logger->expects($this->once())
+		$this->logger->expects($this->once())
 			->method('debug')
 			->with(
-				$this->equalTo('{node}: Not a file or directory or no XMP Metadata requested'),
+				$this->equalTo('{node}: Not a file or no XMP Metadata requested'),
 				['node' => 'non-file-non-directory']
 			);
 
 		$node = new NonFileNonDirectory();
-		$plugin->handleGetProperties($propFind, $node);
+		$this->plugin->handleGetProperties($propFind, $node);
+	}
+
+	public function testHandleGetProperties_DoesNothingOnDirectory() {
+		$propFind = $this->createMock(PropFind::class);
+		$propFind->expects($this->never())
+			->method('getStatus');
+		$propFind->expects($this->never())
+			->method('handle');
+
+		$node = $this->createMock(ICollection::class);
+		$node->expects($this->once())
+			->method('getName')
+			->willReturn('testDirectory');
+
+		$this->plugin->handleGetProperties($propFind, $node);
 	}
 
 	public function testHandleGetProperties_DoesNothingOnXmpMetaNotRequested() {
-		$logger = $this->createMock(LoggerInterface::class);
-		$plugin = new PhotosphereViewerPlugin(
-			$this->createMock(IXmpDataReader::class),
-			$this->cacheFactory,
-			$logger
-		);
 		$propFind = $this->createMock(PropFind::class);
 		$propFind->expects($this->once())
 			->method('getStatus')
@@ -131,322 +114,199 @@ class PhotosphereViewerPluginTest extends TestCase {
 			)
 			->willReturn(null);
 		$propFind->expects($this->never())
-			->method('getDepth')
-			->willReturn(1);
-		$propFind->expects($this->never())
 			->method('handle');
-		$logger->expects($this->once())
-			->method('debug')
-			->with(
-				$this->equalTo('{node}: Not a file or directory or no XMP Metadata requested'),
-				['node' => 'testDirectory']
-			);
-		$node = $this->createMock(Directory::class);
+
+		$node = $this->createMock(File::class);
 		$node->expects($this->once())
 			->method('getName')
-			->willReturn('testDirectory');
+			->willReturn('testFile.jpg');
 
-		$plugin->handleGetProperties($propFind, $node);
+		$this->plugin->handleGetProperties($propFind, $node);
 	}
 
-	public function testHandleGetProperties_RegistersXmpMetaForSingleFile() {
-		$logger = $this->createMock(LoggerInterface::class);
-		$xmpReader = $this->createMock(IXmpDataReader::class);
-		$plugin = new PhotosphereViewerPlugin(
-			$xmpReader,
-			$this->cacheFactory,
-			$logger
-		);
-		$propFind = $this->createMock(PropFind::class);
-		$propFind->expects($this->once())
-			->method('getStatus')
-			->with(
-				$this->equalTo(self::META_PROP)
-			)
-			->willReturn(200);
-		$propFind->expects($this->never())
-			->method('getDepth')
-			->willReturn(1);
-		$propFindHandleFunction = null;
-		$propFind->expects($this->once())
-			->method('handle')
-			->with(
-				$this->equalTo(self::META_PROP),
-				$this->callback(function ($propFindHandleFunctionCall) use (&$propFindHandleFunction) {
-					$propFindHandleFunction = $propFindHandleFunctionCall;
-					return true;
-				})
-			);
-
-		$ocFile = $this->createMock(\OC\Files\Node\File::class);
-		$fileInfo = $this->createMock(FileInfo::class);
-		$fileInfo->expects($this->exactly(2))
-			->method('getMimetype')
-			->willReturn('image/jpeg');
-		$node = $this->createMock(File::class);
-		$node->expects($this->exactly(2))
-			->method('getId')
-			->willReturn(42);
-		$node->expects($this->exactly(2))
-			->method('getFileInfo')
-			->willReturn($fileInfo);
-		$node->expects($this->once())
-			->method('getNode')
-			->willReturn($ocFile);
-
-		$plugin->handleGetProperties($propFind, $node);
-
-		$this->assertNotNull($propFindHandleFunction);
-		$this->assertIsCallable($propFindHandleFunction);
-
-		$xmpReader->expects($this->once()) // We call 2 times, but it should only be called once (cache)
-			->method('readXmpDataFromFileObject')
-			->with(
-				$this->equalTo($ocFile)
-			);
-
-		// This should be called by the propFind->handle() call
-		// and should read the XMP data. We use the same node
-		// twice, since we're lazy :-)
-		$propFindHandleFunction($node);
-
-		// Second call should be cached
-		$propFindHandleFunction($node);
-	}
-
-	public function testHandleGetProperties_SkipsNonJpgSingleFile() {
-		$logger = $this->createMock(LoggerInterface::class);
-		$xmpReader = $this->createMock(IXmpDataReader::class);
-		$plugin = new PhotosphereViewerPlugin(
-			$xmpReader,
-			$this->cacheFactory,
-			$logger
-		);
-		$propFind = $this->createMock(PropFind::class);
-		$propFind->expects($this->once())
-			->method('getStatus')
-			->with(
-				$this->equalTo(self::META_PROP)
-			)
-			->willReturn(200);
-		$propFind->expects($this->never())
-			->method('getDepth')
-			->willReturn(1);
-		$propFindHandleFunction = null;
-		$propFind->expects($this->once())
-			->method('handle')
-			->with(
-				$this->equalTo(self::META_PROP),
-				$this->callback(function ($propFindHandleFunctionCall) use (&$propFindHandleFunction) {
-					$propFindHandleFunction = $propFindHandleFunctionCall;
-					return true;
-				})
-			);
-
+	public function testHandleGetProperties_SkipsNonJpgFile() {
 		$fileInfo = $this->createMock(FileInfo::class);
 		$fileInfo->expects($this->once())
 			->method('getMimetype')
-			->willReturn('application/xml'); // This should be skipped, XMP reader should not be called
+			->willReturn('application/xml');
 		$node = $this->createMock(File::class);
-		$node->expects($this->once())
-			->method('getId')
-			->willReturn(42);
-		$node->expects($this->once())
-			->method('getFileInfo')
+		$node->method('getFileInfo')
 			->willReturn($fileInfo);
-		$node->expects($this->once())
-			->method('getName')
+		$node->method('getName')
 			->willReturn('myTestfile42');
 
-		$plugin->handleGetProperties($propFind, $node);
+		$handler = $this->registerAndCapture($node);
 
-		$this->assertNotNull($propFindHandleFunction);
-		$this->assertIsCallable($propFindHandleFunction);
-
-		$xmpReader->expects($this->never())
-			->method('readXmpDataFromFileObject');
-		$logger->expects($this->once())
+		$this->filesMetadataManager->expects($this->never())
+			->method('getMetadata');
+		$this->logger->expects($this->once())
 			->method('debug')
 			->with(
 				$this->equalTo('Skipping file {file}: it\'s not a jpeg'),
 				['file' => 'myTestfile42']
 			);
 
-		$propFindHandleFunction($node);
+		$this->assertNull($handler());
 	}
 
 	public function testHandleGetProperties_SkipsAndLogsWarningOnFileWithoutId() {
-		$logger = $this->createMock(LoggerInterface::class);
-		$xmpReader = $this->createMock(IXmpDataReader::class);
-		$plugin = new PhotosphereViewerPlugin(
-			$xmpReader,
-			$this->cacheFactory,
-			$logger
-		);
-		$propFind = $this->createMock(PropFind::class);
-		$propFind->expects($this->once())
-			->method('getStatus')
-			->with(
-				$this->equalTo(self::META_PROP)
-			)
-			->willReturn(200);
-		$propFind->expects($this->never())
-			->method('getDepth')
-			->willReturn(1);
-		$propFindHandleFunction = null;
-		$propFind->expects($this->once())
-			->method('handle')
-			->with(
-				$this->equalTo(self::META_PROP),
-				$this->callback(function ($propFindHandleFunctionCall) use (&$propFindHandleFunction) {
-					$propFindHandleFunction = $propFindHandleFunctionCall;
-					return true;
-				})
-			);
-
-		$node = $this->createMock(File::class);
-		$node->expects($this->once())
-			->method('getId')
-			->willReturn(null);
-		$node->expects($this->once())
-			->method('getName')
+		$node = $this->createJpegNode(null);
+		$node->method('getName')
 			->willReturn('myTestfile42');
 
-		$plugin->handleGetProperties($propFind, $node);
+		$handler = $this->registerAndCapture($node);
 
-		$this->assertNotNull($propFindHandleFunction);
-		$this->assertIsCallable($propFindHandleFunction);
-
-		$xmpReader->expects($this->never())
-			->method('readXmpDataFromFileObject');
-		$logger->expects($this->once())
+		$this->filesMetadataManager->expects($this->never())
+			->method('getMetadata');
+		$this->logger->expects($this->once())
 			->method('warning')
 			->with(
 				$this->equalTo('File {file} has no id'),
 				['file' => 'myTestfile42']
 			);
 
-		$propFindHandleFunction($node);
+		$this->assertNull($handler());
 	}
 
-	public function testHandleGetProperties_CreatesDirectoryCache() {
-		$logger = $this->createMock(LoggerInterface::class);
-		$xmpReader = $this->createMock(IXmpDataReader::class);
-		$plugin = new PhotosphereViewerPlugin(
-			$xmpReader,
-			$this->cacheFactory,
-			$logger
-		);
-		$propFind = $this->createMock(PropFind::class);
-		$propFind->expects($this->atLeastOnce())
-			->method('getStatus')
+	public function testHandleGetProperties_ReturnsNullIfNoMetadataStoredYet() {
+		$node = $this->createJpegNode(42);
+		$handler = $this->registerAndCapture($node);
+
+		$this->filesMetadataManager->expects($this->once())
+			->method('getMetadata')
 			->with(
-				$this->equalTo(self::META_PROP)
+				$this->equalTo(42),
+				$this->equalTo(false) // Never generate on-the-fly, that would read the file again
 			)
-			->willReturn(200);
-		$propFind->expects($this->atLeastOnce())
-			->method('getDepth')
-			->willReturn(1);
+			->willThrowException(new FilesMetadataNotFoundException());
 
-		$jpgInfo = $this->createMock(FileInfo::class);
-		$jpgInfo->expects($this->atLeastOnce())
-			->method('getMimetype')
-			->willReturn('image/jpeg');
-		$file1 = $this->createMock(File::class);
-		$file1->expects($this->atLeastOnce())
-			->method('getId')
-			->willReturn(42);
-		$file1->expects($this->atLeastOnce())
-			->method('getFileInfo')
-			->willReturn($jpgInfo);
-		$file2 = $this->createMock(File::class);
-		$file2->expects($this->atLeastOnce())
-			->method('getId')
-			->willReturn(43);
-		$file2->expects($this->atLeastOnce())
-			->method('getFileInfo')
-			->willReturn($jpgInfo);
-		$dir1 = $this->createMock(Directory::class);
-
-		$node = $this->createMock(ICollection::class);
-		$node->expects($this->atLeastOnce())
-			->method('getChildren')
-			->willReturn([$file1, $file2, $dir1]);
-
-		$xmpReader->expects($this->exactly(2)) // 2 reads, one per file. Should be cached
-			->method('readXmpDataFromFileObject');
-
-		$plugin->handleGetProperties($propFind, $node);
-		$plugin->handleGetProperties($propFind, $node);
+		$this->assertNull($handler());
 	}
 
-	public function testReturnsXmpResultModel_IfRedisCacheReturnsArray() { // #137
-		$this->cacheArray = [
-				'42' => [
-					'usePanoramaViewer' => false,
-					'containsCroppingConfig' => true,
-					'croppingConfig' => [
-						'fullWidth' => 1,
-						'fullHeight' => 2,
-						'croppedWidth' => 3,
-						'croppedHeight' => 4,
-						'croppedX' => 5,
-						'croppedY' => 6,
-						'poseHeading' => 7,
-						'posePitch' => 8,
-						'poseRoll' => 9,
-					]
+	public function testHandleGetProperties_ReturnsNullIfMetadataDoesNotContainOurKey() {
+		$node = $this->createJpegNode(42);
+		$handler = $this->registerAndCapture($node);
+
+		$metadata = $this->createMock(IFilesMetadata::class);
+		$metadata->expects($this->once())
+			->method('hasKey')
+			->with(
+				$this->equalTo(PhotosphereViewerPlugin::METADATA_KEY)
+			)
+			->willReturn(false);
+		$metadata->expects($this->never())
+			->method('getArray');
+		$this->filesMetadataManager->method('getMetadata')
+			->willReturn($metadata);
+
+		$this->assertNull($handler());
+	}
+
+	public function testHandleGetProperties_ReturnsStoredMetadata() {
+		$node = $this->createJpegNode(42);
+		$handler = $this->registerAndCapture($node);
+
+		$metadata = $this->createMock(IFilesMetadata::class);
+		$metadata->method('hasKey')
+			->with(
+				$this->equalTo(PhotosphereViewerPlugin::METADATA_KEY)
+			)
+			->willReturn(true);
+		$metadata->method('getArray')
+			->with(
+				$this->equalTo(PhotosphereViewerPlugin::METADATA_KEY)
+			)
+			->willReturn([
+				'usePanoramaViewer' => true,
+				'containsCroppingConfig' => true,
+				'croppingConfig' => [
+					'fullWidth' => 1,
+					'fullHeight' => 2,
+					'croppedWidth' => 3,
+					'croppedHeight' => 4,
+					'croppedX' => 5,
+					'croppedY' => 6,
+					'poseHeading' => 7,
+					'posePitch' => 8,
+					'poseRoll' => 9,
 				]
-			];
-		$logger = $this->createMock(LoggerInterface::class);
-		$xmpReader = $this->createMock(IXmpDataReader::class);
+			]);
+		$this->filesMetadataManager->method('getMetadata')
+			->willReturn($metadata);
 
-		$plugin = new PhotosphereViewerPlugin(
-			$xmpReader,
-			$this->cacheFactory,
-			$logger
-		);
+		$result = $handler();
+
+		$this->assertInstanceOf(XmpResultModel::class, $result);
+		$this->assertTrue($result->usePanoramaViewer);
+		$this->assertTrue($result->containsCroppingConfig);
+		$this->assertEquals(1, $result->croppingConfig->fullWidth);
+		$this->assertEquals(9, $result->croppingConfig->poseRoll);
+	}
+
+	public function testHandleGetProperties_ReturnsNullOnMalformedMetadata() {
+		$node = $this->createJpegNode(42);
+		$node->method('getName')
+			->willReturn('myTestfile42');
+		$handler = $this->registerAndCapture($node);
+
+		$metadata = $this->createMock(IFilesMetadata::class);
+		$metadata->method('hasKey')
+			->willReturn(true);
+		$metadata->method('getArray')
+			->willThrowException(new FilesMetadataTypeException('not an array'));
+		$this->filesMetadataManager->method('getMetadata')
+			->willReturn($metadata);
+
+		$this->logger->expects($this->once())
+			->method('warning')
+			->with(
+				$this->equalTo('Malformed XMP metadata for file {file}: {message}'),
+				$this->anything()
+			);
+
+		$this->assertNull($handler());
+	}
+
+	/**
+	 * Registers the plugin for the given node and returns the closure it
+	 * handed to PropFind::handle(), so that the caller can invoke it
+	 * directly. The node is captured at registration time, so it has to be
+	 * fully set up before calling this.
+	 */
+	private function registerAndCapture(INode $node) : callable {
 		$propFind = $this->createMock(PropFind::class);
-		$propFind->expects($this->once())
-			->method('getStatus')
+		$propFind->method('getStatus')
 			->with(
 				$this->equalTo(self::META_PROP)
 			)
 			->willReturn(200);
-		$propFind->expects($this->never())
-			->method('getDepth')
-			->willReturn(1);
-		$propFindHandleFunction = null;
+		$handler = null;
 		$propFind->expects($this->once())
 			->method('handle')
 			->with(
 				$this->equalTo(self::META_PROP),
-				$this->callback(function ($propFindHandleFunctionCall) use (&$propFindHandleFunction) {
-					$propFindHandleFunction = $propFindHandleFunctionCall;
+				$this->callback(function ($callback) use (&$handler) {
+					$handler = $callback;
 					return true;
 				})
 			);
 
+		$this->plugin->handleGetProperties($propFind, $node);
+
+		$this->assertIsCallable($handler);
+		return $handler;
+	}
+
+	private function createJpegNode(?int $id) : File|MockObject {
 		$fileInfo = $this->createMock(FileInfo::class);
-		$fileInfo
-			->method('getMimetype')
+		$fileInfo->method('getMimetype')
 			->willReturn('image/jpeg');
 		$node = $this->createMock(File::class);
-		$node
-			->method('getId')
-			->willReturn(42);
-		$node
-			->method('getFileInfo')
+		$node->method('getFileInfo')
 			->willReturn($fileInfo);
-
-		$plugin->handleGetProperties($propFind, $node);
-
-		$this->assertNotNull($propFindHandleFunction);
-		$this->assertIsCallable($propFindHandleFunction);
-
-		$result = $propFindHandleFunction($node);
-
-		$this->assertInstanceOf(XmpResultModel::class, $result);
+		$node->method('getId')
+			->willReturn($id);
+		return $node;
 	}
 }
 

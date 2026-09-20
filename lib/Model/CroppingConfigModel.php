@@ -64,15 +64,29 @@ class CroppingConfigModel {
 
 	public static function fromArray(array $data) {
 		$croppingConfig = new CroppingConfigModel();
-		$croppingConfig->fullWidth = $data['fullWidth'];
-		$croppingConfig->fullHeight = $data['fullHeight'];
-		$croppingConfig->croppedWidth = $data['croppedWidth'];
-		$croppingConfig->croppedHeight = $data['croppedHeight'];
-		$croppingConfig->croppedX = $data['croppedX'];
-		$croppingConfig->croppedY = $data['croppedY'];
-		$croppingConfig->poseHeading = $data['poseHeading'];
-		$croppingConfig->posePitch = $data['posePitch'];
-		$croppingConfig->poseRoll = $data['poseRoll'];
+		$croppingConfig->fullWidth = $data['fullWidth'] ?? null;
+		$croppingConfig->fullHeight = $data['fullHeight'] ?? null;
+		$croppingConfig->croppedWidth = $data['croppedWidth'] ?? null;
+		$croppingConfig->croppedHeight = $data['croppedHeight'] ?? null;
+		$croppingConfig->croppedX = $data['croppedX'] ?? null;
+		$croppingConfig->croppedY = $data['croppedY'] ?? null;
+		$croppingConfig->poseHeading = $data['poseHeading'] ?? null;
+		$croppingConfig->posePitch = $data['posePitch'] ?? null;
+		$croppingConfig->poseRoll = $data['poseRoll'] ?? null;
 		return $croppingConfig;
+	}
+
+	public function toArray(): array {
+		return [
+			'fullWidth' => $this->fullWidth,
+			'fullHeight' => $this->fullHeight,
+			'croppedWidth' => $this->croppedWidth,
+			'croppedHeight' => $this->croppedHeight,
+			'croppedX' => $this->croppedX,
+			'croppedY' => $this->croppedY,
+			'poseHeading' => $this->poseHeading,
+			'posePitch' => $this->posePitch,
+			'poseRoll' => $this->poseRoll
+		];
 	}
 }

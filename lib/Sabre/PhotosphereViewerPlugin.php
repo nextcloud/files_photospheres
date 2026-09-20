@@ -26,11 +26,10 @@ namespace OCA\Files_PhotoSpheres\Sabre;
 
 use OCA\DAV\Connector\Sabre\File;
 use OCA\Files_PhotoSpheres\Model\XmpResultModel;
-use OCA\Files_PhotoSpheres\Service\Helper\IXmpDataReader;
-use OCP\ICache;
-use OCP\ICacheFactory;
+use OCP\FilesMetadata\Exceptions\FilesMetadataNotFoundException;
+use OCP\FilesMetadata\Exceptions\FilesMetadataTypeException;
+use OCP\FilesMetadata\IFilesMetadataManager;
 use Psr\Log\LoggerInterface;
-use Sabre\DAV\ICollection;
 use Sabre\DAV\IFile;
 use Sabre\DAV\INode;
 use Sabre\DAV\PropFind;
@@ -40,22 +39,50 @@ use Sabre\DAV\ServerPlugin;
 /**
  * class PhotosphereViewerPlugin
  *
+ * The metadata is, where available, computed ahead of time by
+ * {@see \OCA\Files_PhotoSpheres\Listener\XmpMetadataListener} (on upload/edit)
+ * or by an administrator via `occ files_photospheres:generate-metadata`, and
+ * stored through {@see IFilesMetadataManager}. This plugin only ever reads
+ * the already computed value: it never opens a file itself, so answering a
+ * PROPFIND never costs any file I/O, no matter how many jpegs the directory
+ * contains.
+ *
+ * Pre-generated metadata is optional, not required: for a file whose
+ * metadata was never computed ahead of time, this plugin simply reports
+ * "unknown" (no property value), and the frontend falls back to an
+ * on-demand, single-file check instead (see
+ * {@see \OCA\Files_PhotoSpheres\Controller\UserfilesController::getXmpData()}).
+ *
  * @package OCA\Files_PhotoSpheres\Sabre;
  */
 class PhotosphereViewerPlugin extends ServerPlugin {
 	// Constants for init.js
 	private const PROPERTY_XMP_METADATA = '{http://nextcloud.org/ns}files-photospheres-xmp-metadata';
 
-	private ?Server $server = null;
-	private IXmpDataReader $xmpDataReader;
-	private ICache $cache;
-	private LoggerInterface $logger;
-	//private array $xmpMetadataCache = []; // fileId => xmpMetadata
+	/**
+	 * Key the XMP metadata is stored under in the files metadata store.
+	 *
+	 * Note there is no explicit registration step for this key (no
+	 * migration/repair step calling IFilesMetadataManager::initMetadata()):
+	 * that call is only mandatory for a key to be exposed through DAV's
+	 * generic files-metadata property mechanism. This plugin serves its own,
+	 * hardcoded DAV property directly (see handleGetProperties() below), so
+	 * it does not need the key to be pre-registered; the files metadata
+	 * store itself registers it lazily the first time a value is actually
+	 * saved under it (see IFilesMetadataManager::saveMetadata()).
+	 *
+	 * @see \OCA\Files_PhotoSpheres\Listener\XmpMetadataListener
+	 * @see \OCA\Files_PhotoSpheres\Service\XmpMetadataStorage
+	 */
+	public const METADATA_KEY = 'files_photospheres_xmp';
 
-	public function __construct(IXmpDataReader $xmpDataReader, ICacheFactory $cacheFactory, LoggerInterface $logger) {
-		$this->xmpDataReader = $xmpDataReader;
+	private ?Server $server = null;
+	private IFilesMetadataManager $filesMetadataManager;
+	private LoggerInterface $logger;
+
+	public function __construct(IFilesMetadataManager $filesMetadataManager, LoggerInterface $logger) {
+		$this->filesMetadataManager = $filesMetadataManager;
 		$this->logger = $logger;
-		$this->cache = $cacheFactory->createLocal(get_class($this));
 	}
 
 	/**
@@ -86,71 +113,56 @@ class PhotosphereViewerPlugin extends ServerPlugin {
 		PropFind $propFind,
 		INode $node,
 	) {
-		if ((!($node instanceof IFile) && !($node instanceof ICollection))
-			|| is_null($propFind->getStatus(self::PROPERTY_XMP_METADATA))) {
-			$this->logger->debug('{node}: Not a file or directory or no XMP Metadata requested', ['node' => $node->getName()]);
+		if (!($node instanceof IFile) || is_null($propFind->getStatus(self::PROPERTY_XMP_METADATA))) {
+			$this->logger->debug('{node}: Not a file or no XMP Metadata requested', ['node' => $node->getName()]);
 			return;
 		}
 
-		// We try to create a cache for the whole directory
-		// so that individual file XMP metadata requests are faster
-		if (($node instanceof ICollection) && $propFind->getDepth() !== 0) {
-			$this->cacheDirectory($node);
-		}
-
 		$propFind->handle(self::PROPERTY_XMP_METADATA, function () use ($node) {
-			return $this->handleGetXmpMetadata($node);
+			return $node instanceof File ? $this->getXmpMetadata($node) : null;
 		});
 	}
 
-	private function handleGetXmpMetadata(INode $node) : ?XmpResultModel {
-		// Cache should be already filled here because the meta request
-		// for the whole directory should have been done before
-		return $node instanceof File ? $this->getXmpMetadataCached($node) : null;
-	}
-
-	private function cacheDirectory(ICollection $directory): void {
-		$this->logger->debug('Start caching directory {dir}', ['dir' => $directory->getName()]);
-		$start = hrtime(true);
-
-		$children = $directory->getChildren();
-
-		foreach ($children as $child) {
-			if ($child instanceof File) {
-				$this->getXmpMetadataCached($child);
-			}
+	private function getXmpMetadata(File $file) : ?XmpResultModel {
+		if ($file->getFileInfo()?->getMimetype() !== 'image/jpeg') {
+			$this->logger->debug('Skipping file {file}: it\'s not a jpeg', ['file' => $file->getName()]);
+			return null;
 		}
 
-		$end = hrtime(true);
-		$eta = $end - $start;
-		$elapsedMs = $eta / 1e+6;
-		$this->logger->debug('Caching directory {dir} done. It took {ms}ms', ['dir' => $directory->getName(), 'ms' => $elapsedMs]);
-	}
-
-	private function getXmpMetadataCached(File $file) : ?XmpResultModel {
-		$id = $file?->getId();
+		$id = $file->getId();
 
 		if ($id === null) {
 			$this->logger->warning('File {file} has no id', ['file' => $file->getName()]);
 			return null;
 		}
 
-		if ($file->getFileInfo()?->getMimetype() !== 'image/jpeg') {
-			$this->logger->debug('Skipping file {file}: it\'s not a jpeg', ['file' => $file->getName()]);
+		try {
+			/*
+				Never generate here: generating would mean reading the file
+				during a PROPFIND again, which is exactly what storing the
+				metadata ahead of time avoids. A file without metadata yet
+				(neither uploaded/edited nor covered by a metadata generating
+				rescan since this version of the app was installed) is simply
+				treated as "not a photosphere" until one of those happens.
+			*/
+			$metadata = $this->filesMetadataManager->getMetadata($id, false);
+		} catch (FilesMetadataNotFoundException $e) {
 			return null;
 		}
 
-		$cachedXmpMeta = $this->cache->get($id);
-
-		if ($cachedXmpMeta !== null) {
-			$this->logger->debug('Cache hit for file {file}', ['file' => $file->getName()]);
-			return $cachedXmpMeta instanceof XmpResultModel ? $cachedXmpMeta : XmpResultModel::fromArray($cachedXmpMeta);
+		if (!$metadata->hasKey(self::METADATA_KEY)) {
+			return null;
 		}
 
-		$this->logger->debug('Cache miss for file {file}', ['file' => $file->getName()]);
-		$xmpMeta = $this->xmpDataReader->readXmpDataFromFileObject($file->getNode());
-		$this->cache->set($id, $xmpMeta);
-
-		return $xmpMeta;
+		try {
+			return XmpResultModel::fromArray($metadata->getArray(self::METADATA_KEY));
+		} catch (FilesMetadataTypeException $e) {
+			$this->logger->warning('Malformed XMP metadata for file {file}: {message}', [
+				'file' => $file->getName(),
+				'message' => $e->getMessage(),
+				'exception' => $e
+			]);
+			return null;
+		}
 	}
 }

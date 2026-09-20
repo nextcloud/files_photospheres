@@ -91,11 +91,16 @@ class XmpDataReader implements IXmpDataReader {
 			return $xmpResultModel;
 		}
 
-		// Check if we should use panoramaviewer
-		$xmpResultModel->usePanoramaViewer = $this->shouldUsePanoramaViewer($fileString);
+		// $posEnd is an offset into the whole $fileString, not into the
+		// substring starting at $posStart, so it has to be adjusted by
+		// $posStart when being used as a length here.
+		$buffer = substr($fileString, $posStart, $posEnd - $posStart + strlen(self::$XMP_END_TAG));
 
-		$bufferCutStart = substr($fileString, $posStart);
-		$buffer = substr($bufferCutStart, 0, $posEnd + 12);
+		// Check if we should use panoramaviewer. This is restricted to the
+		// extracted XMP block itself instead of the whole (up to 800kb) read
+		// buffer, so that a tag occurring outside of the actual XMP data
+		// can't cause a false positive.
+		$xmpResultModel->usePanoramaViewer = $this->shouldUsePanoramaViewer($buffer);
 
 		$this->fillXmpData($buffer, $xmpResultModel);
 

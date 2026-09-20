@@ -35,6 +35,17 @@ class XmpDataReaderTest extends TestCase {
 	/** @var LoggerInterface|MockObject */
 	private $logger;
 
+	/** @var string[] */
+	private $tempFiles = [];
+
+	public function tearDown() : void {
+		foreach ($this->tempFiles as $tempFile) {
+			@unlink($tempFile);
+		}
+		$this->tempFiles = [];
+		parent::tearDown();
+	}
+
 	public function setUp() : void {
 		parent::setUp();
 		$this->logger = $this->createMock(LoggerInterface::class);
@@ -149,6 +160,47 @@ class XmpDataReaderTest extends TestCase {
 
 		$reader = new XmpDataReader($loggerMock, $regexMatcherMock);
 		$reader->readXmpDataFromFileObject($testFile);
+	}
+
+	/**
+	 * Regression test for a buffer slicing bug (see
+	 * XmpDataReader::readXmpDataFromFileSting): a GPano tag which occurs in
+	 * the read buffer but *outside* of the actual <x:xmpmeta>...</x:xmpmeta>
+	 * block must not be taken into account.
+	 */
+	public function testIgnoresPanoramaTagOutsideOfXmpBlock() {
+		$testFile = $this->createTempTestFile(
+			'GPano:ProjectionType="equirectangular"'
+			. str_repeat(' ', 32)
+			. '<x:xmpmeta>no GPano data here</x:xmpmeta>'
+		);
+
+		/** @var XmpResultModel */
+		$xmpResultModel = $this->xmpDataReader->readXmpDataFromFileObject($testFile);
+
+		$this->assertFalse($xmpResultModel->usePanoramaViewer);
+		$this->assertFalse($xmpResultModel->containsCroppingConfig);
+	}
+
+	public function testUsesOnlyTheExtractedXmpBlockForCroppingConfig() {
+		$testFile = $this->createTempTestFile(
+			'GPano:FullPanoWidthPixels="99999"'
+			. str_repeat(' ', 32)
+			. '<x:xmpmeta>GPano:FullPanoWidthPixels="1234"</x:xmpmeta>'
+		);
+
+		/** @var XmpResultModel */
+		$xmpResultModel = $this->xmpDataReader->readXmpDataFromFileObject($testFile);
+
+		$this->assertTrue($xmpResultModel->containsCroppingConfig);
+		$this->assertEquals(1234, $xmpResultModel->croppingConfig->fullWidth);
+	}
+
+	private function createTempTestFile(string $content) : TestFile {
+		$path = tempnam(sys_get_temp_dir(), 'ppv');
+		file_put_contents($path, $content);
+		$this->tempFiles[] = $path;
+		return new TestFile($path);
 	}
 
 	public static function dataProvider_Positive() {
