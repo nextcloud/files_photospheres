@@ -72,7 +72,14 @@ jobs:
       run: tar -xf tmp/${{ env.APP_NAME }}/build/artifacts/appstore/${{ env.APP_NAME }}.tar.gz -C apps/
 
     - name: Build viewer app
-      run: npm ci && npm run build
+      # npm ci here (not npm install) intermittently fails with an EUSAGE
+      # "lock file ... does not satisfy" error: viewer's own package-lock.json
+      # can drift from package.json via an optional peer dependency bump
+      # (e.g. @nextcloud/dialogs requiring @nextcloud/files as an optional
+      # peer) that npm ci's strict lockfile-sync check rejects but a normal
+      # resolve tolerates. We don't control viewer's lockfile, so install
+      # leniently instead of failing our own CI on their drift.
+      run: npm install && npm run build
       working-directory: apps/viewer
       
     - name: Set up and run Nextcloud server
