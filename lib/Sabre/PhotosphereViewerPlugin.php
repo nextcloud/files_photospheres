@@ -140,7 +140,8 @@ class PhotosphereViewerPlugin extends ServerPlugin {
 			return null;
 		}
 
-		$cachedXmpMeta = $this->cache->get($id);
+		$cacheKey = (string)$id;
+		$cachedXmpMeta = $this->cache->get($cacheKey);
 
 		if ($cachedXmpMeta !== null) {
 			$this->logger->debug('Cache hit for file {file}', ['file' => $file->getName()]);
@@ -149,7 +150,7 @@ class PhotosphereViewerPlugin extends ServerPlugin {
 
 		$this->logger->debug('Cache miss for file {file}', ['file' => $file->getName()]);
 		$xmpMeta = $this->xmpDataReader->readXmpDataFromFileObject($file->getNode());
-		$this->cache->set($id, $xmpMeta);
+		$this->cache->set($cacheKey, $xmpMeta);
 
 		return $xmpMeta;
 	}
