@@ -1,6 +1,9 @@
 { "translations": {
     "Photo Sphere Viewer" : "Photo Sphere Viser",
     "Enables viewing of google photosphere images" : "Aktiverer visning af google photosphere billeder",
-    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Muliggør visning af Google Photosphere-billeder af\nintegration af photo-sphere-viewer.js-komponenten\nind i din nextcloud-instans."
+    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Muliggør visning af Google Photosphere-billeder af\nintegration af photo-sphere-viewer.js-komponenten\nind i din nextcloud-instans.",
+    "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings." : "Din browser understøtter ikke WebGL/WebGL2. Aktivér understøttelse af WebGL/WebGL2 i browserens indstillinger.",
+    "An error occured while trying to read xmp-data: " : "Der opstod en fejl under læsning af XMP-data: ",
+    "An unknown error occured while trying to read xmp-data." : "Der opstod en ukendt fejl under læsning af XMP-data."
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }
