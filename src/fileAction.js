@@ -50,7 +50,11 @@ import { showError } from '@nextcloud/dialogs'
         _showImageCalled: false,
 
         /**
-         * Actionhandler for image-click
+         * Actionhandler for image-click.
+         * Delegates to the Nextcloud Viewer (OCA.Viewer) when available so
+         * that the photosphere is rendered inside the viewer modal via the
+         * registered PhotoSphereViewer Vue component (see viewerHandler.js).
+         * Falls back to the legacy iframe approach when OCA.Viewer is absent.
          * @param {ActionContextSingle} actionContextSingle The action context
          */
         _actionHandler: function(actionContextSingle) {
@@ -59,8 +63,15 @@ import { showError } from '@nextcloud/dialogs'
             const dir = actionContextSingle.folder.path;
 
             const fileName = node.path.replace(/^.*[\\/]/, '');
-            const xmpResultModel = this._getDavXmpMeta(node);
 
+            // Prefer the Nextcloud Viewer integration when available
+            if (window.OCA?.Viewer?.open) {
+                window.OCA.Viewer.open({ path: node.path, fileInfo: node });
+                return;
+            }
+
+            // Legacy fallback: render in our own iframe
+            const xmpResultModel = this._getDavXmpMeta(node);
             this._showImage(node, view, dir, fileName, xmpResultModel);
         },
 

@@ -45,6 +45,9 @@ class AddScriptsAndStylesListener implements IEventListener {
 		// our file click handlers later than the viewer app
 		Util::addScript(Application::APP_NAME, 'functions', 'viewer');
 		Util::addScript(Application::APP_NAME, 'fileAction', 'viewer');
+		// Register our Vue component as an OCA.Viewer handler.
+		// This must also be loaded after the viewer app so OCA.Viewer is available.
+		Util::addScript(Application::APP_NAME, 'viewerHandler', 'viewer');
 		Util::addStyle(Application::APP_NAME, 'style');
 	}
 }
