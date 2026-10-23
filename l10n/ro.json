@@ -1,0 +1,9 @@
+{ "translations": {
+    "Photo Sphere Viewer" : "Vizualizator Photo Sphere",
+    "Enables viewing of google photosphere images" : "Permite vizualizarea imaginilor Google Photo Sphere",
+    "Enables viewing of google photosphere images by\n        integrating the photo-sphere-viewer.js component\n        into your nextcloud instance." : "Permite vizualizarea imaginilor Google Photo Sphere prin\n        integrarea componentei photo-sphere-viewer.js\n        în instanța ta Nextcloud.",
+    "Your browser doesn't support WebGL/WebGL2. Please enable WebGL/WebGL2 support in the browser settings." : "Browserul tău nu acceptă WebGL/WebGL2. Activează suportul WebGL/WebGL2 din setările browserului.",
+    "An error occured while trying to read xmp-data: " : "A apărut o eroare la citirea datelor XMP: ",
+    "An unknown error occured while trying to read xmp-data." : "A apărut o eroare necunoscută la citirea datelor XMP."
+},"pluralForm" :"nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));"
+}
